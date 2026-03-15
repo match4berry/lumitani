@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lumitani Platform</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            <img src="/logo.png" alt="LumiTani Logo">
+        </div>
+
+        <div class="menu">
+
+            <a href="/">Home</a>
+            <a href="/catalog">Produk</a>
+            <a href="#">Harga</a>
+            <a href="#">Tentang</a>
+
+        </div>
+
+        <div class="nav-right">
+
+            <% if(loggedIn){ %>
+
+                <span class="logged-in">Logged In</span>
+
+                <% } else { %>
+
+                    <a href="/login" class="btn-login">Login</a>
+
+                    <% } %>
+
+        </div>
+
+    </nav>
+
+    <section class="hero">
+
+        <img src="/logo.png" alt="Logo Lumitani" class="hero-logo">
+
+        <h1>Platform Harga Kolektif Pertanian</h1>
+
+        <p>
+            Lumitani membantu petani dan konsumen mendapatkan harga yang adil
+            melalui sistem harga kolektif dan transparansi harga.
+        </p>
+
+        <a href="/catalog">
+            <button class="btn-primary">Lihat Produk</button>
+        </a>
+
+    </section>
+
+    <section class="features">
+
+        <div class="card">
+            <h3>Harga Transparan</h3>
+            <p>Harga produk ditampilkan secara terbuka untuk semua pengguna.</p>
+        </div>
+
+        <div class="card">
+            <h3>Dukung Petani</h3>
+            <p>Petani dapat menjual produk dengan harga yang lebih adil.</p>
+        </div>
+
+        <div class="card">
+            <h3>Distribusi Efisien</h3>
+            <p>Menghubungkan petani dan konsumen secara langsung.</p>
+        </div>
+
+    </section>
+
+    <footer>
+        <p>© 2026 Lumitani Platform</p>
+    </footer>
+
+</body>
+
+</html>
