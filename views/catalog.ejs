@@ -1,23 +1,91 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="id">
 <head>
-    <title>Katalog Produk</title>
-    <link rel="stylesheet" href="/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm E-commerce - Katalog Produk</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/catalog.css">
 </head>
-
 <body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-placeholder">🌾 FARM CO</div>
+                </div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Cari produk..." id="searchInput">
+                    <button type="button">🔍</button>
+                </div>
+            </div>
+        </header>
 
-    <h1>Katalog Produk</h1>
+        <!-- Category Filter -->
+        <nav class="category-nav">
+            <a href="/catalog?category=all" class="category-btn <%= currentCategory === 'all' ? 'active' : '' %>">
+                Semua
+            </a>
+            <% categories.forEach(cat => { %>
+                <a href="/catalog?category=<%= cat %>" class="category-btn <%= currentCategory === cat ? 'active' : '' %>">
+                    <%= cat.charAt(0).toUpperCase() + cat.slice(1).replace('-', ' ') %>
+                </a>
+            <% }) %>
+        </nav>
 
-    <ul>
-        <li>Cabai Merah - Rp 35.000</li>
-        <li>Bawang Merah - Rp 25.000</li>
-        <li>Tomat - Rp 15.000</li>
-    </ul>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Products Grid -->
+            <div class="products-grid">
+                <% if (products && products.length > 0) { %>
+                    <% products.forEach(product => { %>
+                        <div class="product-card">
+                            <div class="product-image">
+                                <img src="<%= product.image %>" alt="<%= product.name %>">
+                            </div>
+                            <div class="product-info">
+                                <h3><%= product.name %></h3>
+                                <p class="category-label"><%= product.category %></p>
+                                <p class="price">Rp <%= product.price.toLocaleString('id-ID') %></p>
+                                <p class="stock">Stok: <%= product.stock %></p>
+                                <a href="/product/<%= product.id %>" class="btn-detail">Lihat Detail</a>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="no-products">
+                        <p>Tidak ada produk ditemukan</p>
+                    </div>
+                <% } %>
+            </div>
+        </main>
 
-    <a href="/">Kembali ke Home</a>
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="/" class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </a>
+            <a href="/catalog" class="nav-item">
+                <span class="nav-icon">📦</span>
+                <span class="nav-label">Katalog</span>
+            </a>
+            <a href="/cart" class="nav-item nav-center">
+                <span class="nav-icon">🛒</span>
+                <span class="nav-label">Keranjang</span>
+            </a>
+            <a href="/about" class="nav-item">
+                <span class="nav-icon">ℹ️</span>
+                <span class="nav-label">Tentang</span>
+            </a>
+            <a href="/profile" class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profil</span>
+            </a>
+        </nav>
+    </div>
 
+    <script src="/js/catalog.js"></script>
 </body>
-
 </html>
