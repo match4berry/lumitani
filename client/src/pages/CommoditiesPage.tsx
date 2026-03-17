@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api";
 import { showToast } from "../components/Toast";
-import { useSort, thSort } from "../hooks/useSort";
-import type { Commodity, Grade } from "../types";
+import type { Commodity, Grade, Product, CommodityPrice } from "../types";
 
 export default function CommoditiesPage() {
   const [commodities, setCommodities] = useState<Commodity[]>([]);
@@ -22,14 +21,18 @@ export default function CommoditiesPage() {
   const [editGradeCom, setEditGradeCom] = useState<number | "">("");
   const [editGradeName, setEditGradeName] = useState("");
   const [editGradeDesc, setEditGradeDesc] = useState("");
-  const comSort = useSort("id");
-  const gradeSort = useSort("id");
+  const [showAddCom, setShowAddCom] = useState(false);
+  const [showAddGrade, setShowAddGrade] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [prices, setPrices] = useState<CommodityPrice[]>([]);
 
   const load = async () => {
     try {
-      const [c, g] = await Promise.all([api.getCommodities(), api.getGrades()]);
+      const [c, g, p, pr] = await Promise.all([api.getCommodities(), api.getGrades(), api.getProducts(), api.getPrices()]);
       setCommodities(c);
       setGrades(g);
+      setProducts(p);
+      setPrices(pr);
     } catch (e: unknown) { setError(e instanceof Error ? e.message : "Failed"); }
   };
 
@@ -37,14 +40,14 @@ export default function CommoditiesPage() {
 
   const addCommodity = async (e: React.FormEvent) => {
     e.preventDefault(); setError("");
-    try { await api.createCommodity({ name: comName, description: comDesc }); setComName(""); setComDesc(""); load(); showToast("Komoditas berhasil ditambahkan", "success"); }
+    try { await api.createCommodity({ name: comName, description: comDesc }); setComName(""); setComDesc(""); setShowAddCom(false); load(); showToast("Komoditas berhasil ditambahkan", "success"); }
     catch (err: unknown) { setError(err instanceof Error ? err.message : "Failed"); }
   };
 
   const addGrade = async (e: React.FormEvent) => {
     e.preventDefault(); setError("");
     if (gradeCom === "") return;
-    try { await api.createGrade({ commodity_id: gradeCom, name: gradeName, description: gradeDesc }); setGradeName(""); setGradeDesc(""); load(); showToast("Grade berhasil ditambahkan", "success"); }
+    try { await api.createGrade({ commodity_id: gradeCom, name: gradeName, description: gradeDesc }); setGradeName(""); setGradeDesc(""); setShowAddGrade(false); load(); showToast("Grade berhasil ditambahkan", "success"); }
     catch (err: unknown) { setError(err instanceof Error ? err.message : "Failed"); }
   };
 
@@ -76,86 +79,179 @@ export default function CommoditiesPage() {
     catch (err: unknown) { setError(err instanceof Error ? err.message : "Failed"); }
   };
 
+  const getProductCount = (comId: number) => products.filter(p => p.commodity_id === comId).length;
+  const getActivePriceCount = (comId: number) => {
+    const comGrades = grades.filter(g => g.commodity_id === comId);
+    return prices.filter(p => p.is_active && comGrades.some(g => g.id === p.grade_id)).length;
+  };
+  const getGradesForCommodity = (comId: number) => grades.filter(g => g.commodity_id === comId);
+
+  const uniqueDescs = [...new Set(commodities.map(c => c.description).filter(Boolean))];
+
   return (
     <div>
-      <h2>Komoditas</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      <div className="page-header">
+        <div>
+          <h1>Manajemen Komoditas & Grade</h1>
+          <p className="page-subtitle">Kelola jenis komoditas dan klasifikasi grade</p>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button className="btn btn-primary" onClick={() => setShowAddCom(true)}>+ Tambah Komoditas</button>
+          <button className="btn btn-secondary" onClick={() => setShowAddGrade(true)}>+ Tambah Grade</button>
+        </div>
+      </div>
 
-      <form onSubmit={addCommodity} style={formRow}>
-        <input placeholder="Nama komoditas *" value={comName} onChange={(e) => setComName(e.target.value)} required style={inputStyle} />
-        <input placeholder="Deskripsi" value={comDesc} onChange={(e) => setComDesc(e.target.value)} style={inputStyle} />
-        <button type="submit" style={btnStyle}>Tambah Komoditas</button>
-      </form>
+      {error && <div className="alert alert-danger"><span>{error}</span></div>}
 
-      <table style={tableStyle}>
-        <thead><tr>
-          <th style={thSort} onClick={() => comSort.toggle("id")}>ID{comSort.arrow("id")}</th>
-          <th style={thSort} onClick={() => comSort.toggle("name")}>Nama{comSort.arrow("name")}</th>
-          <th style={thSort} onClick={() => comSort.toggle("description")}>Deskripsi{comSort.arrow("description")}</th>
-          <th></th>
-        </tr></thead>
-        <tbody>
-          {comSort.sorted(commodities).map((c) => (
-            <tr key={c.id}>
-              <td>{c.id}</td><td>{c.name}</td><td>{c.description}</td>
-              <td style={{ whiteSpace: "nowrap" }}>
-                <button onClick={() => openEditCom(c)} style={{ ...btnStyle, background: "#f59e0b", fontSize: 12, minWidth: 52 }}>Edit</button>{" "}
-                <button onClick={() => delCommodity(c.id)} style={{ ...dangerBtn, minWidth: 52 }}>Hapus</button>
-              </td>
-            </tr>
-          ))}
-          {commodities.length === 0 && <tr><td colSpan={4} style={{ textAlign: "center" }}>Belum ada komoditas</td></tr>}
-        </tbody>
-      </table>
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-card-header">
+            <span className="stat-card-title">Total Komoditas</span>
+            <div className="stat-card-icon" style={{ background: "#dcfce7" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+          </div>
+          <div className="stat-card-value">{commodities.length}</div>
+          <div className="stat-card-desc">Jenis komoditas terdaftar</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-header">
+            <span className="stat-card-title">Total Grade</span>
+            <div className="stat-card-icon" style={{ background: "#dbeafe" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+          </div>
+          <div className="stat-card-value">{grades.length}</div>
+          <div className="stat-card-desc">Klasifikasi grade tersedia</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-header">
+            <span className="stat-card-title">Kategori</span>
+            <div className="stat-card-icon" style={{ background: "#fef3c7" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            </div>
+          </div>
+          <div className="stat-card-value">{uniqueDescs.length || commodities.length}</div>
+          <div className="stat-card-desc">Kategori komoditas</div>
+        </div>
+      </div>
 
-      <h2 style={{ marginTop: 32 }}>Grade</h2>
+      <div className="commodity-cards">
+        {commodities.map((c) => {
+          const comGrades = getGradesForCommodity(c.id);
+          const prodCount = getProductCount(c.id);
+          const activePriceCount = getActivePriceCount(c.id);
+          return (
+            <div key={c.id} className="commodity-card">
+              <div className="commodity-card-header">
+                <div>
+                  <div style={{ fontSize: 18, fontWeight: 700 }}>{c.name}</div>
+                  {c.description && <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>{c.description}</div>}
+                </div>
+                <div className="action-buttons">
+                  <button className="btn-ghost" onClick={() => openEditCom(c)} title="Edit">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button className="btn-ghost" onClick={() => delCommodity(c.id)} title="Hapus" style={{ color: "#dc2626" }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div className="commodity-card-body">
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#64748b", marginBottom: 6 }}>Klasifikasi Grade ({comGrades.length})</div>
+                <div className="grade-badges">
+                  {comGrades.map(g => (
+                    <span key={g.id} className="grade-badge" style={{ cursor: "pointer" }} onClick={() => openEditGrade(g)} title={`Edit: ${g.name}`}>
+                      {g.name}
+                    </span>
+                  ))}
+                  {comGrades.length === 0 && <span style={{ fontSize: 12, color: "#94a3b8" }}>Belum ada grade</span>}
+                </div>
+                <div className="commodity-card-stats">
+                  <div className="commodity-stat">
+                    <div className="commodity-stat-label">Produk</div>
+                    <div className="commodity-stat-value">{prodCount}</div>
+                  </div>
+                  <div className="commodity-stat">
+                    <div className="commodity-stat-label">Harga Aktif</div>
+                    <div className="commodity-stat-value">{activePriceCount}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-      <form onSubmit={addGrade} style={formRow}>
-        <select value={gradeCom} onChange={(e) => setGradeCom(e.target.value ? Number(e.target.value) : "")} required style={inputStyle}>
-          <option value="">Pilih komoditas *</option>
-          {commodities.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
-        <input placeholder="Nama grade *" value={gradeName} onChange={(e) => setGradeName(e.target.value)} required style={inputStyle} />
-        <input placeholder="Deskripsi" value={gradeDesc} onChange={(e) => setGradeDesc(e.target.value)} style={inputStyle} />
-        <button type="submit" style={btnStyle}>Tambah Grade</button>
-      </form>
+      {commodities.length === 0 && (
+        <div className="card" style={{ padding: 40, textAlign: "center", color: "#94a3b8" }}>Belum ada komoditas</div>
+      )}
 
-      <table style={tableStyle}>
-        <thead><tr>
-          <th style={thSort} onClick={() => gradeSort.toggle("id")}>ID{gradeSort.arrow("id")}</th>
-          <th style={thSort} onClick={() => gradeSort.toggle("commodity_name")}>Komoditas{gradeSort.arrow("commodity_name")}</th>
-          <th style={thSort} onClick={() => gradeSort.toggle("name")}>Grade{gradeSort.arrow("name")}</th>
-          <th style={thSort} onClick={() => gradeSort.toggle("description")}>Deskripsi{gradeSort.arrow("description")}</th>
-          <th></th>
-        </tr></thead>
-        <tbody>
-          {gradeSort.sorted(grades).map((g) => (
-            <tr key={g.id}>
-              <td>{g.id}</td><td>{g.commodity_name}</td><td>{g.name}</td><td>{g.description}</td>
-              <td style={{ whiteSpace: "nowrap" }}>
-                <button onClick={() => openEditGrade(g)} style={{ ...btnStyle, background: "#f59e0b", fontSize: 12, minWidth: 52 }}>Edit</button>{" "}
-                <button onClick={() => delGrade(g.id)} style={{ ...dangerBtn, minWidth: 52 }}>Hapus</button>
-              </td>
-            </tr>
-          ))}
-          {grades.length === 0 && <tr><td colSpan={5} style={{ textAlign: "center" }}>Belum ada grade</td></tr>}
-        </tbody>
-      </table>
+      {/* Add Commodity modal */}
+      {showAddCom && (
+        <div className="modal-overlay" onClick={() => setShowAddCom(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Tambah Komoditas</h3>
+              <button className="modal-close" onClick={() => setShowAddCom(false)}>\u2715</button>
+            </div>
+            <form onSubmit={addCommodity} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div><label className="form-label">Nama Komoditas</label>
+                <input value={comName} onChange={(e) => setComName(e.target.value)} required className="form-input-full" placeholder="Nama komoditas" /></div>
+              <div><label className="form-label">Deskripsi / Kategori</label>
+                <input value={comDesc} onChange={(e) => setComDesc(e.target.value)} className="form-input-full" placeholder="Mis: Padi-padian, Sayuran" /></div>
+              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                <button type="submit" className="btn btn-primary">Simpan</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowAddCom(false)}>Batal</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Grade modal */}
+      {showAddGrade && (
+        <div className="modal-overlay" onClick={() => setShowAddGrade(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Tambah Grade</h3>
+              <button className="modal-close" onClick={() => setShowAddGrade(false)}>\u2715</button>
+            </div>
+            <form onSubmit={addGrade} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div><label className="form-label">Komoditas</label>
+                <select value={gradeCom} onChange={(e) => setGradeCom(e.target.value ? Number(e.target.value) : "")} required className="form-input-full">
+                  <option value="">Pilih komoditas *</option>
+                  {commodities.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select></div>
+              <div><label className="form-label">Nama Grade</label>
+                <input value={gradeName} onChange={(e) => setGradeName(e.target.value)} required className="form-input-full" placeholder="Mis: Premium, A, B" /></div>
+              <div><label className="form-label">Deskripsi</label>
+                <input value={gradeDesc} onChange={(e) => setGradeDesc(e.target.value)} className="form-input-full" placeholder="Deskripsi grade" /></div>
+              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                <button type="submit" className="btn btn-primary">Simpan</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowAddGrade(false)}>Batal</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Edit Commodity modal */}
       {editCom && (
-        <div onClick={() => setEditCom(null)} style={overlayStyle}>
-          <div onClick={(e) => e.stopPropagation()} style={modalStyle}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-              <h3 style={{ margin: 0 }}>Edit Komoditas</h3>
-              <button onClick={() => setEditCom(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#64748b" }}>✕</button>
+        <div className="modal-overlay" onClick={() => setEditCom(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Edit Komoditas</h3>
+              <button className="modal-close" onClick={() => setEditCom(null)}>\u2715</button>
             </div>
-            <form onSubmit={handleEditCom} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <label><span style={labelStyle}>Nama</span><input value={editComName} onChange={(e) => setEditComName(e.target.value)} required style={modalInputStyle} /></label>
-              <label><span style={labelStyle}>Deskripsi</span><input value={editComDesc} onChange={(e) => setEditComDesc(e.target.value)} style={modalInputStyle} /></label>
+            <form onSubmit={handleEditCom} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div><label className="form-label">Nama</label>
+                <input value={editComName} onChange={(e) => setEditComName(e.target.value)} required className="form-input-full" /></div>
+              <div><label className="form-label">Deskripsi</label>
+                <input value={editComDesc} onChange={(e) => setEditComDesc(e.target.value)} className="form-input-full" /></div>
               <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                <button type="submit" style={btnStyle}>Simpan</button>
-                <button type="button" onClick={() => setEditCom(null)} style={{ ...btnStyle, background: "#94a3b8" }}>Batal</button>
+                <button type="submit" className="btn btn-primary">Simpan</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setEditCom(null)}>Batal</button>
               </div>
             </form>
           </div>
@@ -164,25 +260,25 @@ export default function CommoditiesPage() {
 
       {/* Edit Grade modal */}
       {editGrade && (
-        <div onClick={() => setEditGrade(null)} style={overlayStyle}>
-          <div onClick={(e) => e.stopPropagation()} style={modalStyle}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-              <h3 style={{ margin: 0 }}>Edit Grade</h3>
-              <button onClick={() => setEditGrade(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#64748b" }}>✕</button>
+        <div className="modal-overlay" onClick={() => setEditGrade(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Edit Grade</h3>
+              <button className="modal-close" onClick={() => setEditGrade(null)}>\u2715</button>
             </div>
-            <form onSubmit={handleEditGrade} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <label>
-                <span style={labelStyle}>Komoditas</span>
-                <select value={editGradeCom} onChange={(e) => setEditGradeCom(e.target.value ? Number(e.target.value) : "")} required style={modalInputStyle}>
+            <form onSubmit={handleEditGrade} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div><label className="form-label">Komoditas</label>
+                <select value={editGradeCom} onChange={(e) => setEditGradeCom(e.target.value ? Number(e.target.value) : "")} required className="form-input-full">
                   <option value="">Pilih komoditas *</option>
                   {commodities.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </label>
-              <label><span style={labelStyle}>Nama Grade</span><input value={editGradeName} onChange={(e) => setEditGradeName(e.target.value)} required style={modalInputStyle} /></label>
-              <label><span style={labelStyle}>Deskripsi</span><input value={editGradeDesc} onChange={(e) => setEditGradeDesc(e.target.value)} style={modalInputStyle} /></label>
+                </select></div>
+              <div><label className="form-label">Nama Grade</label>
+                <input value={editGradeName} onChange={(e) => setEditGradeName(e.target.value)} required className="form-input-full" /></div>
+              <div><label className="form-label">Deskripsi</label>
+                <input value={editGradeDesc} onChange={(e) => setEditGradeDesc(e.target.value)} className="form-input-full" /></div>
               <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                <button type="submit" style={btnStyle}>Simpan</button>
-                <button type="button" onClick={() => setEditGrade(null)} style={{ ...btnStyle, background: "#94a3b8" }}>Batal</button>
+                <button type="submit" className="btn btn-primary">Simpan</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setEditGrade(null)}>Batal</button>
               </div>
             </form>
           </div>
@@ -191,19 +287,3 @@ export default function CommoditiesPage() {
     </div>
   );
 }
-
-const formRow: React.CSSProperties = { display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" };
-const inputStyle: React.CSSProperties = { padding: "6px 10px", borderRadius: 4, border: "1px solid #cbd5e1" };
-const btnStyle: React.CSSProperties = { padding: "6px 16px", borderRadius: 4, border: "none", background: "#2563eb", color: "#fff", cursor: "pointer" };
-const dangerBtn: React.CSSProperties = { ...btnStyle, background: "#dc2626" };
-const tableStyle: React.CSSProperties = { width: "100%", borderCollapse: "collapse", background: "#fff", borderRadius: 8, overflow: "hidden" };
-const overlayStyle: React.CSSProperties = {
-  position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)",
-  display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000,
-};
-const modalStyle: React.CSSProperties = {
-  background: "#fff", borderRadius: 12, padding: 24, width: "100%", maxWidth: 480,
-  maxHeight: "90vh", overflowY: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
-};
-const modalInputStyle: React.CSSProperties = { display: "block", width: "100%", padding: "8px 10px", borderRadius: 4, border: "1px solid #cbd5e1", marginTop: 4 };
-const labelStyle: React.CSSProperties = { fontSize: 13, fontWeight: 600, color: "#475569" };
