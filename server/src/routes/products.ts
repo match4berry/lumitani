@@ -24,6 +24,119 @@ router.get("/", async (_req: Request, res: Response) => {
   res.json(rows);
 });
 
+router.get("/data/:id", async(_req: Request, res: Response) => {
+  let productId = _req.params.id
+  
+  let params = [productId]
+  const {rows} = await pool.query(`
+    SELECT p.*,
+           f.name  AS farmer_name,
+           c.name  AS commodity_name,
+           g.name  AS grade_name,
+           cp.price AS current_price
+    FROM products p
+    JOIN farmers     f  ON f.id  = p.farmer_id
+    JOIN commodities c  ON c.id  = p.commodity_id
+    JOIN grades      g  ON g.id  = p.grade_id
+    LEFT JOIN commodity_prices cp
+      ON cp.grade_id  = p.grade_id
+     AND cp.is_active = TRUE
+     AND CURRENT_DATE BETWEEN cp.start_date AND cp.end_date
+    WHERE p.id = $1
+    ORDER BY p.created_at DESC LIMIT 1
+  `, params);
+
+
+
+
+  
+  if (rows.length == 0 ){
+    res.json({
+      status: 404,
+      message: "Not Found"
+    })
+    return
+  }
+
+
+  let response = {
+    data: {
+      items: rows[0]
+    }
+  }
+  res.json(response);
+})
+
+router.get("/data", async (_req: Request, res: Response) => {
+  let commodityId = _req.query.c_id
+  let response = {}
+
+  if(commodityId){
+
+    let params = [commodityId]
+    const productQuery = pool.query(`
+      SELECT p.*,
+            f.name  AS farmer_name,
+            c.name  AS commodity_name,
+            g.name  AS grade_name,
+            cp.price AS current_price
+      FROM products p
+      JOIN farmers     f  ON f.id  = p.farmer_id
+      JOIN commodities c  ON c.id  = p.commodity_id
+      JOIN grades      g  ON g.id  = p.grade_id
+      LEFT JOIN commodity_prices cp
+        ON cp.grade_id  = p.grade_id
+      AND cp.is_active = TRUE
+      AND CURRENT_DATE BETWEEN cp.start_date AND cp.end_date
+      WHERE p.commodity_id = $1
+      ORDER BY p.created_at DESC
+    `, params);
+
+    const commodityQuery = pool.query(`
+      SELECT * FROM commodities WHERE id = $1
+    `, params)
+
+
+    const [rowProducts, rowCommodity] = await Promise.all([productQuery, commodityQuery]);
+    
+    if (rowCommodity.rowCount == 0 ){
+      res.json({
+        status: 404,
+        message: "Not Found"
+      })
+      return
+    }
+    
+    const commodity = rowCommodity.rows[0]
+    const items = rowProducts.rows
+
+    response = {commodity, items}
+     
+  }else{
+     const {rows} = await pool.query(`
+      SELECT p.*,
+            f.name  AS farmer_name,
+            c.name  AS commodity_name,
+            g.name  AS grade_name,
+            cp.price AS current_price
+      FROM products p
+      JOIN farmers     f  ON f.id  = p.farmer_id
+      JOIN commodities c  ON c.id  = p.commodity_id
+      JOIN grades      g  ON g.id  = p.grade_id
+      LEFT JOIN commodity_prices cp
+        ON cp.grade_id  = p.grade_id
+      AND cp.is_active = TRUE
+      AND CURRENT_DATE BETWEEN cp.start_date AND cp.end_date
+      ORDER BY p.created_at DESC
+    `);
+
+    response = {items: rows}
+  }
+
+  
+  res.json(response);
+});
+
 // GET marketplace products (only active + must have active price)
 router.get("/marketplace", async (_req: Request, res: Response) => {
   const { rows } = await pool.query(`

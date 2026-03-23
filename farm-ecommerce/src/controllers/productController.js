@@ -32,6 +32,21 @@ const getProducts = () => {
   return products;
 };
 
+const fetchProducts = async (categoryId) => {
+  try {
+    
+    let endpoint = `http://localhost:8000/api/products/data`
+    if(categoryId){
+      endpoint = `${endpoint}?c_id=${categoryId}`
+    }
+    let res = await fetch(endpoint);
+    let data = await res.json()
+    return data
+  }catch (e) {
+    return e
+  }
+}
+
 const getProductById = (id) => {
   return products.find(p => p.id === id);
 };
@@ -44,5 +59,6 @@ const getProductsByCategory = (category) => {
 module.exports = {
   getProducts,
   getProductById,
-  getProductsByCategory
+  getProductsByCategory,
+  fetchProducts
 };

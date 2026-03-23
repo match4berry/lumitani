@@ -42,12 +42,12 @@
                     <% products.forEach(product => { %>
                         <div class="product-card">
                             <div class="product-image">
-                                <img src="<%= product.image %>" alt="<%= product.name %>">
+                                <img src="<%= product.photo_url %>" alt="<%= product.name %>">
                             </div>
                             <div class="product-info">
                                 <h3><%= product.name %></h3>
-                                <p class="category-label"><%= product.category %></p>
-                                <p class="price">Rp <%= product.price.toLocaleString('id-ID') %></p>
+                                <p class="category-label"><%= product.commodity_name %></p>
+                                <p class="price">Rp <%= product.current_price.toLocaleString('id-ID') %></p>
                                 <p class="stock">Stok: <%= product.stock %></p>
                                 <a href="/product/<%= product.id %>" class="btn-detail">Lihat Detail</a>
                             </div>

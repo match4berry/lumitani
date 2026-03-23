@@ -10,12 +10,35 @@ import productsRouter from "./routes/products";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+
+const corsOptions = {
+  origin: '*', // Allow only this origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  // Allow these headers in requests
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID'],
+  // Expose these headers to the browser
+  exposedHeaders: ['X-Total-Count', 'X-Page-Count'],
+  // Allow credentials (cookies, authorization headers)
+  credentials: true,
+  // Cache preflight requests for 24 hours
+  maxAge: 86400,
+};
+
+// const corsOptions = {
+//   origin: 'http://localhost:3000', // Only allow this origin
+//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow specific methods
+//   credentials: true, // Allow cookies/authorization headers if needed
+//   optionsSuccessStatus: 204 // Handle preflight requests
+// };
+
+
 app.use(express.json());
+app.use(cors(corsOptions));
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
+
 
 app.use("/api/farmers", farmersRouter);
 app.use("/api/commodities", commoditiesRouter);
@@ -26,7 +49,7 @@ app.use("/api/products", productsRouter);
 const start = async () => {
   try {
     await connectDB();
-    app.listen(PORT, () => {
+    app.listen(PORT, (data) => {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (err) {
@@ -35,4 +58,4 @@ const start = async () => {
   }
 };
 
-start();
+start()

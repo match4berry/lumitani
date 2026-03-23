@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const { getProducts, getProductById } = require('./controllers/productController');
+const { getProducts, getProductById, fetchProducts } = require('./controllers/productController');
 const { getCart, addToCart, removeFromCart } = require('./controllers/cartController');
 
 const app = express();
@@ -19,8 +19,15 @@ app.set('views', path.join(__dirname, '../views'));
 // Routes
 
 // Home page
-app.get('/', (req, res) => {
-  const products = getProducts();
+app.get('/', async (req, res) => {
+  // const products = getProducts();
+  let products = []
+  try {
+    let data = await fetchProducts()
+    products = data.items
+  }catch(err) {
+    console.log(err)
+  }
   const categories = ['sayuran', 'padi-padian', 'umbi-umbian', 'buah-buahan', 'bumbu-dapur'];
   res.render('catalog', { products, categories, currentCategory: 'all' });
 });
