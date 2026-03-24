@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const { getProducts, fetchProductById, fetchProducts, fetchCategories } = require('./controllers/productController');
 const { getCart, addToCart, removeFromCart } = require('./controllers/cartController');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
