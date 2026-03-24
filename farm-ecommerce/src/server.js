@@ -35,7 +35,7 @@ app.get('/', async (req, res) => {
     const mappingFuncCall = [callProducts, fetchCategories()]
     let [dataProducts, dataCategories] = await Promise.all(mappingFuncCall)
     products = dataProducts.items
-    categories = dataCategories.items || dataCategories || []
+    categories = Array.isArray(dataCategories) ? dataCategories : (dataCategories.items || [])
   }catch(err) {
     console.log(err)
   }
