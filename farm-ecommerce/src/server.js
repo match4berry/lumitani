@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const { getProducts, getProductById, fetchProducts } = require('./controllers/productController');
+const { getProducts, fetchProductById, fetchProducts, fetchCategories } = require('./controllers/productController');
 const { getCart, addToCart, removeFromCart } = require('./controllers/cartController');
 
 const app = express();
@@ -21,14 +21,24 @@ app.set('views', path.join(__dirname, '../views'));
 // Home page
 app.get('/', async (req, res) => {
   // const products = getProducts();
+  
   let products = []
   try {
-    let data = await fetchProducts()
-    products = data.items
+    var callProducts
+    if(req.query.category){
+
+      callProducts  = fetchProducts(req.query.category)
+    }else{
+      callProducts = fetchProducts()
+    }
+    const mappingFuncCall = [callProducts, fetchCategories()]
+    let [dataProducts, dataCategories] = await Promise.all(mappingFuncCall)
+    products = dataProducts.items
+    categories = dataCategories
   }catch(err) {
     console.log(err)
   }
-  const categories = ['sayuran', 'padi-padian', 'umbi-umbian', 'buah-buahan', 'bumbu-dapur'];
+  // const categories = ['sayuran', 'padi-padian', 'umbi-umbian', 'buah-buahan', 'bumbu-dapur'];
   res.render('catalog', { products, categories, currentCategory: 'all' });
 });
 
@@ -46,11 +56,17 @@ app.get('/catalog', (req, res) => {
 });
 
 // Product detail page
-app.get('/product/:id', (req, res) => {
-  const product = getProductById(parseInt(req.params.id));
-  
-  if (!product) {
-    return res.status(404).render('404');
+app.get('/product/:id', async (req, res) => {
+  let product = {}
+  try {
+    const {data} = await fetchProductById(req.params.id) 
+    
+    if (!data) {
+      return res.status(404).render('404');
+    }
+    product = data.items
+  } catch (error) {
+    console.log(error)
   }
   
   res.render('product-detail', { product });

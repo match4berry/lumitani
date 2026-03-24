@@ -1,3 +1,5 @@
+const e = require("express");
+
 const products = [
   // Sayuran
   { id: 1, name: 'Tomat Segar', category: 'sayuran', price: 15000, image: '/images/tomat.jpg', description: 'Tomat segar berkualitas premium langsung dari petani', stock: 50 },
@@ -47,6 +49,30 @@ const fetchProducts = async (categoryId) => {
   }
 }
 
+const fetchProductById = async (id) => {
+  let data = []
+  try { 
+    const endpoint = `http://localhost:8000/api/products/data/${id}`
+    let res = await fetch(endpoint)
+    data = await res.json()
+    return data
+  } catch (error) {
+    return e    
+  }
+}
+
+const fetchCategories = async () => {
+  let data = []
+  try {
+    const endpoint = `http://localhost:8000/api/commodities`
+    let res = await fetch(endpoint)
+    data = await res.json()
+    return data
+  } catch (error) {
+    return error    
+  }
+}
+
 const getProductById = (id) => {
   return products.find(p => p.id === id);
 };
@@ -60,5 +86,7 @@ module.exports = {
   getProducts,
   getProductById,
   getProductsByCategory,
-  fetchProducts
+  fetchProducts,
+  fetchProductById,
+  fetchCategories
 };

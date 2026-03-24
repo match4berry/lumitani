@@ -24,12 +24,12 @@
 
         <!-- Category Filter -->
         <nav class="category-nav">
-            <a href="/catalog?category=all" class="category-btn <%= currentCategory === 'all' ? 'active' : '' %>">
+            <a href="/" class="category-btn <%= currentCategory === 'all' ? 'active' : '' %>">
                 Semua
             </a>
             <% categories.forEach(cat => { %>
-                <a href="/catalog?category=<%= cat %>" class="category-btn <%= currentCategory === cat ? 'active' : '' %>">
-                    <%= cat.charAt(0).toUpperCase() + cat.slice(1).replace('-', ' ') %>
+                <a href="?category=<%= cat.id %>" class="category-btn <%= currentCategory === cat ? 'active' : '' %>">
+                    <%= cat.name.charAt(0).toUpperCase() + cat.name.slice(1).replace('-', ' ') %>
                 </a>
             <% }) %>
         </nav>

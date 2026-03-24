@@ -12,7 +12,7 @@
         <!-- Header -->
         <header class="header">
             <div class="header-back">
-                <a href="/catalog" class="btn-back">← Kembali</a>
+                <a href="/" class="btn-back">← Kembali</a>
             </div>
         </header>
 
@@ -20,15 +20,15 @@
         <main class="main-content">
             <div class="product-detail">
                 <div class="product-image-large">
-                    <img src="<%= product.image %>" alt="<%= product.name %>">
+                    <img src="<%= product.photo_url %>" alt="<%= product.name %>">
                 </div>
                 
                 <div class="product-details">
                     <h1><%= product.name %></h1>
-                    <p class="category-badge"><%= product.category %></p>
+                    <p class="category-badge"><%= product.commodity_name %></p>
                     
                     <div class="price-section">
-                        <span class="price">Rp <%= product.price.toLocaleString('id-ID') %></span>
+                        <span class="price">Rp <%= product.current_price.toLocaleString('id-ID') %></span>
                         <span class="stock-status <%= product.stock > 0 ? 'available' : 'unavailable' %>">
                             <%= product.stock > 0 ? 'Tersedia' : 'Habis' %>
                         </span>
