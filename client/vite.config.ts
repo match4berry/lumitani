@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
+    allowedHosts: ['elcyone.my.id', 'www.elcyone.my.id', 'localhost'],
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
