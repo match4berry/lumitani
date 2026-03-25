@@ -38,7 +38,7 @@ const getProducts = () => {
 const fetchProducts = async (categoryId) => {
   try {
     
-    let endpoint = `${process.env.API_URL}/api/products/data`
+    let endpoint = `${process.env.API_URL}/api/products`
     if(categoryId){
       endpoint = `${endpoint}?c_id=${categoryId}`
     }
@@ -53,7 +53,7 @@ const fetchProducts = async (categoryId) => {
 const fetchProductById = async (id) => {
   let data = []
   try { 
-    const endpoint = `${process.env.API_URL}/api/products/data/${id}`
+    const endpoint = `${process.env.API_URL}/api/products/${id}`
     let res = await fetch(endpoint)
     data = await res.json()
     return data
