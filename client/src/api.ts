@@ -1,4 +1,4 @@
-const API_URL = process.env.VITE_API_URL || 'http://elcyone.my.id:8000';
+const API_URL = process.env.VITE_API_URL || '/api';
 
 async function request<T>(url: string, opts?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${url}`, {
