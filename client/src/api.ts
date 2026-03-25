@@ -1,7 +1,7 @@
-const BASE = "http://127.0.0.1:8000/api";
+const API_URL = process.env.VITE_API_URL || 'http://elcyone.my.id:8000';
 
 async function request<T>(url: string, opts?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${url}`, {
+  const res = await fetch(`${API_URL}${url}`, {
     headers: { "Content-Type": "application/json" },
     ...opts,
   });
