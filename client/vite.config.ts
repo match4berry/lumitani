@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     port: 3000,
     allowedHosts: ['elcyone.my.id', 'www.elcyone.my.id', 'localhost'],
+    hmr: false,
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
