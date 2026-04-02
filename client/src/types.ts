@@ -39,6 +39,26 @@ export interface CommodityPrice {
   updated_at: string;
 }
 
+export type OrderStatus = 'menunggu_proses' | 'diproses' | 'dikirim' | 'selesai';
+
+export interface Order {
+  id: number;
+  order_code: string;
+  customer_name: string;
+  status: OrderStatus;
+  total_price: string;
+  order_date: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OrderStatusSummary {
+  menunggu_proses: number;
+  diproses: number;
+  dikirim: number;
+  selesai: number;
+}
+
 export interface Product {
   id: number;
   farmer_id: number;
