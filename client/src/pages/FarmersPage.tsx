@@ -28,6 +28,7 @@ export default function FarmersPage() {
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!confirm("Simpan data petani baru?")) return;
     setError("");
     try {
       await api.createFarmer({ name, phone, address });
@@ -48,8 +49,10 @@ export default function FarmersPage() {
   };
 
   const handleEdit = async (e: React.FormEvent) => {
-    e.preventDefault(); setError("");
+    e.preventDefault();
     if (!editFarmer) return;
+    if (!confirm("Simpan perubahan data petani?")) return;
+    setError("");
     try {
       await api.updateFarmer(editFarmer.id, { name: editName, phone: editPhone, address: editAddress, is_active: editIsActive });
       setEditFarmer(null); load();
@@ -158,7 +161,7 @@ export default function FarmersPage() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Tambah Petani</h3>
-              <button className="modal-close" onClick={() => setShowAddModal(false)}>\u2715</button>
+              <button className="modal-close" onClick={() => setShowAddModal(false)}>✕</button>
             </div>
             <form onSubmit={handleAdd} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div><label className="form-label">Nama</label>
@@ -182,7 +185,7 @@ export default function FarmersPage() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Edit Petani</h3>
-              <button className="modal-close" onClick={() => setEditFarmer(null)}>\u2715</button>
+              <button className="modal-close" onClick={() => setEditFarmer(null)}>✕</button>
             </div>
             <form onSubmit={handleEdit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div><label className="form-label">Nama</label>

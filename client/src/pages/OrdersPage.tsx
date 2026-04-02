@@ -81,6 +81,7 @@ export default function OrdersPage() {
   });
 
   const handleStatusChange = async (order: Order, newStatus: OrderStatus) => {
+    if (!confirm("Ubah status pesanan?")) return;
     try {
       await api.updateOrderStatus(order.id, newStatus);
       setStatusModalOrder(null);

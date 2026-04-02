@@ -39,30 +39,38 @@ export default function CommoditiesPage() {
   useEffect(() => { load(); }, []);
 
   const addCommodity = async (e: React.FormEvent) => {
-    e.preventDefault(); setError("");
+    e.preventDefault();
+    if (!confirm("Simpan komoditas baru?")) return;
+    setError("");
     try { await api.createCommodity({ name: comName, description: comDesc }); setComName(""); setComDesc(""); setShowAddCom(false); load(); showToast("Komoditas berhasil ditambahkan", "success"); }
     catch (err: unknown) { setError(err instanceof Error ? err.message : "Failed"); }
   };
 
   const addGrade = async (e: React.FormEvent) => {
-    e.preventDefault(); setError("");
+    e.preventDefault();
     if (gradeCom === "") return;
+    if (!confirm("Simpan grade baru?")) return;
+    setError("");
     try { await api.createGrade({ commodity_id: gradeCom, name: gradeName, description: gradeDesc }); setGradeName(""); setGradeDesc(""); setShowAddGrade(false); load(); showToast("Grade berhasil ditambahkan", "success"); }
     catch (err: unknown) { setError(err instanceof Error ? err.message : "Failed"); }
   };
 
   const openEditCom = (c: Commodity) => { setEditCom(c); setEditComName(c.name); setEditComDesc(c.description || ""); };
   const handleEditCom = async (e: React.FormEvent) => {
-    e.preventDefault(); setError("");
+    e.preventDefault();
     if (!editCom) return;
+    if (!confirm("Simpan perubahan komoditas?")) return;
+    setError("");
     try { await api.updateCommodity(editCom.id, { name: editComName, description: editComDesc }); setEditCom(null); load(); showToast("Komoditas berhasil diperbarui", "success"); }
     catch (err: unknown) { setError(err instanceof Error ? err.message : "Failed"); }
   };
 
   const openEditGrade = (g: Grade) => { setEditGrade(g); setEditGradeCom(g.commodity_id); setEditGradeName(g.name); setEditGradeDesc(g.description || ""); };
   const handleEditGrade = async (e: React.FormEvent) => {
-    e.preventDefault(); setError("");
+    e.preventDefault();
     if (!editGrade || editGradeCom === "") return;
+    if (!confirm("Simpan perubahan grade?")) return;
+    setError("");
     try { await api.updateGrade(editGrade.id, { commodity_id: editGradeCom, name: editGradeName, description: editGradeDesc }); setEditGrade(null); load(); showToast("Grade berhasil diperbarui", "success"); }
     catch (err: unknown) { setError(err instanceof Error ? err.message : "Failed"); }
   };
@@ -193,7 +201,7 @@ export default function CommoditiesPage() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Tambah Komoditas</h3>
-              <button className="modal-close" onClick={() => setShowAddCom(false)}>\u2715</button>
+              <button className="modal-close" onClick={() => setShowAddCom(false)}>✕</button>
             </div>
             <form onSubmit={addCommodity} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div><label className="form-label">Nama Komoditas</label>
@@ -215,7 +223,7 @@ export default function CommoditiesPage() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Tambah Grade</h3>
-              <button className="modal-close" onClick={() => setShowAddGrade(false)}>\u2715</button>
+              <button className="modal-close" onClick={() => setShowAddGrade(false)}>✕</button>
             </div>
             <form onSubmit={addGrade} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div><label className="form-label">Komoditas</label>
@@ -242,7 +250,7 @@ export default function CommoditiesPage() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Edit Komoditas</h3>
-              <button className="modal-close" onClick={() => setEditCom(null)}>\u2715</button>
+              <button className="modal-close" onClick={() => setEditCom(null)}>✕</button>
             </div>
             <form onSubmit={handleEditCom} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div><label className="form-label">Nama</label>
@@ -264,7 +272,7 @@ export default function CommoditiesPage() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Edit Grade</h3>
-              <button className="modal-close" onClick={() => setEditGrade(null)}>\u2715</button>
+              <button className="modal-close" onClick={() => setEditGrade(null)}>✕</button>
             </div>
             <form onSubmit={handleEditGrade} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div><label className="form-label">Komoditas</label>

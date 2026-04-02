@@ -35,8 +35,10 @@ export default function PricesPage() {
   useEffect(() => { load(); }, []);
 
   const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault(); setError("");
+    e.preventDefault();
     if (gradeId === "") return;
+    if (!confirm("Simpan harga baru?")) return;
+    setError("");
     try {
       await api.createPrice({ grade_id: gradeId, price: Number(price), start_date: startDate, end_date: endDate });
       setPrice(""); setStartDate(""); setEndDate("");
@@ -48,14 +50,16 @@ export default function PricesPage() {
   const openEdit = (p: CommodityPrice) => {
     setEditPrice(p);
     setEditPriceVal(String(p.price));
-    setEditStart(p.start_date);
-    setEditEnd(p.end_date);
+    setEditStart(p.start_date.slice(0, 10));
+    setEditEnd(p.end_date.slice(0, 10));
     setEditIsActive(p.is_active);
   };
 
   const handleEdit = async (e: React.FormEvent) => {
-    e.preventDefault(); setError("");
+    e.preventDefault();
     if (!editPrice) return;
+    if (!confirm("Simpan perubahan harga?")) return;
+    setError("");
     try {
       await api.updatePrice(editPrice.id, { price: Number(editPriceVal), start_date: editStart, end_date: editEnd, is_active: editIsActive });
       setEditPrice(null); load();
