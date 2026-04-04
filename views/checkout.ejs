@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Checkout - Lumitani</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- 🔙 Tombol back -->
+    <a href="/" class="back-btn">← Kembali</a>
+
+    <!-- Logo -->
+    <div style="text-align:center;">
+        <img src="/logo.png" class="logo">
+    </div>
+
+    <h2>Checkout</h2>
+    <p>Ringkasan pesanan kamu</p>
+
+    <div class="checkout-grid">
+
+        <!-- KIRI -->
+        <div>
+            <div class="card">
+                <h3>Ringkasan Pesanan</h3>
+
+                <div class="product">
+                    <div class="product-icon">🥬</div>
+                    <div class="product-info">
+                        <p>Bayam Organik</p>
+                        <small>Rp 10.000 x 1</small>
+                        <div class="price">Rp 10.000</div>
+                    </div>
+                </div>
+
+                <div class="product">
+                    <div class="product-icon">🥦</div>
+                    <div class="product-info">
+                        <p>Kangkung Segar</p>
+                        <small>Rp 10.000 x 1</small>
+                        <div class="price">Rp 10.000</div>
+                    </div>
+                </div>
+
+                <hr>
+                <p><b>Total: Rp 20.000</b></p>
+            </div>
+        </div>
+
+        <!-- KANAN -->
+        <div>
+            <form action="/order" method="POST">
+
+                <div class="card">
+                    <h3>Alamat Pengiriman</h3>
+
+                    <input type="text" name="name" placeholder="Nama Penerima" required>
+                    <input type="text" name="phone" placeholder="Nomor Telepon">
+
+                    <textarea name="address" placeholder="Alamat Lengkap" required></textarea>
+
+                    <div class="row">
+                        <input type="text" name="city" placeholder="Kota">
+                        <input type="text" name="postal" placeholder="Kode Pos">
+                    </div>
+                </div>
+
+                <div class="card payment">
+                    <h3>Metode Pembayaran</h3>
+
+                    <label><input type="radio" name="payment" value="bank" required> Transfer Bank</label>
+                    <label><input type="radio" name="payment" value="ewallet"> E-Wallet</label>
+                    <label><input type="radio" name="payment" value="cod"> COD</label>
+                </div>
+
+                <button type="submit">Order Now</button>
+
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Order Berhasil</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <a href="/checkout" class="back-btn">← Pesan Lagi</a>
+
+        <div style="text-align:center;">
+            <img src="/logo.png" class="logo">
+        </div>
+
+        <h2 class="success">Order Berhasil 🎉</h2>
+
+        <p>ID Order:</p>
+        <h3>
+            <%= order.id %>
+        </h3>
+
+        <p>Status:</p>
+        <h3>
+            <%= order.status %>
+        </h3>
+
+        <p>Total:</p>
+        <h3>Rp <%= order.total %>
+        </h3>
+
+        <a href="/">
+            <button>Kembali ke Beranda</button>
+        </a>
+
+    </div>
+
+</body>
+
+</html>
