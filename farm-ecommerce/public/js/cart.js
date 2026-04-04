@@ -60,6 +60,7 @@ function updateItemTotal(btn) {
 
     cartItem.querySelector('.total-price').textContent = `Rp ${total.toLocaleString('id-ID')}`;
     updateCartTotal();
+    updateCartBadge();
 }
 
 // Delete item from cart
@@ -67,6 +68,7 @@ function deleteItem(btn) {
     if (confirm('Yakin ingin menghapus item ini?')) {
         btn.closest('.cart-item').remove();
         updateCartTotal();
+        updateCartBadge();
 
         // Check if cart is empty
         const cartItems = document.querySelectorAll('.cart-item');
@@ -90,10 +92,24 @@ function updateCartTotal() {
     document.querySelector('.total-items').textContent = `sub total ${itemCount} item`;
 }
 
+// Update cart badge count
+function updateCartBadge() {
+    const cartBadge = document.getElementById('cart-badge');
+    const itemCount = document.querySelectorAll('.cart-item').length;
+
+    if (itemCount > 0) {
+        cartBadge.textContent = itemCount;
+        cartBadge.style.display = 'flex';
+    } else {
+        cartBadge.style.display = 'none';
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize cart total on load
     updateCartTotal();
+    updateCartBadge();
 
     // Initialize minus button styles for each item
     const qtyBtns = document.querySelectorAll('.qty-btn.minus');
