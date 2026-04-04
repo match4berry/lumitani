@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
-const { getProducts, fetchProductById, fetchProducts, fetchCategories } = require('./controllers/productController');
+const { getProducts, getProductById, fetchProductById, fetchProducts, fetchCategories } = require('./controllers/productController');
 const { getCart, addToCart, removeFromCart } = require('./controllers/cartController');
 require('dotenv').config();
 
