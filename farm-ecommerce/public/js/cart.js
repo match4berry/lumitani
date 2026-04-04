@@ -21,6 +21,7 @@ function decreaseQty(btn) {
     if (value > 1) {
         input.value = value - 1;
         updateItemTotal(btn);
+        updateMinusButtonStyle(btn);
     }
 }
 
@@ -30,6 +31,23 @@ function increaseQty(btn) {
     let value = parseInt(input.value);
     input.value = value + 1;
     updateItemTotal(btn);
+    updateMinusButtonStyle(btn);
+}
+
+// Update minus button style based on quantity
+function updateMinusButtonStyle(btn) {
+    const quantityDiv = btn.closest('.item-quantity');
+    const minusBtn = quantityDiv.querySelector('.qty-btn.minus');
+    const input = quantityDiv.querySelector('.qty-input');
+    const qty = parseInt(input.value);
+    
+    if (qty === 1) {
+        minusBtn.style.background = '#d1d5db';
+        minusBtn.style.cursor = 'not-allowed';
+    } else {
+        minusBtn.style.background = '#16a34a';
+        minusBtn.style.cursor = 'pointer';
+    }
 }
 
 // Update item total price
@@ -76,6 +94,18 @@ function updateCartTotal() {
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize cart total on load
     updateCartTotal();
+
+    // Initialize minus button styles for each item
+    const qtyBtns = document.querySelectorAll('.qty-btn.minus');
+    qtyBtns.forEach(btn => {
+        const input = btn.parentElement.querySelector('.qty-input');
+        const qty = parseInt(input.value);
+        if (qty === 1) {
+            btn.style.background = '#d1d5db';
+        } else {
+            btn.style.background = '#16a34a';
+        }
+    });
 
     // Add order now button functionality
     const orderBtn = document.querySelector('.btn-order-now');
