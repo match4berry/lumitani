@@ -4,6 +4,7 @@ const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 const { getProducts, getProductById, fetchProductById, fetchProducts, fetchCategories } = require('./controllers/productController');
 const { getCart, addToCart, removeFromCart } = require('./controllers/cartController');
+const orderRoutes = require('./routes/order');
 require('dotenv').config();
 
 const app = express();
@@ -100,6 +101,9 @@ app.get('/profile', (req, res) => {
 app.get('/alamat-pengiriman', (req, res) => {
   res.render('alamat-pengiriman');
 });
+
+// Order routes
+app.use(orderRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
