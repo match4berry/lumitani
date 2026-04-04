@@ -11,7 +11,7 @@
 
 .page-content {
     width: 100%;
-    padding: 0 0 100px 0;
+    padding: 0 0 80px 0;
     margin: 0;
     background: white;
 }
@@ -274,7 +274,7 @@
     }
 
     .page-content {
-        padding-bottom: 120px;
+        padding-bottom: 95px;
     }
 
     .categories-grid-home {
@@ -346,7 +346,7 @@
     }
 
     .page-content {
-        padding-bottom: 130px;
+        padding-bottom: 105px;
     }
 }
 
@@ -369,6 +369,6 @@
     }
 
     .page-content {
-        padding-bottom: 140px;
+        padding-bottom: 115px;
     }
 }
