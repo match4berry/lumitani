@@ -1,100 +1,65 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil Pengguna - Farm E-commerce</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/profile.css">
-</head>
-<body>
-    <div class="app-container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <h1>Profil Saya</h1>
+<% layout = 'layout' %>
+
+<header class="page-header">
+    <a href="/" class="back-button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    <h1>Profil Saya</h1>
+</header>
+
+<div class="page-content">
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="avatar">👤</div>
+            <h2>Pengguna LumiTani</h2>
+        </div>
+
+        <div class="profile-section">
+            <h3>Informasi Akun</h3>
+            <div class="info-item">
+                <label>Nama Lengkap:</label>
+                <p>Budi Santoso</p>
             </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="profile-container">
-                <div class="profile-header">
-                    <div class="avatar">👤</div>
-                    <h2>Pengguna Farm E-commerce</h2>
-                </div>
-
-                <div class="profile-section">
-                    <h3>Informasi Akun</h3>
-                    <div class="info-item">
-                        <label>Nama Lengkap:</label>
-                        <p>Budi Santoso</p>
-                    </div>
-                    <div class="info-item">
-                        <label>Email:</label>
-                        <p>budi@email.com</p>
-                    </div>
-                    <div class="info-item">
-                        <label>Nomor Telepon:</label>
-                        <p>+62 812 3456 7890</p>
-                    </div>
-                </div>
-
-                <div class="profile-section">
-                    <h3>Alamat Pengiriman</h3>
-                    <div class="info-item">
-                        <label>Alamat:</label>
-                        <p>Jl. Merdeka No. 123, Kelurahan Sejahtera</p>
-                    </div>
-                    <div class="info-item">
-                        <label>Kota:</label>
-                        <p>Jakarta Selatan</p>
-                    </div>
-                    <div class="info-item">
-                        <label>Kode Pos:</label>
-                        <p>12345</p>
-                    </div>
-                </div>
-
-                <div class="profile-section">
-                    <h3>Riwayat Pembelian</h3>
-                    <div class="purchase-history">
-                        <p>Anda belum ada riwayat pembelian</p>
-                    </div>
-                </div>
-
-                <div class="profile-actions">
-                    <button class="btn-edit">Edit Profil</button>
-                    <button class="btn-logout">Logout</button>
-                </div>
+            <div class="info-item">
+                <label>Email:</label>
+                <p>budi@email.com</p>
             </div>
-        </main>
+            <div class="info-item">
+                <label>Nomor Telepon:</label>
+                <p>+62 812 3456 7890</p>
+            </div>
+        </div>
 
-        <!-- Bottom Navigation -->
-        <nav class="bottom-nav">
-            <a href="/" class="nav-item">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-label">Home</span>
-            </a>
-            <a href="/catalog" class="nav-item">
-                <span class="nav-icon">📦</span>
-                <span class="nav-label">Katalog</span>
-            </a>
-            <a href="/cart" class="nav-item nav-center">
-                <span class="nav-icon">🛒</span>
-                <span class="nav-label">Keranjang</span>
-            </a>
-            <a href="/about" class="nav-item">
-                <span class="nav-icon">ℹ️</span>
-                <span class="nav-label">Tentang</span>
-            </a>
-            <a href="/profile" class="nav-item">
-                <span class="nav-icon">👤</span>
-                <span class="nav-label">Profil</span>
-            </a>
-        </nav>
+        <div class="profile-section">
+            <h3>Alamat Pengiriman</h3>
+            <div class="info-item">
+                <label>Alamat:</label>
+                <p>Jl. Merdeka No. 123, Kelurahan Sejahtera</p>
+            </div>
+            <div class="info-item">
+                <label>Kota:</label>
+                <p>Jakarta Selatan</p>
+            </div>
+            <div class="info-item">
+                <label>Kode Pos:</label>
+                <p>12345</p>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h3>Riwayat Pembelian</h3>
+            <div class="purchase-history">
+                <p>Anda belum ada riwayat pembelian</p>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <button class="btn btn-primary">Edit Profil</button>
+            <button class="btn btn-secondary">Logout</button>
+        </div>
     </div>
+</div>
 
-    <script src="/js/profile.js"></script>
-</body>
-</html>
+<script src="/js/profile.js"></script>

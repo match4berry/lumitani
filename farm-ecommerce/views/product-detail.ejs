@@ -1,90 +1,54 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= product.name %> - Farm E-commerce</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/product-detail.css">
-</head>
-<body>
-    <div class="app-container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-back">
-                <a href="/" class="btn-back">← Kembali</a>
+<% layout = 'layout' %>
+
+<header class="page-header">
+    <a href="/catalog" class="back-button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    <h1><%= product.name %></h1>
+</header>
+
+<div class="page-content">
+    <div class="product-detail">
+        <div class="product-image-large">
+            <img src="<%= product.photo_url || (product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/400') %>" alt="<%= product.name %>">
+        </div>
+        
+        <div class="product-details">
+            <p class="category-badge"><%= product.commodity_name || product.category %></p>
+            
+            <div class="price-section">
+                <span class="price">Rp <%= product.current_price ? product.current_price.toLocaleString('id-ID') : (product.price ? product.price.toLocaleString('id-ID') : '0') %></span>
+                <span class="stock-status <%= product.stock > 0 ? 'available' : 'unavailable' %>">
+                    <%= product.stock > 0 ? 'Tersedia' : 'Habis' %>
+                </span>
             </div>
-        </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="product-detail">
-                <div class="product-image-large">
-                    <img src="<%= product.photo_url %>" alt="<%= product.name %>">
-                </div>
-                
-                <div class="product-details">
-                    <h1><%= product.name %></h1>
-                    <p class="category-badge"><%= product.commodity_name %></p>
-                    
-                    <div class="price-section">
-                        <span class="price">Rp <%= product.current_price.toLocaleString('id-ID') %></span>
-                        <span class="stock-status <%= product.stock > 0 ? 'available' : 'unavailable' %>">
-                            <%= product.stock > 0 ? 'Tersedia' : 'Habis' %>
-                        </span>
-                    </div>
+            <p class="description"><%= product.description %></p>
 
-                    <p class="description"><%= product.description %></p>
+            <div class="stock-info">
+                <p>Stok tersedia: <strong><%= product.stock %></strong> unit</p>
+            </div>
 
-                    <div class="stock-info">
-                        <p>Stok tersedia: <strong><%= product.stock %></strong> unit</p>
-                    </div>
-
-                    <div class="quantity-selector">
-                        <label for="quantity">Jumlah:</label>
-                        <div class="quantity-control">
-                            <button id="decreaseQty" type="button">-</button>
-                            <input type="number" id="quantity" value="1" min="1" max="<%= product.stock %>">
-                            <button id="increaseQty" type="button">+</button>
-                        </div>
-                    </div>
-
-                    <% if (product.stock > 0) { %>
-                        <button id="addToCartBtn" class="btn-add-to-cart" data-product-id="<%= product.id %>">
-                            Tambah ke Keranjang
-                        </button>
-                    <% } else { %>
-                        <button class="btn-add-to-cart" disabled>Stok Habis</button>
-                    <% } %>
+            <div class="quantity-selector">
+                <label for="quantity">Jumlah:</label>
+                <div class="quantity-control">
+                    <button id="decreaseQty" type="button">-</button>
+                    <input type="number" id="quantity" value="1" min="1" max="<%= product.stock %>">
+                    <button id="increaseQty" type="button">+</button>
                 </div>
             </div>
-        </main>
 
-        <!-- Bottom Navigation -->
-        <nav class="bottom-nav">
-            <a href="/" class="nav-item">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-label">Home</span>
-            </a>
-            <a href="/catalog" class="nav-item">
-                <span class="nav-icon">📦</span>
-                <span class="nav-label">Katalog</span>
-            </a>
-            <a href="/cart" class="nav-item nav-center">
-                <span class="nav-icon">🛒</span>
-                <span class="nav-label">Keranjang</span>
-            </a>
-            <a href="/about" class="nav-item">
-                <span class="nav-icon">ℹ️</span>
-                <span class="nav-label">Tentang</span>
-            </a>
-            <a href="/profile" class="nav-item">
-                <span class="nav-icon">👤</span>
-                <span class="nav-label">Profil</span>
-            </a>
-        </nav>
+            <% if (product.stock > 0) { %>
+                <button id="addToCartBtn" class="btn btn-primary" data-product-id="<%= product.id %>">
+                    Tambah ke Keranjang
+                </button>
+            <% } else { %>
+                <button class="btn btn-primary" disabled>Stok Habis</button>
+            <% } %>
+        </div>
     </div>
+</div>
 
-    <script src="/js/product-detail.js"></script>
-</body>
-</html>
+<script src="/js/product-detail.js"></script>

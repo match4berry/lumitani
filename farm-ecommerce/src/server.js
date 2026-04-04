@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const expressLayouts = require('express-ejs-layouts');
 const { getProducts, fetchProductById, fetchProducts, fetchCategories } = require('./controllers/productController');
 const { getCart, addToCart, removeFromCart } = require('./controllers/cartController');
 require('dotenv').config();
@@ -13,21 +14,20 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Set view engine
+// Set view engine with layouts
+app.use(expressLayouts);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));
+app.set('layout', 'layout');
 
 // Routes
 
 // Home page
 app.get('/', async (req, res) => {
-  // const products = getProducts();
-  
   let products = []
   try {
     var callProducts
     if(req.query.category){
-
       callProducts  = fetchProducts(req.query.category)
     }else{
       callProducts = fetchProducts()
@@ -39,8 +39,7 @@ app.get('/', async (req, res) => {
   }catch(err) {
     console.log(err)
   }
-  // const categories = ['sayuran', 'padi-padian', 'umbi-umbian', 'buah-buahan', 'bumbu-dapur'];
-  res.render('catalog', { products, categories, currentCategory: 'all' });
+  res.render('landing', { products, categories, currentCategory: 'all' });
 });
 
 // Catalog with category filter

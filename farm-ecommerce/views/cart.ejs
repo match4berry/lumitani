@@ -1,53 +1,18 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keranjang Belanja - Farm E-commerce</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/cart.css">
-</head>
-<body>
-    <div class="app-container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <h1>Keranjang Belanja</h1>
-            </div>
-        </header>
+<% layout = 'layout' %>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <div id="cartContent">
-                <!-- Cart will be loaded here -->
-            </div>
-        </main>
+<header class="page-header">
+    <a href="/" class="back-button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    <h1>Keranjang Belanja</h1>
+</header>
 
-        <!-- Bottom Navigation -->
-        <nav class="bottom-nav">
-            <a href="/" class="nav-item">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-label">Home</span>
-            </a>
-            <a href="/catalog" class="nav-item">
-                <span class="nav-icon">📦</span>
-                <span class="nav-label">Katalog</span>
-            </a>
-            <a href="/cart" class="nav-item nav-center">
-                <span class="nav-icon">🛒</span>
-                <span class="nav-label">Keranjang</span>
-            </a>
-            <a href="/about" class="nav-item">
-                <span class="nav-icon">ℹ️</span>
-                <span class="nav-label">Tentang</span>
-            </a>
-            <a href="/profile" class="nav-item">
-                <span class="nav-icon">👤</span>
-                <span class="nav-label">Profil</span>
-            </a>
-        </nav>
+<div class="page-content">
+    <div id="cartContent">
+        <!-- Cart will be loaded here -->
     </div>
+</div>
 
-    <script src="/js/cart.js"></script>
-</body>
-</html>
+<script src="/js/cart.js"></script>
