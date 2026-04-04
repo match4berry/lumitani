@@ -6,46 +6,96 @@
             <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
     </a>
-    <h1>Katalog Produk</h1>
+    <h1>Beranda</h1>
 </header>
 
-<!-- Category Filter -->
-<div class="filter-section">
-    <div class="filter-chips">
-        <a href="/catalog" class="chip <%= currentCategory === 'all' ? 'active' : '' %>">Semua</a>
-        <% if (categories && categories.length > 0) { %>
-            <% categories.forEach(cat => { %>
-                <a href="/catalog?category=<%= cat %>" class="chip <%= currentCategory === cat ? 'active' : '' %>">
-                    <%= cat.charAt(0).toUpperCase() + cat.slice(1) %>
-                </a>
-            <% }); %>
+<!-- Main Content Container -->
+<div class="catalog-container">
+    <!-- Sidebar Filter -->
+    <aside class="catalog-sidebar">
+        <div class="sidebar-section">
+            <h3 class="sidebar-title">Urutkan</h3>
+            <div class="category-list">
+                <a href="/catalog" class="category-item <%= currentCategory === 'all' ? 'active' : '' %>">Semua</a>
+                <a href="/catalog?category=sayuran" class="category-item <%= currentCategory === 'sayuran' ? 'active' : '' %>">Sayur</a>
+                <a href="/catalog?category=buah" class="category-item <%= currentCategory === 'buah' ? 'active' : '' %>">Buah</a>
+                <a href="/catalog?category=umbi" class="category-item <%= currentCategory === 'umbi' ? 'active' : '' %>">Umbi</a>
+                <a href="/catalog?category=paket" class="category-item <%= currentCategory === 'paket' ? 'active' : '' %>">Paket Hemat</a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Products Grid -->
+    <div class="catalog-content">
+        <% if (products && products.length > 0) { %>
+            <div class="products-grid-catalog">
+                <% products.forEach(product => { %>
+                    <div class="product-card-catalog">
+                        <!-- Product Image -->
+                        <div class="product-image-wrapper">
+                            <img src="<%= product.photo_url || (product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/300') %>" alt="<%= product.name %>" class="product-image-catalog">
+                            
+                            <!-- Status Badges -->
+                            <div class="product-badges">
+                                <span class="badge badge-status">Tersedia</span>
+                                <span class="badge badge-grade">Premium</span>
+                            </div>
+                            
+                            <!-- Stock Info -->
+                            <div class="product-stock">
+                                <%= product.stock_qty || '0' %> Kg
+                            </div>
+                        </div>
+
+                        <!-- Product Details -->
+                        <div class="product-details-catalog">
+                            <h3 class="product-name-catalog"><%= product.name %></h3>
+                            <p class="product-description-catalog"><%= product.description ? product.description.substring(0, 80) + '...' : 'Produk organik berkualitas tinggi' %></p>
+
+                            <!-- Price Section -->
+                            <div class="price-section">
+                                <div class="product-price-catalog">
+                                    Rp <%= product.current_price ? product.current_price.toLocaleString('id-ID') : (product.price ? product.price.toLocaleString('id-ID') : '0') %>
+                                </div>
+                                <div class="price-unit">per 1/4 kg - (250g)</div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="product-actions">
+                                <a href="/product/<%= product.id %>" class="btn btn-detail">Detail</a>
+                                <button class="btn btn-order" onclick="addToCart('<%= product.id %>')">Beli Sekarang</button>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div class="empty-state">
+                <p>Tidak ada produk tersedia</p>
+            </div>
         <% } %>
     </div>
 </div>
 
-<!-- Products Grid -->
-<div class="page-content">
-    <% if (products && products.length > 0) { %>
-        <div class="products-grid">
-            <% products.forEach(product => { %>
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="<%= product.photo_url || (product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/200') %>" alt="<%= product.name %>">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-name"><%= product.name %></h3>
-                        <p class="product-description"><%= product.commodity_name || (product.description ? product.description.substring(0, 60) + '...' : '') %></p>
-                        <div class="product-footer">
-                            <span class="product-price">Rp <%= product.current_price ? product.current_price.toLocaleString('id-ID') : (product.price ? product.price.toLocaleString('id-ID') : '0') %></span>
-                            <a href="/product/<%= product.id %>" class="btn btn-small">Lihat</a>
-                        </div>
-                    </div>
-                </div>
-            <% }); %>
-        </div>
-    <% } else { %>
-        <div class="empty-state">
-            <p>Tidak ada produk tersedia</p>
-        </div>
-    <% } %>
-</div>
+<script>
+function addToCart(productId) {
+    fetch('/api/cart/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            productId: productId,
+            quantity: 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Produk berhasil ditambahkan ke keranjang!');
+            window.location.href = '/cart';
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
