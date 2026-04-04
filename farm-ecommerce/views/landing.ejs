@@ -1,85 +1,63 @@
 <% layout = 'layout' %>
 
-<!-- Hero Section -->
-<section class="hero">
+<!-- Hero Section with Green Banner -->
+<section class="hero-banner">
+    <div class="hero-badge">Segar!</div>
     <div class="hero-content">
-        <h1 class="hero-title">Sayuran Organik<br>Segar dari Petani</h1>
-        <p class="hero-subtitle">Langsung dari Desa ke Meja Anda</p>
-        <a href="/catalog" class="btn btn-primary">Belanja Sekarang</a>
+        <h1 class="hero-title">Langsung dari Petani Lokal</h1>
+        <p class="hero-subtitle">100% Organik • Harga Transparan • Segar Setiap Hari</p>
+        <a href="/catalog" class="hero-button">Belanja Sekarang ></a>
     </div>
-    <div class="hero-image">
-        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=800" alt="Fresh Vegetables">
-    </div>
-</section>
-
-<!-- Categories -->
-<section class="section">
-    <div class="section-header">
-        <h2 class="section-title">Kategori</h2>
-        <a href="/catalog" class="link-text">Lihat Semua</a>
-    </div>
-    <div class="categories-grid">
-        <a href="/?category=sayuran" class="category-card">
-            <span class="category-icon">🍃</span>
-            <span class="category-name">Sayuran</span>
-        </a>
-        <a href="/?category=buah" class="category-card">
-            <span class="category-icon">🍎</span>
-            <span class="category-name">Buah</span>
-        </a>
-        <a href="/?category=bumbu" class="category-card">
-            <span class="category-icon">🌶️</span>
-            <span class="category-name">Bumbu</span>
-        </a>
-        <a href="/catalog" class="category-card">
-            <span class="category-icon">📦</span>
-            <span class="category-name">Semua</span>
-        </a>
+    <div class="hero-decorations">
+        <span class="decoration top-right">◯</span>
+        <span class="decoration bottom-left">◯</span>
     </div>
 </section>
 
-<!-- Featured Products -->
+<!-- Best Seller Section -->
 <% if (products && products.length > 0) { %>
-<section class="section">
+<section class="best-seller-section">
     <div class="section-header">
-        <h2 class="section-title">Produk Tersedia</h2>
-        <a href="/catalog" class="link-text">Lihat Semua</a>
+        <h2 class="section-title">⭐ Best Seller</h2>
+        <a href="/catalog" class="link-text">Lihat Semua ></a>
     </div>
-    <div class="products-grid">
+    <div class="products-scroll">
         <% products.slice(0, 6).forEach(product => { %>
-            <div class="product-card">
+            <div class="product-card-home">
+                <div class="product-badge">Best</div>
                 <div class="product-image">
-                    <img src="<%= product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/200' %>" alt="<%= product.name %>">
+                    <img src="<%= product.photo_url || (product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/200') %>" alt="<%= product.name %>">
                 </div>
-                <div class="product-info">
-                    <h3 class="product-name"><%= product.name %></h3>
-                    <p class="product-description"><%= product.description ? product.description.substring(0, 50) + '...' : '' %></p>
-                    <div class="product-footer">
-                        <span class="product-price">Rp <%= product.price ? product.price.toLocaleString('id-ID') : '0' %></span>
-                        <a href="/product/<%= product.id %>" class="btn btn-small">Lihat</a>
-                    </div>
-                </div>
+                <div class="product-name"><%= product.name %></div>
+                <div class="product-price">Rp <%= product.current_price ? product.current_price.toLocaleString('id-ID') : (product.price ? product.price.toLocaleString('id-ID') : '0') %>/kg</div>
             </div>
         <% }); %>
     </div>
 </section>
 <% } %>
 
-<!-- Features Section -->
-<section class="features-section">
-    <div class="feature-card">
-        <div class="feature-icon">🌿</div>
-        <h3 class="feature-title">100% Organik</h3>
-        <p class="feature-text">Tanpa pestisida kimia</p>
+<!-- Category Section -->
+<section class="category-section">
+    <div class="section-header">
+        <h2 class="section-title">🌾 Kategori Produk</h2>
+        <a href="/catalog" class="link-text">Lihat Semua ></a>
     </div>
-    <div class="feature-card">
-        <div class="feature-icon">🚜</div>
-        <h3 class="feature-title">Dari Petani</h3>
-        <p class="feature-text">Langsung dari kebun</p>
-    </div>
-    <div class="feature-card">
-        <div class="feature-icon">📦</div>
-        <h3 class="feature-title">Antar Cepat</h3>
-        <p class="feature-text">Segar sampai rumah</p>
+    <div class="categories-grid-home">
+        <a href="/?category=sayuran" class="category-card-home" style="background: #D1F4E0;">
+            <span class="category-emoji">🥬</span>
+            <span class="category-label">Sayuran Hijau</span>
+        </a>
+        <a href="/?category=buah" class="category-card-home" style="background: #FFD6E8;">
+            <span class="category-emoji">🍅</span>
+            <span class="category-label">Buah-buahan</span>
+        </a>
+        <a href="/?category=umbi" class="category-card-home" style="background: #FFF4D6;">
+            <span class="category-emoji">🥕</span>
+            <span class="category-label">Umbi-umbian</span>
+        </a>
+        <a href="/?category=bumbu" class="category-card-home" style="background: #D1F4E0;">
+            <span class="category-emoji">🌿</span>
+            <span class="category-label">Bumbu Dapur</span>
+        </a>
     </div>
 </section>
