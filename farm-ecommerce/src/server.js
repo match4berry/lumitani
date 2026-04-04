@@ -56,17 +56,11 @@ app.get('/catalog', (req, res) => {
 });
 
 // Product detail page
-app.get('/product/:id', async (req, res) => {
-  let product = {}
-  try {
-    const {data} = await fetchProductById(req.params.id) 
-    
-    if (!data) {
-      return res.status(404).render('404');
-    }
-    product = data.items
-  } catch (error) {
-    console.log(error)
+app.get('/product/:id', (req, res) => {
+  const product = getProductById(parseInt(req.params.id));
+  
+  if (!product) {
+    return res.status(404).render('404');
   }
   
   res.render('product-detail', { product });

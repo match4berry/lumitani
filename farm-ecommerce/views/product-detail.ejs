@@ -16,12 +16,12 @@
         <!-- Left: Product Images -->
         <div class="product-images-section">
             <div class="product-image-main">
-                <img id="mainImage" src="<%= product.photo_url || (product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/500') %>" alt="<%= product.name %>">
+                <img id="mainImage" src="<%= product.image || 'https://via.placeholder.com/500' %>" alt="<%= product.name %>">
             </div>
             <div class="product-thumbnails">
                 <% for (let i = 0; i < 4; i++) { %>
                     <div class="thumbnail <%= i === 0 ? 'active' : '' %>" onclick="changeImage(this)">
-                        <img src="<%= product.photo_url || (product.images && product.images[i % (product.images ? product.images.length : 1)] ? product.images[i % (product.images ? product.images.length : 1)] : 'https://via.placeholder.com/100') %>" alt="Thumbnail <%= i + 1 %>">
+                        <img src="<%= product.image || 'https://via.placeholder.com/100' %>" alt="Thumbnail <%= i + 1 %>">
                     </div>
                 <% } %>
             </div>
@@ -113,7 +113,7 @@
 
             <!-- Price Section -->
             <div class="price-section">
-                <span class="price-text">Rp <%= product.current_price ? product.current_price.toLocaleString('id-ID') : (product.price ? product.price.toLocaleString('id-ID') : '10.000') %></span>
+                <span class="price-text">Rp <%= (product.price || 10000).toLocaleString('id-ID') %></span>
                 <span class="price-unit">per 1/4 kg (250g)</span>
             </div>
 
