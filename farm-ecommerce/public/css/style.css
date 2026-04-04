@@ -774,13 +774,34 @@ small { font-size: 0.875rem; }
     margin-top: 1rem;
 }
 
-.checkout-grid > div {
+.checkout-grid > div:first-child {
     display: flex;
     flex-direction: column;
 }
 
 .checkout-grid > div:first-child .card {
     flex: 1;
+    padding: 1.5rem;
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    background: white;
+    overflow: visible;
+    width: 100%;
+}
+
+.checkout-grid > div:last-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.checkout-grid > div:last-child .card {
+    padding: 1.5rem;
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    background: white;
+    overflow: visible;
+    width: 100%;
+    flex: none;
 }
 
 .checkout-grid .card {
