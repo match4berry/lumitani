@@ -202,32 +202,40 @@ small { font-size: 0.875rem; }
     background: var(--color-green-600);
     color: white;
     border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    padding: 0;
-    margin-top: -30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0;
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
-    flex-direction: column;
+    width: 70px !important;
+    height: 70px !important;
+    min-width: 70px;
+    min-height: 70px;
+    padding: 0 !important;
+    margin-top: -35px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 !important;
+    box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+    flex-direction: column !important;
+    transition: all 0.3s ease;
 }
 
 .nav-cart-center:hover {
     background: var(--color-green-700);
     color: white;
-    transform: scale(1.1);
+    transform: scale(1.15) translateY(-5px);
+    box-shadow: 0 8px 25px rgba(22, 163, 74, 0.5);
 }
 
 .nav-icon {
     width: 1.5rem;
     height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .nav-cart-center .nav-icon {
     width: 2rem;
     height: 2rem;
+    margin: 0 auto;
 }
 
 .nav-label {

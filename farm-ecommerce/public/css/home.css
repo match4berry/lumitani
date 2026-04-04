@@ -11,7 +11,7 @@
 
 .page-content {
     width: 100%;
-    padding: 0 0 120px 0;
+    padding: 0 0 200px 0;
     margin: 0;
     background: white;
 }
@@ -197,10 +197,11 @@
 /* Category Section */
 .category-section {
     width: 100%;
-    padding: 1.5rem;
+    padding: 1.5rem 1.5rem 3rem 1.5rem;
     background: white;
     margin: 0;
     border-top: 1px solid #e5e7eb;
+    margin-bottom: 2rem;
 }
 
 .categories-grid-home {
