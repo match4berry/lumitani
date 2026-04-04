@@ -109,28 +109,6 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Farmer Group */
-.cart-item-group {
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.cart-item-group:last-child {
-    border-bottom: none;
-}
-
-.farmer-header {
-    background: #f9fafb;
-    padding: 1.25rem 1.5rem;
-    border-bottom: 2px solid #e5e7eb;
-}
-
-.farmer-name {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #111827;
-    margin: 0;
-}
-
 /* Individual Cart Item */
 .cart-item {
     display: grid;

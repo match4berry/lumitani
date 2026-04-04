@@ -3,20 +3,15 @@
 // Filter cart items by category
 function filterCart(category) {
     const filterBtns = document.querySelectorAll('.filter-btn');
-    const cartItems = document.querySelectorAll('.cart-item-group');
+    const cartItems = document.querySelectorAll('.cart-item');
 
     // Update active button
     filterBtns.forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
 
-    // Filter items
-    if (category === 'all') {
-        cartItems.forEach(item => item.style.display = 'block');
-    } else {
-        cartItems.forEach(item => {
-            item.style.display = 'block'; // Show all farmers for now
-        });
-    }
+    // Show/hide items based on category
+    // For demo purposes, all items are shown
+    // In real app, this would filter by product category
 }
 
 // Decrease quantity

@@ -21,7 +21,7 @@
                     <button class="filter-btn" onclick="filterCart('sayuran')">Sayur</button>
                     <button class="filter-btn" onclick="filterCart('buah-buahan')">Buah</button>
                     <button class="filter-btn" onclick="filterCart('umbi-umbian')">Umbi</button>
-                    <button class="filter-btn" onclick="filterCart('bumbu-dapur')">Paket Hemat</button>
+                    <button class="filter-btn" onclick="filterCart('bumbu-dapur')">Bumbu Dapur</button>
                 </div>
             </div>
         </aside>
@@ -30,130 +30,116 @@
         <div class="cart-main">
             <!-- Cart Items -->
             <div class="cart-items">
-                <!-- Sample cart items - will be replaced with dynamic content -->
-                <div class="cart-item-group">
-                    <div class="farmer-header">
-                        <h3 class="farmer-name">Pak Budi - Desa Manud Jaya</h3>
+                <!-- Item 1 -->
+                <div class="cart-item">
+                    <div class="item-checkbox">
+                        <input type="checkbox" class="item-check" checked>
                     </div>
-
-                    <!-- Item 1 -->
-                    <div class="cart-item">
-                        <div class="item-checkbox">
-                            <input type="checkbox" class="item-check" checked>
-                        </div>
-                        <div class="item-image">
-                            <img src="/images/rawit.jpg" alt="Rawit Merah Super">
-                        </div>
-                        <div class="item-info">
-                            <h4 class="item-name">Rawit Merah Super</h4>
-                            <p class="item-price">Rp 10.000 / 250g</p>
-                        </div>
-                        <div class="item-quantity">
-                            <button class="qty-btn" onclick="decreaseQty(this)">−</button>
-                            <input type="number" class="qty-input" value="1" min="1">
-                            <button class="qty-btn" onclick="increaseQty(this)">+</button>
-                        </div>
-                        <div class="item-total">
-                            <div class="total-label">Total</div>
-                            <div class="total-price">Rp 10.000</div>
-                        </div>
-                        <button class="item-delete" onclick="deleteItem(this)">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                            </svg>
-                        </button>
+                    <div class="item-image">
+                        <img src="/images/rawit.jpg" alt="Rawit Merah Super">
                     </div>
-
-                    <!-- Item 2 -->
-                    <div class="cart-item">
-                        <div class="item-checkbox">
-                            <input type="checkbox" class="item-check" checked>
-                        </div>
-                        <div class="item-image">
-                            <img src="/images/tomat.jpg" alt="Tomat Merah Manud Jaya">
-                        </div>
-                        <div class="item-info">
-                            <h4 class="item-name">Tomat Merah Manud Jaya - Kualitas I...</h4>
-                            <p class="item-price">Rp 15.000 / 250g</p>
-                        </div>
-                        <div class="item-quantity">
-                            <button class="qty-btn" onclick="decreaseQty(this)">−</button>
-                            <input type="number" class="qty-input" value="2" min="1">
-                            <button class="qty-btn" onclick="increaseQty(this)">+</button>
-                        </div>
-                        <div class="item-total">
-                            <div class="total-label">Total</div>
-                            <div class="total-price">Rp 30.000</div>
-                        </div>
-                        <button class="item-delete" onclick="deleteItem(this)">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                            </svg>
-                        </button>
+                    <div class="item-info">
+                        <h4 class="item-name">Rawit Merah Super</h4>
+                        <p class="item-price">Rp 10.000 / 250g</p>
                     </div>
+                    <div class="item-quantity">
+                        <button class="qty-btn" onclick="decreaseQty(this)">−</button>
+                        <input type="number" class="qty-input" value="1" min="1">
+                        <button class="qty-btn" onclick="increaseQty(this)">+</button>
+                    </div>
+                    <div class="item-total">
+                        <div class="total-label">Total</div>
+                        <div class="total-price">Rp 10.000</div>
+                    </div>
+                    <button class="item-delete" onclick="deleteItem(this)">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
                 </div>
 
-                <!-- Second Farmer Group -->
-                <div class="cart-item-group">
-                    <div class="farmer-header">
-                        <h3 class="farmer-name">Pak Suparman - Desa Manud Jaya</h3>
+                <!-- Item 2 -->
+                <div class="cart-item">
+                    <div class="item-checkbox">
+                        <input type="checkbox" class="item-check" checked>
                     </div>
+                    <div class="item-image">
+                        <img src="/images/tomat.jpg" alt="Tomat Merah Manud Jaya">
+                    </div>
+                    <div class="item-info">
+                        <h4 class="item-name">Tomat Merah Manud Jaya - Kualitas I...</h4>
+                        <p class="item-price">Rp 15.000 / 250g</p>
+                    </div>
+                    <div class="item-quantity">
+                        <button class="qty-btn" onclick="decreaseQty(this)">−</button>
+                        <input type="number" class="qty-input" value="2" min="1">
+                        <button class="qty-btn" onclick="increaseQty(this)">+</button>
+                    </div>
+                    <div class="item-total">
+                        <div class="total-label">Total</div>
+                        <div class="total-price">Rp 30.000</div>
+                    </div>
+                    <button class="item-delete" onclick="deleteItem(this)">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </div>
 
-                    <!-- Item 3 -->
-                    <div class="cart-item">
-                        <div class="item-checkbox">
-                            <input type="checkbox" class="item-check" checked>
-                        </div>
-                        <div class="item-image">
-                            <img src="/images/mentimun.jpg" alt="Mentimun Lokal">
-                        </div>
-                        <div class="item-info">
-                            <h4 class="item-name">Mentimun Lokal Manud Jaya</h4>
-                            <p class="item-price">Rp 3.000 / 250g</p>
-                        </div>
-                        <div class="item-quantity">
-                            <button class="qty-btn" onclick="decreaseQty(this)">−</button>
-                            <input type="number" class="qty-input" value="1" min="1">
-                            <button class="qty-btn" onclick="increaseQty(this)">+</button>
-                        </div>
-                        <div class="item-total">
-                            <div class="total-label">Total</div>
-                            <div class="total-price">Rp 3.000</div>
-                        </div>
-                        <button class="item-delete" onclick="deleteItem(this)">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                            </svg>
-                        </button>
+                <!-- Item 3 -->
+                <div class="cart-item">
+                    <div class="item-checkbox">
+                        <input type="checkbox" class="item-check" checked>
                     </div>
+                    <div class="item-image">
+                        <img src="/images/mentimun.jpg" alt="Mentimun Lokal">
+                    </div>
+                    <div class="item-info">
+                        <h4 class="item-name">Mentimun Lokal Manud Jaya</h4>
+                        <p class="item-price">Rp 3.000 / 250g</p>
+                    </div>
+                    <div class="item-quantity">
+                        <button class="qty-btn" onclick="decreaseQty(this)">−</button>
+                        <input type="number" class="qty-input" value="1" min="1">
+                        <button class="qty-btn" onclick="increaseQty(this)">+</button>
+                    </div>
+                    <div class="item-total">
+                        <div class="total-label">Total</div>
+                        <div class="total-price">Rp 3.000</div>
+                    </div>
+                    <button class="item-delete" onclick="deleteItem(this)">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </div>
 
-                    <!-- Item 4 -->
-                    <div class="cart-item">
-                        <div class="item-checkbox">
-                            <input type="checkbox" class="item-check" checked>
-                        </div>
-                        <div class="item-image">
-                            <img src="/images/wortel.jpg" alt="Wortel Manud Jaya">
-                        </div>
-                        <div class="item-info">
-                            <h4 class="item-name">Wortel Manud Jaya - Kualitas Import</h4>
-                            <p class="item-price">Rp 8.000 / 250g</p>
-                        </div>
-                        <div class="item-quantity">
-                            <button class="qty-btn" onclick="decreaseQty(this)">−</button>
-                            <input type="number" class="qty-input" value="4" min="1">
-                            <button class="qty-btn" onclick="increaseQty(this)">+</button>
-                        </div>
-                        <div class="item-total">
-                            <div class="total-label">Total</div>
-                            <div class="total-price">Rp 32.000</div>
-                        </div>
-                        <button class="item-delete" onclick="deleteItem(this)">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                            </svg>
-                        </button>
+                <!-- Item 4 -->
+                <div class="cart-item">
+                    <div class="item-checkbox">
+                        <input type="checkbox" class="item-check" checked>
                     </div>
+                    <div class="item-image">
+                        <img src="/images/wortel.jpg" alt="Wortel Manud Jaya">
+                    </div>
+                    <div class="item-info">
+                        <h4 class="item-name">Wortel Manud Jaya - Kualitas Import</h4>
+                        <p class="item-price">Rp 8.000 / 250g</p>
+                    </div>
+                    <div class="item-quantity">
+                        <button class="qty-btn" onclick="decreaseQty(this)">−</button>
+                        <input type="number" class="qty-input" value="4" min="1">
+                        <button class="qty-btn" onclick="increaseQty(this)">+</button>
+                    </div>
+                    <div class="item-total">
+                        <div class="total-label">Total</div>
+                        <div class="total-price">Rp 32.000</div>
+                    </div>
+                    <button class="item-delete" onclick="deleteItem(this)">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
