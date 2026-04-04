@@ -95,10 +95,14 @@ function updateCartTotal() {
 // Update cart badge count
 function updateCartBadge() {
     const cartBadge = document.getElementById('cart-badge');
-    const itemCount = document.querySelectorAll('.cart-item').length;
+    
+    // Count total quantity (sum of all qty inputs), not just number of items
+    const qty = Array.from(document.querySelectorAll('.qty-input')).reduce((sum, input) => {
+        return sum + parseInt(input.value || 0);
+    }, 0);
 
-    if (itemCount > 0) {
-        cartBadge.textContent = itemCount;
+    if (qty > 0) {
+        cartBadge.textContent = qty;
         cartBadge.style.display = 'flex';
     } else {
         cartBadge.style.display = 'none';
