@@ -1065,6 +1065,26 @@ small { font-size: 0.875rem; }
 }
 
 /* ===== ORDER SUCCESS PAGE ===== */
+.logo-container {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.logo {
+    max-width: 100px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+}
+
+.order-success-card .logo {
+    max-width: 90px;
+    margin-bottom: 1rem;
+}
+
+.container > .logo-container {
+    margin: 1.5rem auto 2rem;
+}
 .order-success-card {
     background: white;
     border-radius: var(--radius-xl);
