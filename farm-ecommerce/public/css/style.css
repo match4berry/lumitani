@@ -881,15 +881,11 @@ small { font-size: 0.875rem; }
     margin: 0;
 }
 
-.checkout-grid form {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.checkout-grid form > .card:first-of-type {
+.checkout-grid form > .card {
     display: block !important;
     width: 100%;
+    padding: 1.5rem;
+    box-sizing: border-box;
 }
 
 .checkout-grid input[type="text"],
@@ -913,6 +909,8 @@ small { font-size: 0.875rem; }
 .checkout-grid textarea {
     min-height: 100px;
     resize: vertical;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .checkout-grid input[type="text"]:focus,
