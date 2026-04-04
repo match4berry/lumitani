@@ -171,6 +171,7 @@ small { font-size: 0.875rem; }
     border-top: 1px solid var(--color-gray-200);
     display: flex;
     justify-content: space-around;
+    align-items: center;
     padding: 0.5rem 0;
     z-index: 50;
     width: 100%;
@@ -182,11 +183,13 @@ small { font-size: 0.875rem; }
     flex-direction: column;
     align-items: center;
     gap: 0.25rem;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.75rem;
     text-decoration: none;
     color: var(--color-gray-500);
     transition: color 0.2s;
     position: relative;
+    flex: 1;
+    justify-content: center;
 }
 
 .nav-item:hover,
@@ -194,14 +197,46 @@ small { font-size: 0.875rem; }
     color: var(--color-green-600);
 }
 
+/* Cart Center Styling */
+.nav-cart-center {
+    background: var(--color-green-600);
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    margin-top: -30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    flex-direction: column;
+}
+
+.nav-cart-center:hover {
+    background: var(--color-green-700);
+    color: white;
+    transform: scale(1.1);
+}
+
 .nav-icon {
     width: 1.5rem;
     height: 1.5rem;
 }
 
+.nav-cart-center .nav-icon {
+    width: 2rem;
+    height: 2rem;
+}
+
 .nav-label {
     font-size: 0.75rem;
     font-weight: 500;
+}
+
+.nav-cart-center .nav-label {
+    display: none;
 }
 
 .cart-badge {
