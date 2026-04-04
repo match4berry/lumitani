@@ -43,6 +43,7 @@ body {
     color: var(--color-gray-900);
     line-height: 1.6;
     overflow-x: hidden;
+    overscroll-behavior: none;
 }
 
 .app-container {
