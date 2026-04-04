@@ -915,19 +915,30 @@ small { font-size: 0.875rem; }
 }
 
 .checkout-grid .form-row {
-    display: grid;
+    display: grid !important;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
     margin-bottom: 0;
+    margin-top: 1.5rem;
+    width: 100%;
 }
 
 .checkout-grid .form-row .form-group {
-    margin-bottom: 0;
+    margin-bottom: 0 !important;
     width: 100%;
+}
+
+.checkout-grid .form-row .form-group label {
+    display: block;
+    font-weight: 500;
+    color: var(--color-gray-900);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
 }
 
 .checkout-grid .form-row .form-group input {
     width: 100%;
+    display: block;
 }
 
 .checkout-grid .row {
