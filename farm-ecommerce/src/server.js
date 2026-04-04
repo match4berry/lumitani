@@ -102,6 +102,11 @@ app.get('/profile', (req, res) => {
   res.render('profile');
 });
 
+// Alamat Pengiriman (Shipping Address) page
+app.get('/alamat-pengiriman', (req, res) => {
+  res.render('alamat-pengiriman');
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

@@ -1,73 +1,42 @@
 // Product detail page functionality
+
+// Change main image when thumbnail is clicked
+function changeImage(thumbnail) {
+    const mainImage = document.getElementById('mainImage');
+    const images = document.querySelectorAll('.thumbnail');
+    
+    // Remove active class from all thumbnails
+    images.forEach(img => img.classList.remove('active'));
+    
+    // Add active class to clicked thumbnail
+    thumbnail.classList.add('active');
+    
+    // Update main image
+    const newSrc = thumbnail.querySelector('img').src;
+    mainImage.src = newSrc;
+}
+
+// Add to cart
+function addToCart(productId) {
+    alert('Produk telah ditambahkan ke keranjang!');
+    console.log('Added product', productId, 'to cart');
+}
+
+// Order now
+function orderNow(productId) {
+    alert('Mengarahkan ke halaman checkout...');
+    // In a real app, this would redirect to checkout
+    // window.location.href = `/checkout?productId=${productId}`;
+    console.log('Ordering product', productId);
+}
+
+// Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    const decreaseBtn = document.getElementById('decreaseQty');
-    const increaseBtn = document.getElementById('increaseQty');
-    const quantityInput = document.getElementById('quantity');
-    const addToCartBtn = document.getElementById('addToCartBtn');
-
-    // Quantity control
-    if (decreaseBtn) {
-        decreaseBtn.addEventListener('click', function() {
-            const currentValue = parseInt(quantityInput.value);
-            if (currentValue > 1) {
-                quantityInput.value = currentValue - 1;
-            }
+    // Add smooth interactions
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', function() {
+            changeImage(this);
         });
-    }
-
-    if (increaseBtn) {
-        increaseBtn.addEventListener('click', function() {
-            const currentValue = parseInt(quantityInput.value);
-            const maxValue = parseInt(quantityInput.max);
-            if (currentValue < maxValue) {
-                quantityInput.value = currentValue + 1;
-            }
-        });
-    }
-
-    // Add to cart
-    if (addToCartBtn) {
-        addToCartBtn.addEventListener('click', function() {
-            const productId = this.getAttribute('data-product-id');
-            const quantity = parseInt(quantityInput.value);
-
-            fetch('/api/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    productId: parseInt(productId),
-                    quantity: quantity
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Produk berhasil ditambahkan ke keranjang!');
-                    quantityInput.value = 1;
-                } else {
-                    alert('Gagal menambahkan produk ke keranjang');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan');
-            });
-        });
-    }
-
-    // Validate quantity input
-    if (quantityInput) {
-        quantityInput.addEventListener('change', function() {
-            let value = parseInt(this.value);
-            const maxValue = parseInt(this.max);
-
-            if (isNaN(value) || value < 1) {
-                this.value = 1;
-            } else if (value > maxValue) {
-                this.value = maxValue;
-            }
-        });
-    }
+    });
 });
