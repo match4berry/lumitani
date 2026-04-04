@@ -67,6 +67,12 @@ const api = {
     request<import("./types").Product>("/products/" + id + "/toggle", { method: "PATCH" }),
   deleteProduct: (id: number) =>
     request("/products/" + id, { method: "DELETE" }),
+
+  // Orders
+  getOrders: () => request<import("./types").Order[]>("/orders"),
+  getOrderSummary: () => request<import("./types").OrderStatusSummary>("/orders/summary"),
+  updateOrderStatus: (id: number, status: import("./types").OrderStatus) =>
+    request<import("./types").Order>("/orders/" + id + "/status", { method: "PATCH", body: JSON.stringify({ status }) }),
 };
 
 export default api;

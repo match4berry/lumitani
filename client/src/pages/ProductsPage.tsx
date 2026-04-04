@@ -61,8 +61,10 @@ export default function ProductsPage() {
   };
 
   const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault(); setError("");
+    e.preventDefault();
     if (farmerId === "" || commodityId === "" || gradeId === "") return;
+    if (!confirm("Simpan produk baru?")) return;
+    setError("");
     try {
       await api.createProduct({
         farmer_id: farmerId, commodity_id: commodityId, grade_id: gradeId,
@@ -85,8 +87,10 @@ export default function ProductsPage() {
   };
 
   const handleEdit = async (e: React.FormEvent) => {
-    e.preventDefault(); setError("");
+    e.preventDefault();
     if (!editProduct || editFarmerId === "" || editCommodityId === "" || editGradeId === "") return;
+    if (!confirm("Simpan perubahan produk?")) return;
+    setError("");
     try {
       await api.updateProduct(editProduct.id, {
         farmer_id: editFarmerId, commodity_id: editCommodityId, grade_id: editGradeId,

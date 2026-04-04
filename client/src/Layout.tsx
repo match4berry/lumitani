@@ -7,6 +7,7 @@ const navItems = [
   { to: "/prices", label: "Harga Kolektif", icon: "prices" },
   { to: "/farmers", label: "Petani", icon: "farmers" },
   { to: "/commodities", label: "Komoditas & Grade", icon: "commodities" },
+  { to: "/orders", label: "Manajemen Pesanan", icon: "orders" },
 ];
 
 const icons: Record<string, React.ReactNode> = {
@@ -35,6 +36,13 @@ const icons: Record<string, React.ReactNode> = {
   commodities: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
+    </svg>
+  ),
+  orders: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2" />
+      <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+      <path d="M9 14l2 2 4-4" />
     </svg>
   ),
 };

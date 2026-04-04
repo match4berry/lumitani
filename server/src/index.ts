@@ -6,6 +6,7 @@ import commoditiesRouter from "./routes/commodities";
 import gradesRouter from "./routes/grades";
 import pricesRouter from "./routes/prices";
 import productsRouter from "./routes/products";
+import ordersRouter from "./routes/orders";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -45,6 +46,7 @@ app.use("/api/commodities", commoditiesRouter);
 app.use("/api/grades", gradesRouter);
 app.use("/api/prices", pricesRouter);
 app.use("/api/products", productsRouter);
+app.use("/api/orders", ordersRouter);
 
 const start = async () => {
   try {
