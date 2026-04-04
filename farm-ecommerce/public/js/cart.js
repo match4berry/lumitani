@@ -152,6 +152,38 @@ function saveCartToStorage() {
     localStorage.setItem('lumitani_cart', JSON.stringify(cart));
 }
 
+// Proceed to checkout from cart - "Pesan Sekarang"
+function proceedToCheckout() {
+    const cartItems = document.querySelectorAll('.cart-item');
+    
+    if (cartItems.length === 0) {
+        alert('Keranjang Anda kosong!');
+        return;
+    }
+    
+    const items = [];
+    let total = 0;
+    
+    cartItems.forEach(item => {
+        const name = item.querySelector('.item-name').textContent;
+        const priceText = item.querySelector('.item-price').textContent;
+        const price = parseInt(priceText.match(/\d+/)[0]);
+        const quantity = parseInt(item.querySelector('.qty-input').value);
+        
+        items.push({
+            name: name,
+            price: price,
+            quantity: quantity
+        });
+        
+        total += price * quantity;
+    });
+    
+    // Redirect to checkout with items as query parameter
+    const productsParam = encodeURIComponent(JSON.stringify(items));
+    window.location.href = `/checkout?products=${productsParam}`;
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     // Save/sync initial cart items to localStorage
@@ -176,9 +208,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add order now button functionality
     const orderBtn = document.querySelector('.btn-order-now');
     if (orderBtn) {
-        orderBtn.addEventListener('click', function() {
-            alert('Mengarahkan ke halaman checkout...');
-            // In a real app: window.location.href = '/checkout';
+        orderBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            proceedToCheckout();
         });
     }
 });

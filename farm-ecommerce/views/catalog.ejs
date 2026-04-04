@@ -63,7 +63,12 @@
                             <!-- Action Buttons -->
                             <div class="product-actions">
                                 <a href="/product/<%= product.id %>" class="btn btn-detail">Detail</a>
-                                <button class="btn btn-order" onclick="addToCart('<%= product.id %>')">Beli Sekarang</button>
+                                <button class="btn btn-order" 
+                                    onclick="buyNow(
+                                        '<%= product.id %>', 
+                                        '<%= product.name %>', 
+                                        <%= product.current_price || product.price || 0 %>
+                                    )">Beli Sekarang</button>
                             </div>
                         </div>
                     </div>
@@ -78,6 +83,23 @@
 </div>
 
 <script>
+// Direct checkout from catalog - "Beli Sekarang"
+function buyNow(productId, productName, productPrice) {
+    const item = {
+        id: productId,
+        name: productName,
+        price: productPrice,
+        quantity: 1
+    };
+    
+    const items = [item];
+    const total = productPrice * 1;
+    
+    // Redirect to checkout with product as query parameter
+    const productsParam = encodeURIComponent(JSON.stringify(items));
+    window.location.href = `/checkout?products=${productsParam}`;
+}
+
 function addToCart(productId) {
     fetch('/api/cart/add', {
         method: 'POST',
