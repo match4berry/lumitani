@@ -9,57 +9,103 @@
     <h1>Profil Saya</h1>
 </header>
 
-<div class="page-content">
-    <div class="profile-container">
-        <div class="profile-header">
-            <div class="avatar">👤</div>
-            <h2>Pengguna LumiTani</h2>
-        </div>
+<!-- Profile Hero Section -->
+<section class="profile-hero">
+    <div class="profile-avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+        </svg>
+    </div>
+    <div class="profile-info">
+        <h2 class="profile-name">hiya</h2>
+        <p class="profile-email">hiya@gmail.com</p>
+    </div>
+</section>
 
-        <div class="profile-section">
-            <h3>Informasi Akun</h3>
-            <div class="info-item">
-                <label>Nama Lengkap:</label>
-                <p>Budi Santoso</p>
-            </div>
-            <div class="info-item">
-                <label>Email:</label>
-                <p>budi@email.com</p>
-            </div>
-            <div class="info-item">
-                <label>Nomor Telepon:</label>
-                <p>+62 812 3456 7890</p>
-            </div>
+<!-- Stats Section -->
+<div class="profile-content">
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pesanan</div>
         </div>
-
-        <div class="profile-section">
-            <h3>Alamat Pengiriman</h3>
-            <div class="info-item">
-                <label>Alamat:</label>
-                <p>Jl. Merdeka No. 123, Kelurahan Sejahtera</p>
-            </div>
-            <div class="info-item">
-                <label>Kota:</label>
-                <p>Jakarta Selatan</p>
-            </div>
-            <div class="info-item">
-                <label>Kode Pos:</label>
-                <p>12345</p>
-            </div>
+        <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Keranjang Saya</div>
         </div>
-
-        <div class="profile-section">
-            <h3>Riwayat Pembelian</h3>
-            <div class="purchase-history">
-                <p>Anda belum ada riwayat pembelian</p>
-            </div>
-        </div>
-
-        <div class="profile-actions">
-            <button class="btn btn-primary">Edit Profil</button>
-            <button class="btn btn-secondary">Logout</button>
+        <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Alamat</div>
         </div>
     </div>
-</div>
 
-<script src="/js/profile.js"></script>
+    <!-- Menu Section -->
+    <div class="profile-menu">
+        <a href="#" class="menu-item">
+            <div class="menu-icon orders">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="9" cy="21" r="1"/>
+                    <circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+            </div>
+            <span class="menu-label">Pesanan Saya</span>
+            <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"/>
+            </svg>
+        </a>
+
+        <a href="#" class="menu-item">
+            <div class="menu-icon cart">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+            </div>
+            <span class="menu-label">Keranjang Saya</span>
+            <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"/>
+            </svg>
+        </a>
+
+        <a href="#" class="menu-item">
+            <div class="menu-icon address">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+            </div>
+            <span class="menu-label">Alamat Pengiriman</span>
+            <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"/>
+            </svg>
+        </a>
+
+        <a href="#" class="menu-item">
+            <div class="menu-icon settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m2.12 2.12l4.24 4.24M1 12h6m6 0h6m-15.78 7.78l4.24-4.24m2.12-2.12l4.24-4.24"/>
+                </svg>
+            </div>
+            <span class="menu-label">Pengaturan Akun</span>
+            <svg class="menu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"/>
+            </svg>
+        </a>
+    </div>
+
+    <!-- Member Section -->
+    <div class="member-section">
+        <div class="member-content">
+            <div class="member-icon">🌱</div>
+            <div>
+                <h3 class="member-title">Member LumiTani</h3>
+                <p class="member-text">Terima kasih telah mendukung petani lokal Desa Manud Jaya! 🚀</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Section -->
+    <button class="logout-button">⬅ Keluar</button>
+</div>

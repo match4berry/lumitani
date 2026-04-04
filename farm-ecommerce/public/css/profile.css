@@ -1,124 +1,430 @@
-/* Profile Page */
-.profile-container {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 600px;
-    margin: 0 auto;
-}
+/* ===== PROFILE PAGE STYLES ===== */
 
-.profile-header {
-    text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
-}
-
-.avatar {
-    font-size: 64px;
-    margin-bottom: 15px;
-}
-
-.profile-header h2 {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-}
-
-.profile-section {
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
-}
-
-.profile-section:last-of-type {
-    border-bottom: none;
-}
-
-.profile-section h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #2d5016;
-    margin-bottom: 15px;
-}
-
-.info-item {
-    margin-bottom: 12px;
-}
-
-.info-item label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: #999;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-}
-
-.info-item p {
-    font-size: 15px;
-    color: #333;
-}
-
-.purchase-history {
-    background-color: #f9f9f9;
-    padding: 15px;
-    border-radius: 4px;
-    text-align: center;
-    color: #999;
-    font-size: 14px;
-}
-
-/* Profile Actions */
-.profile-actions {
+/* Hero Section */
+.profile-hero {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    padding: 2.5rem 2rem;
     display: flex;
-    gap: 10px;
-    margin-top: 30px;
+    align-items: center;
+    gap: 1.5rem;
 }
 
-.btn-edit,
-.btn-logout {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: all 0.3s ease;
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
-.btn-edit {
-    background-color: #2d5016;
+.profile-avatar svg {
+    width: 50px;
+    height: 50px;
+    stroke: #16a34a;
+    stroke-width: 2;
+}
+
+.profile-info {
     color: white;
 }
 
-.btn-edit:hover {
-    background-color: #1e3610;
+.profile-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
 }
 
-.btn-logout {
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ddd;
+.profile-email {
+    font-size: 0.95rem;
+    opacity: 0.95;
+    margin: 0;
 }
 
-.btn-logout:hover {
-    background-color: #e0e0e0;
+/* Content Container */
+.profile-content {
+    padding: 1.5rem;
+    background: white;
 }
 
-/* Responsive */
+/* Stats Cards */
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    margin-bottom: 2rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    border-radius: 0;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    border-right: 1px solid #e5e7eb;
+}
+
+.stat-card:last-child {
+    border-right: none;
+}
+
+.stat-number {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #16a34a;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* Profile Menu */
+.profile-menu {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    text-decoration: none;
+    color: #111827;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.menu-item:last-child {
+    border-bottom: none;
+}
+
+.menu-item:hover {
+    background: #f9fafb;
+    transform: translateX(4px);
+}
+
+.menu-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.menu-icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: white;
+    stroke-width: 2;
+}
+
+.menu-icon.orders {
+    background: #dcfce7;
+}
+
+.menu-icon.orders svg {
+    stroke: #16a34a;
+}
+
+.menu-icon.cart {
+    background: #dcfce7;
+}
+
+.menu-icon.cart svg {
+    stroke: #16a34a;
+    fill: none;
+}
+
+.menu-icon.address {
+    background: #dcfce7;
+}
+
+.menu-icon.address svg {
+    stroke: #16a34a;
+    fill: none;
+}
+
+.menu-icon.settings {
+    background: #dcfce7;
+}
+
+.menu-icon.settings svg {
+    stroke: #16a34a;
+}
+
+.menu-label {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.menu-arrow {
+    width: 24px;
+    height: 24px;
+    stroke: #9ca3af;
+    stroke-width: 2;
+    flex-shrink: 0;
+}
+
+/* Member Section */
+.member-section {
+    background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+    border: 2px solid #16a34a;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.member-content {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.member-icon {
+    font-size: 1.5rem;
+}
+
+.member-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #16a34a;
+    margin: 0 0 0.5rem 0;
+}
+
+.member-text {
+    font-size: 0.9rem;
+    color: #16a34a;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Logout Button */
+.logout-button {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #ef4444;
+    background: white;
+    color: #ef4444;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.logout-button:hover {
+    background: #fef2f2;
+    transform: scale(1.02);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-    .profile-container {
-        padding: 15px;
+    .profile-hero {
+        padding: 2rem 1.5rem;
+        gap: 1rem;
     }
 
-    .profile-actions {
-        flex-direction: column;
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
     }
 
-    .btn-edit,
-    .btn-logout {
-        width: 100%;
+    .profile-avatar svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    .profile-name {
+        font-size: 1.25rem;
+    }
+
+    .profile-email {
+        font-size: 0.9rem;
+    }
+
+    .profile-content {
+        padding: 1.25rem;
+    }
+
+    .stats-cards {
+        padding: 1.25rem;
+        margin-left: -1.25rem;
+        margin-right: -1.25rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+
+    .menu-item {
+        padding: 1rem 1.25rem;
+        gap: 0.75rem;
+    }
+
+    .menu-icon {
+        width: 42px;
+        height: 42px;
+    }
+
+    .menu-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .menu-arrow {
+        width: 20px;
+        height: 20px;
+    }
+
+    .menu-label {
+        font-size: 0.95rem;
+    }
+
+    .member-section {
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .member-title {
+        font-size: 1rem;
+    }
+
+    .member-text {
+        font-size: 0.85rem;
+    }
+
+    .logout-button {
+        padding: 0.875rem;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .profile-hero {
+        padding: 1.5rem 1rem;
+        gap: 1rem;
+        border-radius: 0 0 12px 12px;
+    }
+
+    .profile-avatar {
+        width: 70px;
+        height: 70px;
+    }
+
+    .profile-avatar svg {
+        width: 35px;
+        height: 35px;
+    }
+
+    .profile-name {
+        font-size: 1.1rem;
+    }
+
+    .profile-email {
+        font-size: 0.85rem;
+    }
+
+    .profile-content {
+        padding: 1rem;
+    }
+
+    .stats-cards {
+        grid-template-columns: repeat(3, 1fr);
+        padding: 1rem;
+        margin-left: -1rem;
+        margin-right: -1rem;
+        margin-bottom: 1.5rem;
+        gap: 0.5rem;
+    }
+
+    .stat-card {
+        padding: 0.75rem;
+    }
+
+    .stat-number {
+        font-size: 1.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+    }
+
+    .menu-item {
+        padding: 0.875rem 1rem;
+        gap: 0.75rem;
+    }
+
+    .menu-icon {
+        width: 38px;
+        height: 38px;
+    }
+
+    .menu-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .menu-label {
+        font-size: 0.9rem;
+    }
+
+    .menu-arrow {
+        width: 18px;
+        height: 18px;
+    }
+
+    .member-section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .member-icon {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .member-title {
+        font-size: 0.95rem;
+    }
+
+    .member-text {
+        font-size: 0.8rem;
+    }
+
+    .logout-button {
+        padding: 0.75rem;
+        font-size: 0.9rem;
     }
 }
