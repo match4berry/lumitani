@@ -20,5 +20,39 @@
     "total": 20000,
     "status": "Menunggu Diproses",
     "createdAt": "2026-04-02T04:29:00.070Z"
+  },
+  {
+    "id": "ORD-1775324447574",
+    "name": "hiya",
+    "phone": "0882737",
+    "address": "su",
+    "city": "surabaya",
+    "postal": "83838",
+    "payment": "bank",
+    "items": [
+      {
+        "name": "Rawit Merah Super",
+        "price": 10,
+        "quantity": 1
+      },
+      {
+        "name": "Tomat Merah Manud Jaya - Kualitas I...",
+        "price": 15,
+        "quantity": 2
+      },
+      {
+        "name": "Mentimun Lokal Manud Jaya",
+        "price": 3,
+        "quantity": 1
+      },
+      {
+        "name": "Wortel Manud Jaya - Kualitas Import",
+        "price": 8,
+        "quantity": 4
+      }
+    ],
+    "total": 75,
+    "status": "Menunggu Diproses",
+    "createdAt": "2026-04-04T17:40:47.574Z"
   }
 ]
