@@ -3,7 +3,7 @@
 
 <head>
     <title>Order Berhasil</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
@@ -12,29 +12,32 @@
 
         <a href="/checkout" class="back-btn">← Pesan Lagi</a>
 
-        <div style="text-align:center;">
-            <img src="/logo.png" class="logo">
+        <div class="order-success-card">
+            <div style="text-align:center; margin-bottom: 2.5rem;">
+                <img src="/logo.png" class="logo">
+            </div>
+
+            <h2 class="success-title">Order Berhasil 🎉</h2>
+
+            <div class="order-info">
+                <p class="info-label">ID Order:</p>
+                <h3 class="info-value">
+                    <%= order.id %>
+                </h3>
+
+                <p class="info-label">Status:</p>
+                <h3 class="info-value">
+                    <%= order.status %>
+                </h3>
+
+                <p class="info-label">Total:</p>
+                <h3 class="info-value">
+                    Rp <%= order.total.toLocaleString('id-ID') %>
+                </h3>
+            </div>
+
+            <a href="/" class="btn-back-home">Kembali ke Beranda</a>
         </div>
-
-        <h2 class="success">Order Berhasil 🎉</h2>
-
-        <p>ID Order:</p>
-        <h3>
-            <%= order.id %>
-        </h3>
-
-        <p>Status:</p>
-        <h3>
-            <%= order.status %>
-        </h3>
-
-        <p>Total:</p>
-        <h3>Rp <%= order.total %>
-        </h3>
-
-        <a href="/">
-            <button>Kembali ke Beranda</button>
-        </a>
 
     </div>
 

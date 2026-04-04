@@ -1064,6 +1064,68 @@ small { font-size: 0.875rem; }
     }
 }
 
+/* ===== ORDER SUCCESS PAGE ===== */
+.order-success-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: 3rem 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    max-width: 600px;
+    margin: 2rem auto;
+    text-align: center;
+}
+
+.success-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-green-600);
+    margin-bottom: 2rem;
+    letter-spacing: -0.5px;
+}
+
+.order-info {
+    margin: 2.5rem 0;
+    text-align: center;
+}
+
+.info-label {
+    font-size: 0.95rem;
+    color: var(--color-gray-600);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-gray-900);
+    margin-bottom: 2rem;
+    word-break: break-all;
+}
+
+.btn-back-home {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    background: var(--color-green-600);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.btn-back-home:hover {
+    background: var(--color-green-700);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 640px) {
     h1 { font-size: 1.5rem; }
