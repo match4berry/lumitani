@@ -22,6 +22,7 @@ function decreaseQty(btn) {
         input.value = value - 1;
         updateItemTotal(btn);
         updateMinusButtonStyle(btn);
+        saveCartToStorage();
     }
 }
 
@@ -32,6 +33,7 @@ function increaseQty(btn) {
     input.value = value + 1;
     updateItemTotal(btn);
     updateMinusButtonStyle(btn);
+    saveCartToStorage();
 }
 
 // Update minus button style based on quantity
@@ -66,9 +68,13 @@ function updateItemTotal(btn) {
 // Delete item from cart
 function deleteItem(btn) {
     if (confirm('Yakin ingin menghapus item ini?')) {
-        btn.closest('.cart-item').remove();
+        const cartItem = btn.closest('.cart-item');
+        const itemName = cartItem.querySelector('.item-name').textContent;
+        
+        cartItem.remove();
         updateCartTotal();
         updateCartBadge();
+        saveCartToStorage();
 
         // Check if cart is empty
         const cartItems = document.querySelectorAll('.cart-item');
@@ -96,21 +102,61 @@ function updateCartTotal() {
 function updateCartBadge() {
     const cartBadge = document.getElementById('cart-badge');
     
-    // Count total quantity (sum of all qty inputs), not just number of items
-    const qty = Array.from(document.querySelectorAll('.qty-input')).reduce((sum, input) => {
-        return sum + parseInt(input.value || 0);
-    }, 0);
-
-    if (qty > 0) {
-        cartBadge.textContent = qty;
-        cartBadge.style.display = 'flex';
-    } else {
-        cartBadge.style.display = 'none';
+    // Read from localStorage (state.cart) to ensure consistency across all pages
+    // This is the same approach used in script.js
+    try {
+        const cart = JSON.parse(localStorage.getItem('lumitani_cart')) || [];
+        const qty = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+        
+        if (qty > 0) {
+            cartBadge.textContent = qty;
+            cartBadge.style.display = 'flex';
+        } else {
+            cartBadge.style.display = 'none';
+        }
+    } catch (e) {
+        // Fallback: if localStorage fails, count DOM elements
+        const qty = Array.from(document.querySelectorAll('.qty-input')).reduce((sum, input) => {
+            return sum + parseInt(input.value || 0);
+        }, 0);
+        
+        if (qty > 0) {
+            cartBadge.textContent = qty;
+            cartBadge.style.display = 'flex';
+        } else {
+            cartBadge.style.display = 'none';
+        }
     }
+}
+
+// Save cart items from DOM to localStorage
+function saveCartToStorage() {
+    const cartItems = document.querySelectorAll('.cart-item');
+    const cart = [];
+    
+    cartItems.forEach(item => {
+        const name = item.querySelector('.item-name').textContent;
+        const priceText = item.querySelector('.item-price').textContent;
+        const price = parseInt(priceText.match(/\d+/)[0]);
+        const quantity = parseInt(item.querySelector('.qty-input').value);
+        
+        cart.push({
+            id: name.toLowerCase().replace(/\s+/g, '-'),
+            name: name,
+            price: price,
+            quantity: quantity,
+            image: item.querySelector('.item-image img').src
+        });
+    });
+    
+    localStorage.setItem('lumitani_cart', JSON.stringify(cart));
 }
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Save/sync initial cart items to localStorage
+    saveCartToStorage();
+    
     // Initialize cart total on load
     updateCartTotal();
     updateCartBadge();
