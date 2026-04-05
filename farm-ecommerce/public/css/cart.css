@@ -321,6 +321,8 @@
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s;
+    min-width: 150px;
+    white-space: nowrap;
 }
 
 .btn-order-now:hover {
@@ -416,6 +418,7 @@
     .btn-order-now {
         width: 100%;
         text-align: center;
+        min-width: unset;
     }
 }
 
@@ -512,5 +515,13 @@
     .btn-order-now {
         font-size: 0.9rem;
         padding: 0.7rem 1.5rem;
+        width: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+    .btn-order-now {
+        font-size: 0.85rem;
+        padding: 0.65rem 1.25rem;
     }
 }

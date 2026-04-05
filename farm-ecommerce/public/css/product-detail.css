@@ -296,6 +296,10 @@
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-order:hover {
@@ -516,5 +520,23 @@
     .btn-order {
         font-size: 0.9rem;
         padding: 0.6rem 1.25rem;
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 400px) {
+    .action-buttons {
+        gap: 0.5rem;
+    }
+
+    .btn-add-cart {
+        width: 40px;
+        height: 40px;
+    }
+
+    .btn-order {
+        font-size: 0.85rem;
+        padding: 0.55rem 1rem;
+        min-height: 40px;
     }
 }
