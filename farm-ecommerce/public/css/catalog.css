@@ -269,6 +269,7 @@
     width: 40px;
     height: 40px;
     padding: 0;
+    margin: 0;
     background: white;
     border: 2px solid #16a34a;
     border-radius: 4px;
@@ -279,7 +280,11 @@
     transition: all 0.3s;
     text-decoration: none;
     font-family: inherit;
+    font-size: inherit;
+    line-height: 1;
     box-sizing: border-box;
+    -webkit-appearance: none;
+    vertical-align: top;
 }
 
 .btn-detail-icon svg {
@@ -300,6 +305,7 @@
     width: 40px;
     height: 40px;
     padding: 0;
+    margin: 0;
     background: white;
     border: 2px solid #16a34a;
     border-radius: 4px;
@@ -310,7 +316,11 @@
     transition: all 0.3s;
     text-decoration: none;
     font-family: inherit;
+    font-size: inherit;
+    line-height: 1;
     box-sizing: border-box;
+    -webkit-appearance: none;
+    vertical-align: top;
 }
 
 .btn-add-cart svg {
@@ -402,7 +412,10 @@
         width: 42px;
         height: 42px;
         border: 2px solid #16a34a;
+        margin: 0;
+        line-height: 1;
         box-sizing: border-box;
+        -webkit-appearance: none;
     }
 
     .btn-detail-icon svg {
@@ -416,7 +429,10 @@
         width: 42px;
         height: 42px;
         border: 2px solid #16a34a;
+        margin: 0;
+        line-height: 1;
         box-sizing: border-box;
+        -webkit-appearance: none;
     }
 
     .btn-add-cart svg {
@@ -493,7 +509,10 @@
         width: 36px;
         height: 36px;
         border: 2px solid #16a34a;
+        margin: 0;
+        line-height: 1;
         box-sizing: border-box;
+        -webkit-appearance: none;
     }
 
     .btn-detail-icon svg {
@@ -516,7 +535,10 @@
         width: 36px;
         height: 36px;
         border: 2px solid #16a34a;
+        margin: 0;
+        line-height: 1;
         box-sizing: border-box;
+        -webkit-appearance: none;
     }
 
     .btn-add-cart svg {
@@ -583,7 +605,10 @@
         width: 32px;
         height: 32px;
         border: 2px solid #16a34a;
+        margin: 0;
+        line-height: 1;
         box-sizing: border-box;
+        -webkit-appearance: none;
     }
 
     .btn-detail-icon svg {
@@ -606,7 +631,10 @@
         width: 32px;
         height: 32px;
         border: 2px solid #16a34a;
+        margin: 0;
+        line-height: 1;
         box-sizing: border-box;
+        -webkit-appearance: none;
     }
 
     .btn-add-cart svg {
@@ -658,7 +686,10 @@
         width: 30px;
         height: 30px;
         border: 2px solid #16a34a;
+        margin: 0;
+        line-height: 1;
         box-sizing: border-box;
+        -webkit-appearance: none;
     }
 
     .btn-detail-icon svg {
@@ -680,7 +711,10 @@
         width: 30px;
         height: 30px;
         border: 2px solid #16a34a;
+        margin: 0;
+        line-height: 1;
         box-sizing: border-box;
+        -webkit-appearance: none;
     }
 
     .btn-add-cart svg {
