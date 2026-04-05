@@ -391,6 +391,18 @@
         font-size: 0.8rem;
     }
 
+    .btn-detail-icon {
+        flex: 0 0 42px;
+        flex-shrink: 0;
+        width: 42px;
+        height: 42px;
+    }
+
+    .btn-detail-icon svg {
+        width: 22px;
+        height: 22px;
+    }
+
     .btn-add-cart {
         flex: 0 0 42px;
         flex-shrink: 0;
@@ -487,10 +499,10 @@
     }
 
     .btn-add-cart {
-        flex: 0 0 36px;
+        flex: 0 0 32px;
         flex-shrink: 0;
-        width: 36px;
-        height: 36px;
+        width: 32px;
+        height: 32px;
     }
 
     .btn-add-cart svg {
@@ -564,7 +576,7 @@
     }
 
     .btn-order {
-        font-size: 0.65rem;
+        font-size: 0.68rem;
         padding: 0.28rem 0.55rem;
         min-height: 30px;
         flex: 0 0 auto;
@@ -572,10 +584,10 @@
     }
 
     .btn-add-cart {
-        flex: 0 0 34px;
+        flex: 0 0 30px;
         flex-shrink: 0;
-        width: 34px;
-        height: 34px;
+        width: 30px;
+        height: 30px;
     }
 
     .btn-add-cart svg {
@@ -641,11 +653,10 @@
     }
 
     .btn-add-cart {
-        flex: 0 0 34px;
+        flex: 0 0 28px;
         flex-shrink: 0;
-        flex: 0 0 34px;
-        width: 34px;
-        height: 34px;
+        width: 28px;
+        height: 28px;
     }
 
     .btn-add-cart svg {
