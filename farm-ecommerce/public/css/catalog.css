@@ -233,7 +233,7 @@
     font-weight: 700;
     color: #16a34a;
     line-height: 1;
-    margin: 1.6px 0 0 210.339px;
+    margin: 0;
 }
 
 .price-unit {
@@ -521,7 +521,6 @@
 
     .product-price-catalog {
         font-size: 1rem;
-        margin: 1.6px 0 0 150px;
     }
 
     .price-section {
@@ -646,7 +645,6 @@
 
     .product-price-catalog {
         font-size: 0.95rem;
-        margin: 1.6px 0 0 100px;
     }
 
     .price-unit {
@@ -740,7 +738,6 @@
 
     .product-price-catalog {
         font-size: 0.9rem;
-        margin: 1.6px 0 0 60px;
     }
 
     .price-section {
