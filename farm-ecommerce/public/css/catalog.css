@@ -268,6 +268,8 @@
     flex-shrink: 0;
     width: 40px;
     height: 40px;
+    min-height: 40px;
+    max-height: 40px;
     padding: 0 !important;
     margin: 0 !important;
     gap: 0 !important;
@@ -281,8 +283,10 @@
     transition: all 0.3s;
     text-decoration: none;
     font-size: 0;
-    line-height: 1;
+    line-height: 0;
     box-sizing: border-box;
+    overflow: hidden;
+    vertical-align: top;
 }
 
 .btn-detail-icon svg {
@@ -302,6 +306,8 @@
     flex-shrink: 0;
     width: 40px;
     height: 40px;
+    min-height: 40px;
+    max-height: 40px;
     padding: 0 !important;
     margin: 0 !important;
     gap: 0 !important;
@@ -315,8 +321,10 @@
     transition: all 0.3s;
     text-decoration: none;
     font-size: 0;
-    line-height: 1;
+    line-height: 0;
     box-sizing: border-box;
+    overflow: hidden;
+    vertical-align: top;
 }
 
 .btn-add-cart svg {
@@ -336,7 +344,7 @@
     min-width: auto;
     background: #16a34a;
     color: white;
-    padding: 0.4rem 0.6rem;
+    padding: 0.4rem 0.1rem;
     border: none;
     border-radius: 6px;
     font-weight: 600;
@@ -407,13 +415,17 @@
         flex-shrink: 0;
         width: 42px;
         height: 42px;
+        min-height: 42px;
+        max-height: 42px;
         border: 2px solid #16a34a;
         margin: 0 !important;
         padding: 0 !important;
         gap: 0 !important;
         font-size: 0;
-        line-height: 1;
+        line-height: 0;
         box-sizing: border-box;
+        overflow: hidden;
+        vertical-align: top;
     }
 
     .btn-detail-icon svg {
@@ -426,13 +438,17 @@
         flex-shrink: 0;
         width: 42px;
         height: 42px;
+        min-height: 42px;
+        max-height: 42px;
         border: 2px solid #16a34a;
         margin: 0 !important;
         padding: 0 !important;
         gap: 0 !important;
         font-size: 0;
-        line-height: 1;
+        line-height: 0;
         box-sizing: border-box;
+        overflow: hidden;
+        vertical-align: top;
     }
 
     .btn-add-cart svg {
@@ -508,13 +524,17 @@
         flex-shrink: 0;
         width: 36px;
         height: 36px;
+        min-height: 36px;
+        max-height: 36px;
         border: 2px solid #16a34a;
         margin: 0 !important;
         padding: 0 !important;
         gap: 0 !important;
         font-size: 0;
-        line-height: 1;
+        line-height: 0;
         box-sizing: border-box;
+        overflow: hidden;
+        vertical-align: top;
     }
 
     .btn-detail-icon svg {
@@ -536,13 +556,17 @@
         flex-shrink: 0;
         width: 36px;
         height: 36px;
+        min-height: 36px;
+        max-height: 36px;
         border: 2px solid #16a34a;
         margin: 0 !important;
         padding: 0 !important;
         gap: 0 !important;
         font-size: 0;
-        line-height: 1;
+        line-height: 0;
         box-sizing: border-box;
+        overflow: hidden;
+        vertical-align: top;
     }
 
     .btn-add-cart svg {
@@ -608,13 +632,17 @@
         flex-shrink: 0;
         width: 32px;
         height: 32px;
+        min-height: 32px;
+        max-height: 32px;
         border: 2px solid #16a34a;
         margin: 0 !important;
         padding: 0 !important;
         gap: 0 !important;
         font-size: 0;
-        line-height: 1;
+        line-height: 0;
         box-sizing: border-box;
+        overflow: hidden;
+        vertical-align: top;
     }
 
     .btn-detail-icon svg {
@@ -636,13 +664,17 @@
         flex-shrink: 0;
         width: 32px;
         height: 32px;
+        min-height: 32px;
+        max-height: 32px;
         border: 2px solid #16a34a;
         margin: 0 !important;
         padding: 0 !important;
         gap: 0 !important;
         font-size: 0;
-        line-height: 1;
+        line-height: 0;
         box-sizing: border-box;
+        overflow: hidden;
+        vertical-align: top;
     }
 
     .btn-add-cart svg {
@@ -693,13 +725,17 @@
         flex-shrink: 0;
         width: 30px;
         height: 30px;
+        min-height: 30px;
+        max-height: 30px;
         border: 2px solid #16a34a;
         margin: 0 !important;
         padding: 0 !important;
         gap: 0 !important;
         font-size: 0;
-        line-height: 1;
+        line-height: 0;
         box-sizing: border-box;
+        overflow: hidden;
+        vertical-align: top;
     }
 
     .btn-detail-icon svg {
@@ -720,13 +756,17 @@
         flex-shrink: 0;
         width: 30px;
         height: 30px;
+        min-height: 30px;
+        max-height: 30px;
         border: 2px solid #16a34a;
         margin: 0 !important;
         padding: 0 !important;
         gap: 0 !important;
         font-size: 0;
-        line-height: 1;
+        line-height: 0;
         box-sizing: border-box;
+        overflow: hidden;
+        vertical-align: top;
     }
 
     .btn-add-cart svg {
