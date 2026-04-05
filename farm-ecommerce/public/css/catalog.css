@@ -271,7 +271,7 @@
     padding: 0;
     background: white;
     border: 1px solid #16a34a;
-    border-radius: 8px;
+    border-radius: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -300,7 +300,7 @@
     padding: 0;
     background: white;
     border: 1px solid #16a34a;
-    border-radius: 8px;
+    border-radius: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
