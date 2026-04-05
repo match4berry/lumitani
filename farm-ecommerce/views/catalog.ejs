@@ -63,6 +63,13 @@
                             <!-- Action Buttons -->
                             <div class="product-actions">
                                 <a href="/product/<%= product.id %>" class="btn btn-detail">Detail</a>
+                                <button class="btn btn-cart" 
+                                    onclick="addToCart(
+                                        '<%= product.id %>',
+                                        '<%= product.name %>',
+                                        <%= product.current_price || product.price || 0 %>,
+                                        '<%= product.photo_url || (product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/300') %>'
+                                    )">Tambah Keranjang</button>
                                 <button class="btn btn-order" 
                                     onclick="buyNow(
                                         '<%= product.id %>', 
@@ -101,23 +108,45 @@ function buyNow(productId, productName, productPrice) {
 }
 
 function addToCart(productId) {
-    fetch('/api/cart/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            productId: productId,
-            quantity: 1
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Produk berhasil ditambahkan ke keranjang!');
-            window.location.href = '/cart';
+    const productCard = event.target.closest('.product-card-catalog');
+    const productName = productCard.querySelector('.product-name-catalog').textContent;
+    const productPrice = parseInt(productCard.querySelector('.product-price-catalog').textContent.replace(/\D/g, ''));
+    const productImage = productCard.querySelector('.product-image-catalog').src;
+    
+    // Call cart.js function to add to localStorage
+    var addToCartFunc = window.parent.addToCart || window.addToCart;
+    if (addToCartFunc) {
+        addToCartFunc(productId, productName, productPrice, productImage);
+    } else {
+        // Fallback: save to localStorage directly
+        const cart = JSON.parse(localStorage.getItem('lumitani_cart')) || [];
+        const existingItem = cart.find(item => item.id === productId);
+        
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cart.push({
+                id: productId,
+                name: productName,
+                price: productPrice,
+                quantity: 1,
+                image: productImage
+            });
         }
-    })
+        
+        localStorage.setItem('lumitani_cart', JSON.stringify(cart));
+        
+        // Update badge
+        const cartBadge = document.getElementById('cart-badge');
+        if (cartBadge) {
+            const qty = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+            cartBadge.textContent = qty;
+            cartBadge.style.display = 'flex';
+        }
+        
+        alert('Produk berhasil ditambahkan ke keranjang!');
+    }
+}
     .catch(error => console.error('Error:', error));
 }
 </script>

@@ -263,6 +263,17 @@
     background: #f0fdf4;
 }
 
+.btn-cart {
+    flex: 1;
+    background: #e8f5e9;
+    color: #16a34a;
+    border: 1px solid #16a34a;
+}
+
+.btn-cart:hover {
+    background: #c8e6c9;
+}
+
 .btn-order {
     flex: 1;
     background: #16a34a;

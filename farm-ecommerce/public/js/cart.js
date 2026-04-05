@@ -198,6 +198,10 @@ function loadCartFromStorage() {
             
             // Render items from localStorage
             cart.forEach(item => {
+                const itemPrice = parseInt(item.price) || 0;
+                const itemQty = parseInt(item.quantity) || 1;
+                const itemTotal = itemPrice * itemQty;
+                
                 const cartItemHTML = `
                     <div class="cart-item">
                         <div class="item-checkbox">
@@ -208,7 +212,7 @@ function loadCartFromStorage() {
                         </div>
                         <div class="item-info">
                             <h4 class="item-name">${item.name}</h4>
-                            <p class="item-price">Rp ${item.price.toLocaleString('id-ID')} / 250g</p>
+                            <p class="item-price">Rp ${itemPrice.toLocaleString('id-ID')} / 250g</p>
                         </div>
                         <div class="item-quantity">
                             <button class="qty-btn minus" onclick="decreaseQty(this)">
@@ -216,7 +220,7 @@ function loadCartFromStorage() {
                                     <line x1="5" y1="12" x2="19" y2="12"/>
                                 </svg>
                             </button>
-                            <input type="number" class="qty-input" value="${item.quantity}" min="1">
+                            <input type="number" class="qty-input" value="${itemQty}" min="1">
                             <button class="qty-btn plus" onclick="increaseQty(this)">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="12" y1="5" x2="12" y2="19"/>
@@ -226,7 +230,7 @@ function loadCartFromStorage() {
                         </div>
                         <div class="item-total">
                             <div class="total-label">Total</div>
-                            <div class="total-price">Rp ${(item.price * item.quantity).toLocaleString('id-ID')}</div>
+                            <div class="total-price">Rp ${itemTotal.toLocaleString('id-ID')}</div>
                         </div>
                         <button class="item-delete" onclick="deleteItem(this)">
                             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -251,6 +255,64 @@ function loadCartFromStorage() {
         }
     } catch (e) {
         console.error('Error loading cart from localStorage:', e);
+    }
+}
+
+// Add product to cart from catalog page
+function addToCart(productId, productName, productPrice, productImage) {
+    try {
+        // Get current cart from localStorage
+        const cart = JSON.parse(localStorage.getItem('lumitani_cart')) || [];
+        
+        // Check if product already exists in cart
+        const existingItem = cart.find(item => item.id === productId);
+        
+        if (existingItem) {
+            // Increment quantity if item already in cart
+            existingItem.quantity += 1;
+        } else {
+            // Add new item to cart
+            cart.push({
+                id: productId,
+                name: productName,
+                price: parseInt(productPrice),
+                quantity: 1,
+                image: productImage || '/images/default.jpg'
+            });
+        }
+        
+        // Save updated cart to localStorage
+        localStorage.setItem('lumitani_cart', JSON.stringify(cart));
+        
+        // Update cart badge
+        updateCartBadgeGlobal();
+        
+        // Show success message
+        alert('Produk berhasil ditambahkan ke keranjang!');
+        
+    } catch (e) {
+        console.error('Error adding to cart:', e);
+        alert('Gagal menambahkan ke keranjang');
+    }
+}
+
+// Update cart badge globally (used from any page)
+function updateCartBadgeGlobal() {
+    try {
+        const cartBadge = document.getElementById('cart-badge');
+        if (!cartBadge) return;
+        
+        const cart = JSON.parse(localStorage.getItem('lumitani_cart')) || [];
+        const qty = cart.reduce((sum, item) => sum + (parseInt(item.quantity) || 0), 0);
+        
+        if (qty > 0) {
+            cartBadge.textContent = qty;
+            cartBadge.style.display = 'flex';
+        } else {
+            cartBadge.style.display = 'none';
+        }
+    } catch (e) {
+        console.error('Error updating cart badge:', e);
     }
 }
 
