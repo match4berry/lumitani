@@ -263,15 +263,31 @@
     background: #f0fdf4;
 }
 
-.btn-cart {
-    flex: 1;
+.btn-add-cart {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    padding: 0;
     background: #e8f5e9;
-    color: #16a34a;
     border: 1px solid #16a34a;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
 }
 
-.btn-cart:hover {
+.btn-add-cart svg {
+    width: 24px;
+    height: 24px;
+    color: #16a34a;
+    stroke-width: 2;
+}
+
+.btn-add-cart:hover {
     background: #c8e6c9;
+    transform: scale(1.05);
 }
 
 .btn-order {

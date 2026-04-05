@@ -63,13 +63,19 @@
                             <!-- Action Buttons -->
                             <div class="product-actions">
                                 <a href="/product/<%= product.id %>" class="btn btn-detail">Detail</a>
-                                <button class="btn btn-cart" 
+                                <button class="btn-add-cart" 
                                     onclick="addToCart(
                                         '<%= product.id %>',
                                         '<%= product.name %>',
                                         <%= product.current_price || product.price || 0 %>,
                                         '<%= product.photo_url || (product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/300') %>'
-                                    )">Tambah Keranjang</button>
+                                    )">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="9" cy="21" r="1"/>
+                                        <circle cx="20" cy="21" r="1"/>
+                                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                                    </svg>
+                                </button>
                                 <button class="btn btn-order" 
                                     onclick="buyNow(
                                         '<%= product.id %>', 
@@ -113,12 +119,8 @@ function addToCart(productId) {
     const productPrice = parseInt(productCard.querySelector('.product-price-catalog').textContent.replace(/\D/g, ''));
     const productImage = productCard.querySelector('.product-image-catalog').src;
     
-    // Call cart.js function to add to localStorage
-    var addToCartFunc = window.parent.addToCart || window.addToCart;
-    if (addToCartFunc) {
-        addToCartFunc(productId, productName, productPrice, productImage);
-    } else {
-        // Fallback: save to localStorage directly
+    try {
+        // Save to localStorage directly  
         const cart = JSON.parse(localStorage.getItem('lumitani_cart')) || [];
         const existingItem = cart.find(item => item.id === productId);
         
@@ -145,8 +147,9 @@ function addToCart(productId) {
         }
         
         alert('Produk berhasil ditambahkan ke keranjang!');
+    } catch (e) {
+        console.error('Error adding to cart:', e);
+        alert('Gagal menambahkan ke keranjang');
     }
-}
-    .catch(error => console.error('Error:', error));
 }
 </script>
