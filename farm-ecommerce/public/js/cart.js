@@ -184,10 +184,80 @@ function proceedToCheckout() {
     window.location.href = `/checkout?products=${productsParam}`;
 }
 
+// Load cart items from localStorage and render them
+function loadCartFromStorage() {
+    try {
+        const cart = JSON.parse(localStorage.getItem('lumitani_cart')) || [];
+        const cartItemsContainer = document.querySelector('.cart-items');
+        
+        // If cart is empty from localStorage, keep mockup items (for first-time users)
+        // Otherwise, clear and load from localStorage
+        if (cart.length > 0) {
+            // Clear all hardcoded mockup items
+            cartItemsContainer.innerHTML = '';
+            
+            // Render items from localStorage
+            cart.forEach(item => {
+                const cartItemHTML = `
+                    <div class="cart-item">
+                        <div class="item-checkbox">
+                            <input type="checkbox" class="item-check" checked>
+                        </div>
+                        <div class="item-image">
+                            <img src="${item.image || '/images/default.jpg'}" alt="${item.name}">
+                        </div>
+                        <div class="item-info">
+                            <h4 class="item-name">${item.name}</h4>
+                            <p class="item-price">Rp ${item.price.toLocaleString('id-ID')} / 250g</p>
+                        </div>
+                        <div class="item-quantity">
+                            <button class="qty-btn minus" onclick="decreaseQty(this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                </svg>
+                            </button>
+                            <input type="number" class="qty-input" value="${item.quantity}" min="1">
+                            <button class="qty-btn plus" onclick="increaseQty(this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"/>
+                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="item-total">
+                            <div class="total-label">Total</div>
+                            <div class="total-price">Rp ${(item.price * item.quantity).toLocaleString('id-ID')}</div>
+                        </div>
+                        <button class="item-delete" onclick="deleteItem(this)">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-9l-1 1H5v2h14V4z"/>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                cartItemsContainer.innerHTML += cartItemHTML;
+            });
+            
+            // Re-initialize minus button styles for loaded items
+            const qtyBtns = document.querySelectorAll('.qty-btn.minus');
+            qtyBtns.forEach(btn => {
+                const input = btn.parentElement.querySelector('.qty-input');
+                const qty = parseInt(input.value);
+                if (qty === 1) {
+                    btn.style.background = '#d1d5db';
+                    btn.style.cursor = 'not-allowed';
+                }
+            });
+        }
+    } catch (e) {
+        console.error('Error loading cart from localStorage:', e);
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Save/sync initial cart items to localStorage
-    saveCartToStorage();
+    // Load cart items from localStorage first
+    loadCartFromStorage();
     
     // Initialize cart total on load
     updateCartTotal();
