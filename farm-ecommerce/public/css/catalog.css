@@ -344,7 +344,7 @@
     min-width: auto;
     background: #16a34a;
     color: white;
-    padding: 0.4rem 0.1rem;
+    padding: 0 0.5rem !important;
     border: none;
     border-radius: 6px;
     font-weight: 600;
@@ -356,8 +356,13 @@
     justify-content: center;
     white-space: nowrap;
     height: 40px;
+    min-height: 40px;
+    max-height: 40px;
+    line-height: 0;
     overflow: hidden;
     text-overflow: ellipsis;
+    box-sizing: border-box;
+    vertical-align: top;
 }
 
 .btn-order:hover {
@@ -544,11 +549,15 @@
 
     .btn-order {
         font-size: 0.72rem;
-        padding: 0.35rem 0.55rem;
-        min-height: 36px;
-        height: 36px;
-        flex: 0 0 auto;
+        padding: 0 0.55rem !important;
+        min-height: 42px;
+        max-height: 42px;
+        height: 42px;
+        line-height: 0;
+        flex: 1 1 auto;
         min-width: auto;
+        box-sizing: border-box;
+        overflow: hidden;
     }
 
     .btn-add-cart {
@@ -651,12 +660,16 @@
     }
 
     .btn-order {
-        font-size: 0.68rem;
-        padding: 0.3rem 0.5rem;
+        font-size: 0.7rem;
+        padding: 0 0.5rem !important;
         min-height: 32px;
+        max-height: 32px;
         height: 32px;
-        flex: 0 0 auto;
+        line-height: 0;
+        flex: 1 1 auto;
         min-width: auto;
+        box-sizing: border-box;
+        overflow: hidden;
     }
 
     .btn-add-cart {
@@ -745,10 +758,15 @@
 
     .btn-order {
         font-size: 0.66rem;
-        padding: 0.3rem 0.45rem;
+        padding: 0 0.45rem !important;
         height: 30px;
-        flex: 0 0 auto;
+        min-height: 30px;
+        max-height: 30px;
+        line-height: 0;
+        flex: 1 1 auto;
         min-width: auto;
+        box-sizing: border-box;
+        overflow: hidden;
     }
 
     .btn-add-cart {
