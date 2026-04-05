@@ -196,7 +196,7 @@
 
 /* Product Details */
 .product-details-catalog {
-    padding: 0.35rem;
+    padding: 0.6rem;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -242,7 +242,7 @@
     gap: 0.3rem;
     margin-top: auto;
     width: 100%;
-    height: 35px;
+    height: 40px;
     flex-wrap: nowrap;
     align-items: center;
     justify-content: flex-start;
@@ -264,13 +264,13 @@
 }
 
 .btn-detail-icon {
-    flex: 0 0 35px;
+    flex: 0 0 40px;
     flex-shrink: 0;
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     background: white;
-    border: 1px solid #16a34a;
+    border: 2px solid #16a34a;
     border-radius: 4px;
     cursor: pointer;
     display: flex;
@@ -281,8 +281,8 @@
 }
 
 .btn-detail-icon svg {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     color: #16a34a;
     stroke-width: 2;
 }
@@ -293,13 +293,13 @@
 }
 
 .btn-add-cart {
-    flex: 0 0 35px;
+    flex: 0 0 40px;
     flex-shrink: 0;
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     background: white;
-    border: 1px solid #16a34a;
+    border: 2px solid #16a34a;
     border-radius: 4px;
     cursor: pointer;
     display: flex;
@@ -309,8 +309,8 @@
 }
 
 .btn-add-cart svg {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     color: #16a34a;
     stroke-width: 2;
 }
@@ -325,18 +325,18 @@
     min-width: auto;
     background: #16a34a;
     color: white;
-    padding: 0.3rem 0.4rem;
+    padding: 0.4rem 0.5rem;
     border: none;
     border-radius: 6px;
     font-weight: 600;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     cursor: pointer;
     transition: all 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
     white-space: nowrap;
-    height: 35px;
+    height: 40px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -396,6 +396,7 @@
         flex-shrink: 0;
         width: 42px;
         height: 42px;
+        border: 2px solid #16a34a;
     }
 
     .btn-detail-icon svg {
@@ -408,6 +409,7 @@
         flex-shrink: 0;
         width: 42px;
         height: 42px;
+        border: 2px solid #16a34a;
     }
 
     .btn-add-cart svg {
@@ -479,30 +481,33 @@
     }
 
     .btn-detail-icon {
-        flex: 0 0 32px;
+        flex: 0 0 36px;
         flex-shrink: 0;
-        width: 32px;
-        height: 32px;
+        width: 36px;
+        height: 36px;
+        border: 2px solid #16a34a;
     }
 
     .btn-detail-icon svg {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
     }
 
     .btn-order {
-        font-size: 0.7rem;
-        padding: 0.3rem 0.6rem;
-        min-height: 32px;
+        font-size: 0.72rem;
+        padding: 0.35rem 0.55rem;
+        min-height: 36px;
+        height: 36px;
         flex: 0 0 auto;
         min-width: auto;
     }
 
     .btn-add-cart {
-        flex: 0 0 32px;
+        flex: 0 0 36px;
         flex-shrink: 0;
-        width: 32px;
-        height: 32px;
+        width: 36px;
+        height: 36px;
+        border: 2px solid #16a34a;
     }
 
     .btn-add-cart svg {
@@ -564,30 +569,33 @@
     }
 
     .btn-detail-icon {
-        flex: 0 0 30px;
+        flex: 0 0 32px;
         flex-shrink: 0;
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
+        border: 2px solid #16a34a;
     }
 
     .btn-detail-icon svg {
-        width: 15px;
-        height: 15px;
+        width: 16px;
+        height: 16px;
     }
 
     .btn-order {
         font-size: 0.68rem;
-        padding: 0.28rem 0.55rem;
-        min-height: 30px;
+        padding: 0.3rem 0.5rem;
+        min-height: 32px;
+        height: 32px;
         flex: 0 0 auto;
         min-width: auto;
     }
 
     .btn-add-cart {
-        flex: 0 0 30px;
+        flex: 0 0 32px;
         flex-shrink: 0;
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
+        border: 2px solid #16a34a;
     }
 
     .btn-add-cart svg {
@@ -634,10 +642,11 @@
     }
 
     .btn-detail-icon {
-        flex: 0 0 28px;
+        flex: 0 0 30px;
         flex-shrink: 0;
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
+        border: 2px solid #16a34a;
     }
 
     .btn-detail-icon svg {
@@ -646,17 +655,19 @@
     }
 
     .btn-order {
-        font-size: 0.65rem;
-        padding: 0.33rem 0.55rem;
+        font-size: 0.66rem;
+        padding: 0.3rem 0.45rem;
+        height: 30px;
         flex: 0 0 auto;
         min-width: auto;
     }
 
     .btn-add-cart {
-        flex: 0 0 28px;
+        flex: 0 0 30px;
         flex-shrink: 0;
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
+        border: 2px solid #16a34a;
     }
 
     .btn-add-cart svg {
