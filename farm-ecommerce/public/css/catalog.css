@@ -374,6 +374,8 @@
 
     .product-actions {
         gap: 0.55rem;
+        flex-wrap: nowrap;
+        align-items: center;
     }
 
     .btn {
@@ -450,6 +452,7 @@
         gap: 0.3rem;
         min-height: 36px;
         flex-wrap: nowrap;
+        align-items: center;
     }
 
     .btn-detail-icon {
