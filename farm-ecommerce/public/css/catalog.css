@@ -279,12 +279,6 @@
     justify-content: center;
     transition: all 0.3s;
     text-decoration: none;
-    font-family: inherit;
-    font-size: inherit;
-    line-height: 1;
-    box-sizing: border-box;
-    -webkit-appearance: none;
-    vertical-align: top;
 }
 
 .btn-detail-icon svg {
@@ -315,12 +309,6 @@
     justify-content: center;
     transition: all 0.3s;
     text-decoration: none;
-    font-family: inherit;
-    font-size: inherit;
-    line-height: 1;
-    box-sizing: border-box;
-    -webkit-appearance: none;
-    vertical-align: top;
 }
 
 .btn-add-cart svg {
@@ -413,9 +401,7 @@
         height: 42px;
         border: 2px solid #16a34a;
         margin: 0;
-        line-height: 1;
-        box-sizing: border-box;
-        -webkit-appearance: none;
+        padding: 0;
     }
 
     .btn-detail-icon svg {
@@ -430,9 +416,7 @@
         height: 42px;
         border: 2px solid #16a34a;
         margin: 0;
-        line-height: 1;
-        box-sizing: border-box;
-        -webkit-appearance: none;
+        padding: 0;
     }
 
     .btn-add-cart svg {
@@ -510,9 +494,7 @@
         height: 36px;
         border: 2px solid #16a34a;
         margin: 0;
-        line-height: 1;
-        box-sizing: border-box;
-        -webkit-appearance: none;
+        padding: 0;
     }
 
     .btn-detail-icon svg {
@@ -536,9 +518,7 @@
         height: 36px;
         border: 2px solid #16a34a;
         margin: 0;
-        line-height: 1;
-        box-sizing: border-box;
-        -webkit-appearance: none;
+        padding: 0;
     }
 
     .btn-add-cart svg {
@@ -606,9 +586,7 @@
         height: 32px;
         border: 2px solid #16a34a;
         margin: 0;
-        line-height: 1;
-        box-sizing: border-box;
-        -webkit-appearance: none;
+        padding: 0;
     }
 
     .btn-detail-icon svg {
@@ -632,9 +610,7 @@
         height: 32px;
         border: 2px solid #16a34a;
         margin: 0;
-        line-height: 1;
-        box-sizing: border-box;
-        -webkit-appearance: none;
+        padding: 0;
     }
 
     .btn-add-cart svg {
@@ -687,9 +663,7 @@
         height: 30px;
         border: 2px solid #16a34a;
         margin: 0;
-        line-height: 1;
-        box-sizing: border-box;
-        -webkit-appearance: none;
+        padding: 0;
     }
 
     .btn-detail-icon svg {
@@ -712,9 +686,7 @@
         height: 30px;
         border: 2px solid #16a34a;
         margin: 0;
-        line-height: 1;
-        box-sizing: border-box;
-        -webkit-appearance: none;
+        padding: 0;
     }
 
     .btn-add-cart svg {
