@@ -70,6 +70,7 @@ const api = {
 
   // Orders
   getOrders: () => request<import("./types").Order[]>("/orders"),
+  getOrder: (id: number) => request<import("./types").Order>("/orders/" + id),
   getOrderSummary: () => request<import("./types").OrderStatusSummary>("/orders/summary"),
   updateOrderStatus: (id: number, status: import("./types").OrderStatus) =>
     request<import("./types").Order>("/orders/" + id + "/status", { method: "PATCH", body: JSON.stringify({ status }) }),

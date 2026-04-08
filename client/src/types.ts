@@ -50,6 +50,17 @@ export interface Order {
   order_date: string;
   created_at: string;
   updated_at: string;
+  items?: OrderItem[];
+}
+
+export interface OrderItem {
+  id: number;
+  order_id: number;
+  product_id: number;
+  product_name: string;
+  quantity: number;
+  unit_price: string;
+  subtotal: string;
 }
 
 export interface OrderStatusSummary {

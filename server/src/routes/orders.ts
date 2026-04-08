@@ -82,9 +82,9 @@ router.post("/", async (req: Request, res: Response) => {
       if (!item.product_id || !item.quantity || item.quantity <= 0) {
         throw new Error("Each item needs a valid product_id and quantity > 0");
       }
-      // Look up the product and its current active price via grade_id
+      // Look up the product, its stock, and its current active price via grade_id
       const { rows: productRows } = await client.query(
-        `SELECT p.id, cp.price
+        `SELECT p.id, p.name, p.stock, cp.price
          FROM products p
          JOIN commodity_prices cp ON cp.grade_id = p.grade_id
            AND cp.is_active = true
@@ -96,7 +96,13 @@ router.post("/", async (req: Request, res: Response) => {
       if (productRows.length === 0) {
         throw new Error(`Product ${item.product_id} not found or has no active price`);
       }
-      const unit_price = Number(productRows[0].price);
+      const product = productRows[0];
+      if (product.stock < item.quantity) {
+        throw new Error(
+          `Stok tidak cukup untuk "${product.name}": tersedia ${product.stock}, diminta ${item.quantity}`
+        );
+      }
+      const unit_price = Number(product.price);
       const subtotal = unit_price * item.quantity;
       total_price += subtotal;
       orderItems.push({ product_id: item.product_id, quantity: item.quantity, unit_price, subtotal });
@@ -110,12 +116,16 @@ router.post("/", async (req: Request, res: Response) => {
     );
     const order = orderRows[0];
 
-    // --- 5. Insert each order item ---
+    // --- 5. Insert each order item & reduce stock ---
     for (const oi of orderItems) {
       await client.query(
         `INSERT INTO order_items (order_id, product_id, quantity, unit_price, subtotal)
          VALUES ($1, $2, $3, $4, $5)`,
         [order.id, oi.product_id, oi.quantity, oi.unit_price, oi.subtotal]
+      );
+      await client.query(
+        `UPDATE products SET stock = stock - $1 WHERE id = $2`,
+        [oi.quantity, oi.product_id]
       );
     }
 

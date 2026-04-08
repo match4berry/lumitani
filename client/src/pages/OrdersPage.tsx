@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api";
 import { showToast } from "../components/Toast";
-import type { Order, OrderStatus, OrderStatusSummary } from "../types";
+import type { Order, OrderItem, OrderStatus, OrderStatusSummary } from "../types";
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   menunggu_proses: "Menunggu Proses",
@@ -36,7 +36,19 @@ export default function OrdersPage() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<OrderStatus | "">("");
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
+  const [detailItems, setDetailItems] = useState<OrderItem[]>([]);
   const [statusModalOrder, setStatusModalOrder] = useState<Order | null>(null);
+
+  const openDetail = async (order: Order) => {
+    try {
+      const full = await api.getOrder(order.id);
+      setDetailOrder(full);
+      setDetailItems(full.items || []);
+    } catch {
+      setDetailOrder(order);
+      setDetailItems([]);
+    }
+  };
 
   const load = async () => {
     try {
@@ -222,7 +234,7 @@ export default function OrdersPage() {
                       fontSize: 13,
                       fontWeight: 500,
                     }}
-                    onClick={() => setDetailOrder(o)}
+                    onClick={() => openDetail(o)}
                   >
                     Lihat Detail
                   </button>
@@ -313,6 +325,32 @@ export default function OrdersPage() {
                 ))}
               </tbody>
             </table>
+
+            {detailItems.length > 0 && (
+              <>
+                <h4 style={{ margin: "20px 0 10px", color: "#334155" }}>Item Pesanan</h4>
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Produk</th>
+                      <th style={{ textAlign: "right" }}>Jumlah</th>
+                      <th style={{ textAlign: "right" }}>Harga Satuan</th>
+                      <th style={{ textAlign: "right" }}>Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detailItems.map((item) => (
+                      <tr key={item.id}>
+                        <td>{item.product_name}</td>
+                        <td style={{ textAlign: "right" }}>{item.quantity}</td>
+                        <td style={{ textAlign: "right" }}>{fmt(item.unit_price)}</td>
+                        <td style={{ textAlign: "right" }}>{fmt(item.subtotal)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            )}
             <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
               <button
                 className="btn btn-secondary"
