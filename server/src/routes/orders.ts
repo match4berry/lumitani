@@ -131,12 +131,34 @@ router.post("/", async (req: Request, res: Response) => {
   }
 });
 
-// PATCH update order status
+// PATCH update order status (must follow sequential order)
+const STATUS_FLOW = ["menunggu_proses", "diproses", "dikirim", "selesai"];
+
 router.patch("/:id/status", async (req: Request, res: Response) => {
   const { status } = req.body;
-  const validStatuses = ["menunggu_proses", "diproses", "dikirim", "selesai"];
-  if (!validStatuses.includes(status)) {
+  if (!STATUS_FLOW.includes(status)) {
     res.status(400).json({ error: "Invalid status" });
+    return;
+  }
+
+  // Fetch current order
+  const { rows: current } = await pool.query(
+    "SELECT * FROM orders WHERE id = $1",
+    [req.params.id]
+  );
+  if (current.length === 0) {
+    res.status(404).json({ error: "Order not found" });
+    return;
+  }
+
+  const currentIndex = STATUS_FLOW.indexOf(current[0].status);
+  const newIndex = STATUS_FLOW.indexOf(status);
+
+  if (newIndex !== currentIndex + 1) {
+    const nextStatus = STATUS_FLOW[currentIndex + 1] || "(sudah selesai)";
+    res.status(400).json({
+      error: `Status hanya bisa diubah ke tahap berikutnya: ${nextStatus}`,
+    });
     return;
   }
 
@@ -144,10 +166,6 @@ router.patch("/:id/status", async (req: Request, res: Response) => {
     "UPDATE orders SET status = $1 WHERE id = $2 RETURNING *",
     [status, req.params.id]
   );
-  if (rows.length === 0) {
-    res.status(404).json({ error: "Order not found" });
-    return;
-  }
   res.json(rows[0]);
 });
 

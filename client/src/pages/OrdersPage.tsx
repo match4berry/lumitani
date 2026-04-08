@@ -352,26 +352,30 @@ export default function OrdersPage() {
                 gap: 8,
               }}
             >
-              {(
-                [
-                  "menunggu_proses",
-                  "diproses",
-                  "dikirim",
-                  "selesai",
-                ] as OrderStatus[]
-              ).map((status) => (
-                <button
-                  key={status}
-                  className={`btn ${statusModalOrder.status === status ? "btn-primary" : "btn-secondary"}`}
-                  onClick={() =>
-                    handleStatusChange(statusModalOrder, status)
-                  }
-                  style={{ justifyContent: "flex-start" }}
-                >
-                  {STATUS_LABELS[status]}
-                  {statusModalOrder.status === status && " (saat ini)"}
-                </button>
-              ))}
+              {(() => {
+                const flow: OrderStatus[] = ["menunggu_proses", "diproses", "dikirim", "selesai"];
+                const currentIndex = flow.indexOf(statusModalOrder.status);
+                const nextStatus = flow[currentIndex + 1];
+                return flow.map((status) => {
+                  const isCurrent = statusModalOrder.status === status;
+                  const isNext = status === nextStatus;
+                  return (
+                    <button
+                      key={status}
+                      className={`btn ${isCurrent ? "btn-primary" : isNext ? "btn-success" : "btn-secondary"}`}
+                      onClick={() =>
+                        handleStatusChange(statusModalOrder, status)
+                      }
+                      disabled={!isNext}
+                      style={{ justifyContent: "flex-start", opacity: isCurrent || isNext ? 1 : 0.4 }}
+                    >
+                      {STATUS_LABELS[status]}
+                      {isCurrent && " (saat ini)"}
+                      {isNext && " →"}
+                    </button>
+                  );
+                });
+              })()}
             </div>
           </div>
         </div>
