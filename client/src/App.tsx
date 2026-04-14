@@ -6,6 +6,7 @@ import FarmersPage from "./pages/FarmersPage";
 import CommoditiesPage from "./pages/CommoditiesPage";
 import PricesPage from "./pages/PricesPage";
 import OrdersPage from "./pages/OrdersPage";
+import CommissionPage from "./pages/CommissionPage";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/commodities" element={<CommoditiesPage />} />
           <Route path="/prices" element={<PricesPage />} />
           <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/commissions" element={<CommissionPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

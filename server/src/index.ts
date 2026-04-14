@@ -7,6 +7,8 @@ import gradesRouter from "./routes/grades";
 import pricesRouter from "./routes/prices";
 import productsRouter from "./routes/products";
 import ordersRouter from "./routes/orders";
+import usersRouter from "./routes/users";
+import commissionsRouter from "./routes/commissions";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -47,6 +49,8 @@ app.use("/api/grades", gradesRouter);
 app.use("/api/prices", pricesRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/orders", ordersRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/commissions", commissionsRouter);
 
 const start = async () => {
   try {

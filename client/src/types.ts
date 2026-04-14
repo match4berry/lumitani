@@ -45,6 +45,8 @@ export interface Order {
   id: number;
   order_code: string;
   customer_name: string;
+  user_id: number | null;
+  user_name?: string;
   status: OrderStatus;
   total_price: string;
   order_date: string;
@@ -86,4 +88,45 @@ export interface Product {
   current_price?: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  address: string | null;
+  role: 'user' | 'admin';
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommissionSettings {
+  id: number | null;
+  rate: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CommissionReportSummary {
+  total_orders: number;
+  total_revenue: string;
+  total_commission: string;
+}
+
+export interface CommissionOrder {
+  id: number;
+  order_code: string;
+  customer_name: string;
+  order_date: string;
+  total_price: string;
+  commission_rate: string;
+  commission_amount: string;
+  status: string;
+}
+
+export interface CommissionReport {
+  summary: CommissionReportSummary;
+  orders: CommissionOrder[];
 }

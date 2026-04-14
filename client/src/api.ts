@@ -74,6 +74,28 @@ const api = {
   getOrderSummary: () => request<import("./types").OrderStatusSummary>("/orders/summary"),
   updateOrderStatus: (id: number, status: import("./types").OrderStatus) =>
     request<import("./types").Order>("/orders/" + id + "/status", { method: "PATCH", body: JSON.stringify({ status }) }),
+
+  // Users
+  getUsers: () => request<import("./types").User[]>("/users"),
+  getUser: (id: number) => request<import("./types").User>("/users/" + id),
+  createUser: (data: { name: string; email: string; phone?: string; address?: string; role?: string }) =>
+    request<import("./types").User>("/users", { method: "POST", body: JSON.stringify(data) }),
+  updateUser: (id: number, data: { name: string; email: string; phone?: string; address?: string; role?: string; is_active?: boolean }) =>
+    request<import("./types").User>("/users/" + id, { method: "PUT", body: JSON.stringify(data) }),
+  deleteUser: (id: number) =>
+    request("/users/" + id, { method: "DELETE" }),
+
+  // Commissions
+  getCommissionSettings: () => request<import("./types").CommissionSettings>("/commissions/settings"),
+  updateCommissionSettings: (rate: number) =>
+    request<import("./types").CommissionSettings>("/commissions/settings", { method: "PUT", body: JSON.stringify({ rate }) }),
+  getCommissionReport: (startDate?: string, endDate?: string) => {
+    const params = new URLSearchParams();
+    if (startDate) params.set("start_date", startDate);
+    if (endDate) params.set("end_date", endDate);
+    const qs = params.toString();
+    return request<import("./types").CommissionReport>("/commissions/report" + (qs ? `?${qs}` : ""));
+  },
 };
 
 export default api;

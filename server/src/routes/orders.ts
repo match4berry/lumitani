@@ -3,11 +3,21 @@ import pool from "../config/db";
 
 const router = Router();
 
-// GET all orders
-router.get("/", async (_req: Request, res: Response) => {
-  const { rows } = await pool.query(`
-    SELECT * FROM orders ORDER BY order_date DESC
-  `);
+// GET all orders (optional filter: ?user_id=X)
+router.get("/", async (req: Request, res: Response) => {
+  const { user_id } = req.query;
+  let query = `
+    SELECT o.*, u.name AS user_name
+    FROM orders o
+    LEFT JOIN users u ON u.id = o.user_id
+  `;
+  const params: any[] = [];
+  if (user_id) {
+    query += " WHERE o.user_id = $1";
+    params.push(user_id);
+  }
+  query += " ORDER BY o.order_date DESC";
+  const { rows } = await pool.query(query, params);
   res.json(rows);
 });
 
@@ -54,7 +64,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 // POST create a new order
 router.post("/", async (req: Request, res: Response) => {
-  const { customer_name, items } = req.body;
+  const { customer_name, items, user_id } = req.body;
 
   // --- 1. Validate the request body ---
   if (!customer_name || !Array.isArray(items) || items.length === 0) {
@@ -108,15 +118,21 @@ router.post("/", async (req: Request, res: Response) => {
       orderItems.push({ product_id: item.product_id, quantity: item.quantity, unit_price, subtotal });
     }
 
-    // --- 4. Insert the order row ---
+    // --- 4. Fetch current commission rate (snapshot) ---
+    const { rows: commRows } = await client.query(
+      "SELECT rate FROM commission_settings ORDER BY id DESC LIMIT 1"
+    );
+    const commission_rate = commRows.length > 0 ? Number(commRows[0].rate) : 5.0;
+
+    // --- 5. Insert the order row ---
     const { rows: orderRows } = await client.query(
-      `INSERT INTO orders (order_code, customer_name, total_price)
-       VALUES ($1, $2, $3) RETURNING *`,
-      [order_code, customer_name, total_price]
+      `INSERT INTO orders (order_code, customer_name, total_price, user_id, commission_rate)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [order_code, customer_name, total_price, user_id || null, commission_rate]
     );
     const order = orderRows[0];
 
-    // --- 5. Insert each order item & reduce stock ---
+    // --- 6. Insert each order item & reduce stock ---
     for (const oi of orderItems) {
       await client.query(
         `INSERT INTO order_items (order_id, product_id, quantity, unit_price, subtotal)
@@ -131,7 +147,7 @@ router.post("/", async (req: Request, res: Response) => {
 
     await client.query("COMMIT");
 
-    // --- 6. Return the created order with its items ---
+    // --- 7. Return the created order with its items ---
     res.status(201).json({ ...order, items: orderItems });
   } catch (err: any) {
     await client.query("ROLLBACK");
@@ -176,6 +192,19 @@ router.patch("/:id/status", async (req: Request, res: Response) => {
     "UPDATE orders SET status = $1 WHERE id = $2 RETURNING *",
     [status, req.params.id]
   );
+
+  // Calculate commission when order reaches "selesai"
+  if (status === "selesai") {
+    const order = rows[0];
+    const rate = order.commission_rate != null ? Number(order.commission_rate) : 5.0;
+    const commission_amount = Math.round(Number(order.total_price) * rate / 100 * 100) / 100;
+    await pool.query(
+      "UPDATE orders SET commission_amount = $1 WHERE id = $2",
+      [commission_amount, order.id]
+    );
+    rows[0].commission_amount = commission_amount;
+  }
+
   res.json(rows[0]);
 });
 
