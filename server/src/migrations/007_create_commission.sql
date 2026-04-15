@@ -26,10 +26,10 @@ ALTER TABLE orders
     ADD COLUMN commission_rate   NUMERIC(5,2) DEFAULT NULL,
     ADD COLUMN commission_amount NUMERIC(15,2) DEFAULT NULL;
 
--- Backfill existing "selesai" orders with the default 5% rate
+-- Backfill all existing orders with the default 5% rate
 UPDATE orders
 SET commission_rate = 5.00,
     commission_amount = ROUND(total_price * 5.00 / 100, 2)
-WHERE status = 'selesai';
+WHERE commission_rate IS NULL;
 
 COMMIT;

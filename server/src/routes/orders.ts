@@ -118,17 +118,18 @@ router.post("/", async (req: Request, res: Response) => {
       orderItems.push({ product_id: item.product_id, quantity: item.quantity, unit_price, subtotal });
     }
 
-    // --- 4. Fetch current commission rate (snapshot) ---
+    // --- 4. Fetch current commission rate & calculate commission upfront ---
     const { rows: commRows } = await client.query(
       "SELECT rate FROM commission_settings ORDER BY id DESC LIMIT 1"
     );
     const commission_rate = commRows.length > 0 ? Number(commRows[0].rate) : 5.0;
+    const commission_amount = Math.round(total_price * commission_rate / 100 * 100) / 100;
 
     // --- 5. Insert the order row ---
     const { rows: orderRows } = await client.query(
-      `INSERT INTO orders (order_code, customer_name, total_price, user_id, commission_rate)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [order_code, customer_name, total_price, user_id || null, commission_rate]
+      `INSERT INTO orders (order_code, customer_name, total_price, user_id, commission_rate, commission_amount)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [order_code, customer_name, total_price, user_id || null, commission_rate, commission_amount]
     );
     const order = orderRows[0];
 
@@ -192,18 +193,6 @@ router.patch("/:id/status", async (req: Request, res: Response) => {
     "UPDATE orders SET status = $1 WHERE id = $2 RETURNING *",
     [status, req.params.id]
   );
-
-  // Calculate commission when order reaches "selesai"
-  if (status === "selesai") {
-    const order = rows[0];
-    const rate = order.commission_rate != null ? Number(order.commission_rate) : 5.0;
-    const commission_amount = Math.round(Number(order.total_price) * rate / 100 * 100) / 100;
-    await pool.query(
-      "UPDATE orders SET commission_amount = $1 WHERE id = $2",
-      [commission_amount, order.id]
-    );
-    rows[0].commission_amount = commission_amount;
-  }
 
   res.json(rows[0]);
 });

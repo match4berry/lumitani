@@ -49,6 +49,8 @@ export interface Order {
   user_name?: string;
   status: OrderStatus;
   total_price: string;
+  commission_rate: string | null;
+  commission_amount: string | null;
   order_date: string;
   created_at: string;
   updated_at: string;

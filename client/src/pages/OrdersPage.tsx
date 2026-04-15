@@ -206,6 +206,7 @@ export default function OrdersPage() {
               <th>Nama Pelanggan</th>
               <th>Tanggal Pesanan</th>
               <th>Total Harga</th>
+              <th>Komisi (%)</th>
               <th>Status</th>
               <th>Aksi</th>
             </tr>
@@ -217,6 +218,9 @@ export default function OrdersPage() {
                 <td>{o.customer_name}</td>
                 <td>{fmtDate(o.order_date)}</td>
                 <td>{fmt(o.total_price)}</td>
+                <td style={{ textAlign: "right" }}>
+                  {o.commission_rate != null ? `${Number(o.commission_rate).toFixed(2)}%` : "—"}
+                </td>
                 <td>
                   <span
                     className={`badge ${STATUS_BADGE[o.status]}`}
@@ -244,7 +248,7 @@ export default function OrdersPage() {
             {filtered.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   style={{
                     textAlign: "center",
                     padding: 24,
@@ -299,6 +303,18 @@ export default function OrdersPage() {
                     ["Nama Pelanggan", detailOrder.customer_name],
                     ["Tanggal Pesanan", fmtDate(detailOrder.order_date)],
                     ["Total Harga", fmt(detailOrder.total_price)],
+                    [
+                      "Tarif Komisi",
+                      detailOrder.commission_rate != null
+                        ? `${Number(detailOrder.commission_rate).toFixed(2)}%`
+                        : "—",
+                    ],
+                    [
+                      "Jumlah Komisi",
+                      detailOrder.commission_amount != null
+                        ? fmt(detailOrder.commission_amount)
+                        : "—",
+                    ],
                     ["Status", STATUS_LABELS[detailOrder.status]],
                     [
                       "Dibuat",
