@@ -1,5 +1,27 @@
 /* ===== PROFILE PAGE STYLES ===== */
 
+/* Page Header */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 20px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-image {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+}
+
 /* Hero Section */
 .profile-hero {
     background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);

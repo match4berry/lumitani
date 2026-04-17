@@ -102,6 +102,75 @@ app.get('/alamat-pengiriman', (req, res) => {
   res.render('alamat-pengiriman');
 });
 
+// Pesanan Saya (My Orders) page - renamed to order-history
+app.get('/order-history', (req, res) => {
+  try {
+    const fs = require('fs');
+    const ordersPath = path.join(__dirname, '../data/orders.json');
+    
+    // Read orders from file
+    const ordersData = fs.readFileSync(ordersPath, 'utf8');
+    let allOrders = JSON.parse(ordersData);
+    
+    // Filter by status if provided
+    const { status, sort, page = 1 } = req.query;
+    let filteredOrders = allOrders;
+    
+    if (status && status !== 'all') {
+      const statusMap = {
+        'pending': 'Menunggu Diproses',
+        'processing': 'Diproses',
+        'completed': 'Selesai',
+        'shipped': 'Pengiriman'
+      };
+      const statusValue = statusMap[status];
+      filteredOrders = allOrders.filter(order => order.status === statusValue);
+    }
+    
+    // Sort orders
+    if (sort === 'oldest') {
+      filteredOrders.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    } else {
+      filteredOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+    
+    // Pagination
+    const itemsPerPage = 5;
+    const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+    const currentPage = Math.min(Math.max(parseInt(page) || 1, 1), totalPages || 1);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const orders = filteredOrders.slice(startIndex, startIndex + itemsPerPage);
+    
+    // Map display seller names from items or use default
+    orders.forEach(order => {
+      order.seller = order.seller || 'Penjual Lokal Manud Jaya';
+    });
+    
+    res.render('order-history', { 
+      orders, 
+      currentPage, 
+      totalPages,
+      currentStatus: status || 'all',
+      currentSort: sort || 'newest'
+    });
+  } catch (err) {
+    console.error('Error loading orders:', err);
+    const { status, sort } = req.query;
+    res.render('order-history', { 
+      orders: [], 
+      currentPage: 1, 
+      totalPages: 0,
+      currentStatus: status || 'all',
+      currentSort: sort || 'newest'
+    });
+  }
+});
+
+// Redirect from old pesanan-saya route
+app.get('/pesanan-saya', (req, res) => {
+  res.redirect('/order-history');
+});
+
 // Order routes
 app.use(orderRoutes);
 
