@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api";
 import { showToast } from "../components/Toast";
-import type { Order, OrderStatus, OrderStatusSummary } from "../types";
+import type { Order, OrderItem, OrderStatus, OrderStatusSummary } from "../types";
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   menunggu_proses: "Menunggu Proses",
@@ -36,7 +36,19 @@ export default function OrdersPage() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<OrderStatus | "">("");
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
+  const [detailItems, setDetailItems] = useState<OrderItem[]>([]);
   const [statusModalOrder, setStatusModalOrder] = useState<Order | null>(null);
+
+  const openDetail = async (order: Order) => {
+    try {
+      const full = await api.getOrder(order.id);
+      setDetailOrder(full);
+      setDetailItems(full.items || []);
+    } catch {
+      setDetailOrder(order);
+      setDetailItems([]);
+    }
+  };
 
   const load = async () => {
     try {
@@ -194,6 +206,7 @@ export default function OrdersPage() {
               <th>Nama Pelanggan</th>
               <th>Tanggal Pesanan</th>
               <th>Total Harga</th>
+              <th>Komisi (%)</th>
               <th>Status</th>
               <th>Aksi</th>
             </tr>
@@ -205,6 +218,9 @@ export default function OrdersPage() {
                 <td>{o.customer_name}</td>
                 <td>{fmtDate(o.order_date)}</td>
                 <td>{fmt(o.total_price)}</td>
+                <td style={{ textAlign: "right" }}>
+                  {o.commission_rate != null ? `${Number(o.commission_rate).toFixed(2)}%` : "—"}
+                </td>
                 <td>
                   <span
                     className={`badge ${STATUS_BADGE[o.status]}`}
@@ -222,7 +238,7 @@ export default function OrdersPage() {
                       fontSize: 13,
                       fontWeight: 500,
                     }}
-                    onClick={() => setDetailOrder(o)}
+                    onClick={() => openDetail(o)}
                   >
                     Lihat Detail
                   </button>
@@ -232,7 +248,7 @@ export default function OrdersPage() {
             {filtered.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   style={{
                     textAlign: "center",
                     padding: 24,
@@ -287,6 +303,18 @@ export default function OrdersPage() {
                     ["Nama Pelanggan", detailOrder.customer_name],
                     ["Tanggal Pesanan", fmtDate(detailOrder.order_date)],
                     ["Total Harga", fmt(detailOrder.total_price)],
+                    [
+                      "Tarif Komisi",
+                      detailOrder.commission_rate != null
+                        ? `${Number(detailOrder.commission_rate).toFixed(2)}%`
+                        : "—",
+                    ],
+                    [
+                      "Jumlah Komisi",
+                      detailOrder.commission_amount != null
+                        ? fmt(detailOrder.commission_amount)
+                        : "—",
+                    ],
                     ["Status", STATUS_LABELS[detailOrder.status]],
                     [
                       "Dibuat",
@@ -313,6 +341,32 @@ export default function OrdersPage() {
                 ))}
               </tbody>
             </table>
+
+            {detailItems.length > 0 && (
+              <>
+                <h4 style={{ margin: "20px 0 10px", color: "#334155" }}>Item Pesanan</h4>
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Produk</th>
+                      <th style={{ textAlign: "right" }}>Jumlah</th>
+                      <th style={{ textAlign: "right" }}>Harga Satuan</th>
+                      <th style={{ textAlign: "right" }}>Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detailItems.map((item) => (
+                      <tr key={item.id}>
+                        <td>{item.product_name}</td>
+                        <td style={{ textAlign: "right" }}>{item.quantity}</td>
+                        <td style={{ textAlign: "right" }}>{fmt(item.unit_price)}</td>
+                        <td style={{ textAlign: "right" }}>{fmt(item.subtotal)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            )}
             <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
               <button
                 className="btn btn-secondary"
@@ -352,26 +406,30 @@ export default function OrdersPage() {
                 gap: 8,
               }}
             >
-              {(
-                [
-                  "menunggu_proses",
-                  "diproses",
-                  "dikirim",
-                  "selesai",
-                ] as OrderStatus[]
-              ).map((status) => (
-                <button
-                  key={status}
-                  className={`btn ${statusModalOrder.status === status ? "btn-primary" : "btn-secondary"}`}
-                  onClick={() =>
-                    handleStatusChange(statusModalOrder, status)
-                  }
-                  style={{ justifyContent: "flex-start" }}
-                >
-                  {STATUS_LABELS[status]}
-                  {statusModalOrder.status === status && " (saat ini)"}
-                </button>
-              ))}
+              {(() => {
+                const flow: OrderStatus[] = ["menunggu_proses", "diproses", "dikirim", "selesai"];
+                const currentIndex = flow.indexOf(statusModalOrder.status);
+                const nextStatus = flow[currentIndex + 1];
+                return flow.map((status) => {
+                  const isCurrent = statusModalOrder.status === status;
+                  const isNext = status === nextStatus;
+                  return (
+                    <button
+                      key={status}
+                      className={`btn ${isCurrent ? "btn-primary" : isNext ? "btn-success" : "btn-secondary"}`}
+                      onClick={() =>
+                        handleStatusChange(statusModalOrder, status)
+                      }
+                      disabled={!isNext}
+                      style={{ justifyContent: "flex-start", opacity: isCurrent || isNext ? 1 : 0.4 }}
+                    >
+                      {STATUS_LABELS[status]}
+                      {isCurrent && " (saat ini)"}
+                      {isNext && " →"}
+                    </button>
+                  );
+                });
+              })()}
             </div>
           </div>
         </div>
