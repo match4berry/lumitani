@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
+const session = require('express-session');
 const { getProducts, getProductById, fetchProductById, fetchProducts, fetchCategories } = require('./controllers/productController');
 const { getCart, addToCart, removeFromCart } = require('./controllers/cartController');
 const orderRoutes = require('./routes/order');
@@ -15,6 +16,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
+// Session middleware
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'lumitani-secret-key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { maxAge: 60000 * 60 * 24 } // 24 hours
+}));
+
 // Set view engine with layouts
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
@@ -23,7 +32,7 @@ app.set('layout', 'layout');
 
 // Routes
 
-// Home page
+// Home page (before login) - shows landing-before-login + landing combined without bottom nav
 app.get('/', async (req, res) => {
   let products = []
   try {
@@ -40,7 +49,113 @@ app.get('/', async (req, res) => {
   }catch(err) {
     console.log(err)
   }
+
+  // If not logged in, show combined landing-before-login + landing 
+  if (!req.session.userId) {
+    return res.render('landing-before-login', { 
+      layout: false, 
+      products, 
+      categories, 
+      currentCategory: 'all',
+      isLoggedIn: false
+    });
+  }
+
+  // If logged in, redirect to /home
+  res.redirect('/home');
+});
+
+// Home page (after login) - shows landing page with bottom nav and layout
+app.get('/home', async (req, res) => {
+  // If not logged in, redirect to /
+  if (!req.session.userId) {
+    return res.redirect('/');
+  }
+
+  let products = []
+  try {
+    var callProducts
+    if(req.query.category){
+      callProducts  = fetchProducts(req.query.category)
+    }else{
+      callProducts = fetchProducts()
+    }
+    const mappingFuncCall = [callProducts, fetchCategories()]
+    let [dataProducts, dataCategories] = await Promise.all(mappingFuncCall)
+    products = dataProducts.items
+    categories = Array.isArray(dataCategories) ? dataCategories : (dataCategories.items || [])
+  }catch(err) {
+    console.log(err)
+  }
+
   res.render('landing', { products, categories, currentCategory: 'all' });
+});
+
+// Registration page
+app.get('/registration', (req, res) => {
+  res.render('registration', { layout: false });
+});
+
+// Registration POST
+app.post('/register', (req, res) => {
+  const { name, email, password, confirm_password } = req.body;
+  
+  // Basic validation
+  if (!name || !email || !password || !confirm_password) {
+    return res.render('registration', { 
+      layout: false, 
+      error: 'Semua field harus diisi' 
+    });
+  }
+  
+  if (password !== confirm_password) {
+    return res.render('registration', { 
+      layout: false, 
+      error: 'Password tidak cocok' 
+    });
+  }
+  
+  // Create session
+  req.session.userId = email;
+  req.session.userName = name;
+  
+  // Redirect to home after successful registration
+  res.redirect('/home');
+});
+
+// Login page
+app.get('/login', (req, res) => {
+  res.render('login', { layout: false });
+});
+
+// Login POST
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  
+  // Basic validation
+  if (!email || !password) {
+    return res.render('login', { 
+      layout: false, 
+      error: 'Email dan Password harus diisi' 
+    });
+  }
+  
+  // Create session (simple - just save email and a dummy name)
+  req.session.userId = email;
+  req.session.userName = email.split('@')[0];
+  
+  // Redirect to home after successful login
+  res.redirect('/home');
+});
+
+// Logout
+app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.render('error', { message: 'Failed to logout' });
+    }
+    res.redirect('/');
+  });
 });
 
 // Catalog with category filter
