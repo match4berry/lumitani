@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lumitani Platform</title>
+    <link rel="stylesheet" href="/css/landing-page.css">
+    <link rel="stylesheet" href="/css/home.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            <img src="/logo.png" alt="LumiTani Logo">
+        </div>
+
+        <div class="menu">
+            <a href="/">Home</a>
+            <a href="/catalog">Produk</a>
+            <a href="#">Harga</a>
+            <a href="/about">Tentang</a>
+        </div>
+
+        <div class="nav-right">
+            <a href="/registration" class="btn-login">Login</a>
+        </div>
+
+    </nav>
+
+    <section class="hero">
+
+        <img src="/logo.png" alt="Logo Lumitani" class="hero-logo">
+
+        <h1>Platform Harga Kolektif Pertanian</h1>
+
+        <p>
+            Lumitani membantu petani dan konsumen mendapatkan harga yang adil
+            melalui sistem harga kolektif dan transparansi harga.
+        </p>
+
+        <a href="/catalog">
+            <button class="btn-primary">Lihat Produk</button>
+        </a>
+
+    </section>
+
+    <section class="features">
+
+        <div class="card">
+            <h3>Harga Transparan</h3>
+            <p>Harga produk ditampilkan secara terbuka untuk semua pengguna.</p>
+        </div>
+
+        <div class="card">
+            <h3>Dukung Petani</h3>
+            <p>Petani dapat menjual produk dengan harga yang lebih adil.</p>
+        </div>
+
+        <div class="card">
+            <h3>Distribusi Efisien</h3>
+            <p>Menghubungkan petani dan konsumen secara langsung.</p>
+        </div>
+
+    </section>
+
+    <!-- Best Seller Section -->
+    <section class="best-seller-section">
+        <div class="section-header">
+            <h2 class="section-title">⭐ Best Seller</h2>
+            <a href="/catalog" class="link-text">Lihat Semua ></a>
+        </div>
+        <% if (products && products.length > 0) { %>
+        <div class="products-scroll">
+            <% products.slice(0, 6).forEach(product => { %>
+                <div class="product-card-home">
+                    <div class="product-badge">Best</div>
+                    <div class="product-image">
+                        <img 
+                            src="<%= product.photo_url || (product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/200') %>" 
+                            alt="<%= product.name %>"
+                            loading="lazy">
+                    </div>
+                    <div class="product-name"><%= product.name %></div>
+                    <div class="product-price">Rp <%= product.current_price ? product.current_price.toLocaleString('id-ID') : (product.price ? product.price.toLocaleString('id-ID') : '0') %>/kg</div>
+                </div>
+            <% }); %>
+        </div>
+        <% } else { %>
+        <div class="no-products">
+            <p>Produk tidak tersedia</p>
+        </div>
+        <% } %>
+    </section>
+
+    <!-- Category Section -->
+    <section class="category-section">
+        <div class="section-header">
+            <h2 class="section-title">🌾 Kategori Produk</h2>
+            <a href="/catalog" class="link-text">Lihat Semua ></a>
+        </div>
+        <div class="categories-grid-home">
+            <a href="/?category=sayuran" class="category-card-home" data-bg-color="#D1F4E0">
+                <span class="category-emoji">🥬</span>
+                <span class="category-label">Sayuran Hijau</span>
+            </a>
+            <a href="/?category=buah" class="category-card-home" data-bg-color="#FFD6E8">
+                <span class="category-emoji">🍅</span>
+                <span class="category-label">Buah-buahan</span>
+            </a>
+            <a href="/?category=umbi" class="category-card-home" data-bg-color="#FFF4D6">
+                <span class="category-emoji">🥕</span>
+                <span class="category-label">Umbi-umbian</span>
+            </a>
+            <a href="/?category=bumbu" class="category-card-home" data-bg-color="#D1F4E0">
+                <span class="category-emoji">🌿</span>
+                <span class="category-label">Bumbu Dapur</span>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 Lumitani Platform</p>
+    </footer>
+
+    <script>
+    document.querySelectorAll('.category-card-home').forEach(card => {
+        const bgColor = card.getAttribute('data-bg-color');
+        if (bgColor) {
+            card.style.backgroundColor = bgColor;
+        }
+    });
+    </script>
+
+</body>
+
+</html>

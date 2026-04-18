@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Checkout - Lumitani</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="page-header">
+        <div class="header-logo">
+            <img src="/logo.png" alt="LumiTani" class="logo-image">
+        </div>
+    </header>
+
+    <h2>Checkout</h2>
+    <p>Ringkasan pesanan kamu</p>
+
+    <div class="checkout-grid">
+
+        <!-- KIRI -->
+        <div>
+            <div class="card">
+                <h3>Ringkasan Pesanan</h3>
+
+                <% if (items && items.length > 0) { %>
+                    <% items.forEach(item => { %>
+                        <div class="product">
+                            <div class="product-icon">
+                                <% 
+                                    // Map product names to emojis
+                                    let emoji = '🥬';
+                                    const name = item.name.toLowerCase();
+                                    if (name.includes('bayam')) emoji = '🥬';
+                                    else if (name.includes('kangkung')) emoji = '🥬';
+                                    else if (name.includes('tomat')) emoji = '🍅';
+                                    else if (name.includes('wortel')) emoji = '🥕';
+                                    else if (name.includes('mentimun')) emoji = '🥒';
+                                    else if (name.includes('cabai')) emoji = '🌶️';
+                                    else if (name.includes('lada')) emoji = '🌶️';
+                                    else if (name.includes('uni') || name.includes('ungu')) emoji = '🌶️';
+                                %>
+                                <%= emoji %>
+                            </div>
+                            <div class="product-info">
+                                <p><%= item.name %></p>
+                                <small>Rp <%= item.price.toLocaleString('id-ID') %> x <%= item.quantity %></small>
+                                <div class="price">Rp <%= (item.price * item.quantity).toLocaleString('id-ID') %></div>
+                            </div>
+                        </div>
+                    <% }); %>
+                    <hr>
+                    <p><b>Total: Rp <%= total.toLocaleString('id-ID') %></b></p>
+                <% } else { %>
+                    <p>Tidak ada produk dalam pesanan</p>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- KANAN -->
+        <div>
+            <form action="/order" method="POST">
+
+                <div class="card">
+                    <h3>Alamat Pengiriman</h3>
+
+                    <div class="form-group">
+                        <label>Nama Penerima</label>
+                        <input type="text" name="name" placeholder="Masukkan nama penerima" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nomor Telepon</label>
+                        <input type="text" name="phone" placeholder="Masukkan nomor telepon">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Alamat Lengkap</label>
+                        <textarea name="address" placeholder="Masukkan alamat lengkap" required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Kota</label>
+                            <input type="text" name="city" placeholder="Masukkan kota">
+                        </div>
+                        <div class="form-group">
+                            <label>Kode Pos</label>
+                            <input type="text" name="postal" placeholder="Masukkan kode pos">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card payment">
+                    <h3>Metode Pembayaran</h3>
+
+                    <label><input type="radio" name="payment" value="bank" required> Transfer Bank</label>
+                    <label><input type="radio" name="payment" value="ewallet"> E-Wallet</label>
+                    <label><input type="radio" name="payment" value="cod"> COD</label>
+                </div>
+
+                <!-- Hidden fields to pass items and total -->
+                <input type="hidden" name="items" value='<%= JSON.stringify(items) %>'>
+                <input type="hidden" name="total" value="<%= total %>">
+
+                <button type="submit">Order Now</button>
+
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
+
+

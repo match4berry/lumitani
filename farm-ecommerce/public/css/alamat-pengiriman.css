@@ -1,0 +1,342 @@
+/* ===== ALAMAT PENGIRIMAN PAGE STYLES ===== */
+
+/* Header */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 20px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-image {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Content Container */
+.address-content {
+    padding: 1.5rem;
+    background: #f9fafb;
+    min-height: calc(100vh - 200px);
+}
+
+/* Address Cards */
+.address-cards {
+    margin-bottom: 2rem;
+}
+
+.address-card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s;
+}
+
+.address-card.primary {
+    border-color: #16a34a;
+}
+
+.address-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Address Header */
+.address-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.address-icon {
+    width: 48px;
+    height: 48px;
+    background: #dcfce7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.address-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: #16a34a;
+}
+
+.address-title {
+    flex: 1;
+}
+
+.address-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 0.25rem 0;
+}
+
+.address-label {
+    display: inline-block;
+    background: #dcfce7;
+    color: #16a34a;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+}
+
+/* Address Actions */
+.address-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    flex-shrink: 0;
+}
+
+.action-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: #6b7280;
+    stroke-width: 2;
+}
+
+.action-btn.edit:hover {
+    background: #dcfce7;
+}
+
+.action-btn.edit:hover svg {
+    stroke: #16a34a;
+}
+
+.action-btn.delete:hover {
+    background: #fee2e2;
+}
+
+.action-btn.delete:hover svg {
+    stroke: #ef4444;
+}
+
+/* Address Details */
+.address-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-row {
+    font-size: 0.95rem;
+    color: #374151;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.detail-row strong {
+    color: #111827;
+    font-weight: 700;
+}
+
+/* Tips Section */
+.tips-section {
+    background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+    border: 2px solid #16a34a;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.tips-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(22, 163, 74, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tips-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: #16a34a;
+}
+
+.tips-content {
+    flex: 1;
+}
+
+.tips-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #16a34a;
+    margin: 0 0 0.5rem 0;
+}
+
+.tips-text {
+    font-size: 0.95rem;
+    color: #16a34a;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 16px 20px;
+    }
+
+    .address-content {
+        padding: 1.25rem;
+    }
+
+    .address-card {
+        padding: 1.25rem;
+    }
+
+    .address-header {
+        margin-bottom: 1.25rem;
+        padding-bottom: 1.25rem;
+    }
+
+    .address-icon {
+        width: 42px;
+        height: 42px;
+    }
+
+    .address-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .address-name {
+        font-size: 1rem;
+    }
+
+    .detail-row {
+        font-size: 0.9rem;
+    }
+
+    .tips-section {
+        padding: 1.25rem;
+        gap: 0.75rem;
+    }
+
+    .tips-icon {
+        width: 42px;
+        height: 42px;
+    }
+
+    .tips-title {
+        font-size: 1rem;
+    }
+
+    .tips-text {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-header {
+        padding: 16px 20px;
+    }
+
+    .address-content {
+        padding: 1rem;
+        min-height: calc(100vh - 180px);
+    }
+
+    .address-card {
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .address-header {
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    .address-icon {
+        width: 38px;
+        height: 38px;
+    }
+
+    .address-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .address-name {
+        font-size: 0.95rem;
+    }
+
+    .address-label {
+        font-size: 0.75rem;
+    }
+
+    .action-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .action-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .detail-row {
+        font-size: 0.85rem;
+    }
+
+    .tips-section {
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+
+    .tips-icon {
+        width: 38px;
+        height: 38px;
+    }
+
+    .tips-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .tips-title {
+        font-size: 0.95rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .tips-text {
+        font-size: 0.85rem;
+    }
+}
