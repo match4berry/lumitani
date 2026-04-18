@@ -19,7 +19,7 @@ router.get("/", async (_req: Request, res: Response) => {
       ON cp.grade_id  = p.grade_id
      AND cp.is_active = TRUE
      AND CURRENT_DATE BETWEEN cp.start_date AND cp.end_date
-    ORDER BY p.created_at DESC
+     ORDER BY p.created_at DESC
   `);
   res.json(rows);
 });
@@ -42,7 +42,7 @@ router.get("/data/:id", async(_req: Request, res: Response) => {
       ON cp.grade_id  = p.grade_id
      AND cp.is_active = TRUE
      AND CURRENT_DATE BETWEEN cp.start_date AND cp.end_date
-    WHERE p.id = $1
+    WHERE p.id = $1 AND p.is_active = true
     ORDER BY p.created_at DESC LIMIT 1
   `, params);
 
@@ -88,7 +88,7 @@ router.get("/data", async (_req: Request, res: Response) => {
         ON cp.grade_id  = p.grade_id
       AND cp.is_active = TRUE
       AND CURRENT_DATE BETWEEN cp.start_date AND cp.end_date
-      WHERE p.commodity_id = $1
+      WHERE p.commodity_id = $1 AND p.is_active = TRUE
       ORDER BY p.created_at DESC
     `, params);
 
@@ -127,6 +127,7 @@ router.get("/data", async (_req: Request, res: Response) => {
         ON cp.grade_id  = p.grade_id
       AND cp.is_active = TRUE
       AND CURRENT_DATE BETWEEN cp.start_date AND cp.end_date
+      WHERE p.is_active = TRUE
       ORDER BY p.created_at DESC
     `);
 
