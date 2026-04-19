@@ -63,6 +63,27 @@ app.post("/login", (req, res) => {
 
 });
 
+// halaman registrasi
+app.get("/register", (req, res) => {
+    res.render("register");
+});
+
+// proses registrasi
+app.post("/register", (req, res) => {
+
+    const name = req.body.name;
+    const email = req.body.email;
+    const password = req.body.password;
+
+    // validasi sederhana
+    if (!name || !email || !password) {
+        return res.send("Semua field harus diisi");
+    }
+
+    // sementara hanya redirect ke login
+    res.redirect("/login");
+
+});
 // halaman katalog
 app.get("/catalog", (req, res) => {
     res.render("catalog");
@@ -75,4 +96,9 @@ app.get("/catalog", (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server berjalan di http://localhost:${PORT}`);
+});
+
+
+app.get('/regulasi', (req, res) => {
+    res.render('regulasi');
 });
