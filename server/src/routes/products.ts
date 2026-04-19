@@ -187,26 +187,27 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 // POST create product
 router.post("/", async (req: Request, res: Response) => {
-  const { farmer_id, commodity_id, grade_id, name, description, stock, photo_url } =
+  const { farmer_id, commodity_id, grade_id, name, description, stock, photo_url, keunggulan_produk, panen_terakhir } =
     req.body;
   const { rows } = await pool.query(
-    `INSERT INTO products (farmer_id, commodity_id, grade_id, name, description, stock, photo_url)
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-    [farmer_id, commodity_id, grade_id, name, description, stock || 0, photo_url]
+    `INSERT INTO products (farmer_id, commodity_id, grade_id, name, description, stock, photo_url, keunggulan_produk, panen_terakhir)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+    [farmer_id, commodity_id, grade_id, name, description, stock || 0, photo_url, keunggulan_produk || [], panen_terakhir || null]
   );
   res.status(201).json(rows[0]);
 });
 
 // PUT update product
 router.put("/:id", async (req: Request, res: Response) => {
-  const { farmer_id, commodity_id, grade_id, name, description, stock, photo_url } =
+  const { farmer_id, commodity_id, grade_id, name, description, stock, photo_url, keunggulan_produk, panen_terakhir } =
     req.body;
   const { rows } = await pool.query(
     `UPDATE products
      SET farmer_id = $1, commodity_id = $2, grade_id = $3,
-         name = $4, description = $5, stock = $6, photo_url = $7
-     WHERE id = $8 RETURNING *`,
-    [farmer_id, commodity_id, grade_id, name, description, stock, photo_url, req.params.id]
+         name = $4, description = $5, stock = $6, photo_url = $7,
+         keunggulan_produk = $8, panen_terakhir = $9
+     WHERE id = $10 RETURNING *`,
+    [farmer_id, commodity_id, grade_id, name, description, stock, photo_url, keunggulan_produk || [], panen_terakhir || null, req.params.id]
   );
   if (rows.length === 0) {
     res.status(404).json({ error: "Product not found" });

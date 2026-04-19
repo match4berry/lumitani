@@ -83,6 +83,8 @@ export interface Product {
   description: string | null;
   stock: number;
   photo_url: string | null;
+  keunggulan_produk: string[];
+  panen_terakhir: string | null;
   is_active: boolean;
   farmer_name?: string;
   commodity_name?: string;

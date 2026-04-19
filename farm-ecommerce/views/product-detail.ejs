@@ -36,6 +36,34 @@
 
                     <p class="description"><%= product.description %></p>
 
+                    <% if (product.keunggulan_produk && product.keunggulan_produk.length > 0) { %>
+                    <div class="product-advantages">
+                        <h3>Keunggulan Produk</h3>
+                        <ul class="advantages-list">
+                            <% product.keunggulan_produk.forEach(function(item) { %>
+                                <li><span class="check-icon">✓</span> <%= item %></li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                    <% } %>
+
+                    <div class="product-info-cards">
+                        <div class="info-card">
+                            <span class="info-label">PETANI</span>
+                            <span class="info-value"><%= product.farmer_name %></span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">STOK TERSEDIA</span>
+                            <span class="info-value"><%= product.stock %> unit</span>
+                        </div>
+                        <% if (product.panen_terakhir) { %>
+                        <div class="info-card">
+                            <span class="info-label">PANEN TERAKHIR</span>
+                            <span class="info-value"><%= Math.floor((Date.now() - new Date(product.panen_terakhir).getTime()) / (1000 * 60 * 60 * 24)) %> hari yang lalu</span>
+                        </div>
+                        <% } %>
+                    </div>
+
                     <div class="stock-info">
                         <p>Stok tersedia: <strong><%= product.stock %></strong> unit</p>
                     </div>

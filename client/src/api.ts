@@ -58,10 +58,12 @@ const api = {
   createProduct: (data: {
     farmer_id: number; commodity_id: number; grade_id: number;
     name: string; description?: string; stock?: number; photo_url?: string;
+    keunggulan_produk?: string[]; panen_terakhir?: string;
   }) => request<import("./types").Product>("/products", { method: "POST", body: JSON.stringify(data) }),
   updateProduct: (id: number, data: {
     farmer_id: number; commodity_id: number; grade_id: number;
     name: string; description?: string; stock?: number; photo_url?: string;
+    keunggulan_produk?: string[]; panen_terakhir?: string;
   }) => request<import("./types").Product>("/products/" + id, { method: "PUT", body: JSON.stringify(data) }),
   toggleProduct: (id: number) =>
     request<import("./types").Product>("/products/" + id + "/toggle", { method: "PATCH" }),

@@ -30,6 +30,8 @@ export default function ProductsPage() {
   const [desc, setDesc] = useState("");
   const [stock, setStock] = useState("0");
   const [photoUrl, setPhotoUrl] = useState("");
+  const [keunggulanProduk, setKeunggulanProduk] = useState<string[]>([]);
+  const [panenTerakhir, setPanenTerakhir] = useState("");
 
   // edit form
   const [editFarmerId, setEditFarmerId] = useState<number | "">("");
@@ -39,6 +41,8 @@ export default function ProductsPage() {
   const [editDesc, setEditDesc] = useState("");
   const [editStock, setEditStock] = useState("0");
   const [editPhotoUrl, setEditPhotoUrl] = useState("");
+  const [editKeunggulanProduk, setEditKeunggulanProduk] = useState<string[]>([]);
+  const [editPanenTerakhir, setEditPanenTerakhir] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
 
   const load = async () => {
@@ -58,6 +62,7 @@ export default function ProductsPage() {
   const resetForm = () => {
     setFarmerId(""); setCommodityId(""); setGradeId("");
     setName(""); setDesc(""); setStock("0"); setPhotoUrl("");
+    setKeunggulanProduk([]); setPanenTerakhir("");
   };
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -69,6 +74,8 @@ export default function ProductsPage() {
       await api.createProduct({
         farmer_id: farmerId, commodity_id: commodityId, grade_id: gradeId,
         name, description: desc, stock: Number(stock), photo_url: photoUrl || undefined,
+        keunggulan_produk: keunggulanProduk.length > 0 ? keunggulanProduk : undefined,
+        panen_terakhir: panenTerakhir || undefined,
       });
       resetForm(); setShowAddModal(false); load();
       showToast("Produk berhasil ditambahkan", "success");
@@ -84,6 +91,8 @@ export default function ProductsPage() {
     setEditDesc(p.description || "");
     setEditStock(String(p.stock));
     setEditPhotoUrl(p.photo_url || "");
+    setEditKeunggulanProduk(p.keunggulan_produk || []);
+    setEditPanenTerakhir(p.panen_terakhir || "");
   };
 
   const handleEdit = async (e: React.FormEvent) => {
@@ -96,6 +105,8 @@ export default function ProductsPage() {
         farmer_id: editFarmerId, commodity_id: editCommodityId, grade_id: editGradeId,
         name: editName, description: editDesc, stock: Number(editStock),
         photo_url: editPhotoUrl || undefined,
+        keunggulan_produk: editKeunggulanProduk,
+        panen_terakhir: editPanenTerakhir || undefined,
       });
       setEditProduct(null); load();
       showToast("Produk berhasil diperbarui", "success");
@@ -116,6 +127,14 @@ export default function ProductsPage() {
 
   const fmt = (v: string | null | undefined) =>
     v ? Number(v).toLocaleString("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }) : "—";
+
+  const formatHariLalu = (dateStr: string | null) => {
+    if (!dateStr) return "—";
+    const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24));
+    if (diff === 0) return "Hari ini";
+    if (diff === 1) return "1 hari yang lalu";
+    return `${diff} hari yang lalu`;
+  };
 
   const filtered = products.filter((p) => {
     if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.farmer_name?.toLowerCase().includes(search.toLowerCase())) return false;
@@ -165,6 +184,7 @@ export default function ProductsPage() {
               <th className="sortable" onClick={() => sort.toggle("grade_name")}>Grade{sort.arrow("grade_name")}</th>
               <th className="sortable" onClick={() => sort.toggle("current_price")}>Harga{sort.arrow("current_price")}</th>
               <th className="sortable" onClick={() => sort.toggle("stock")}>Stok{sort.arrow("stock")}</th>
+              <th className="sortable" onClick={() => sort.toggle("panen_terakhir")}>Panen Terakhir{sort.arrow("panen_terakhir")}</th>
               <th className="sortable" onClick={() => sort.toggle("is_active")}>Status{sort.arrow("is_active")}</th>
               <th></th>
             </tr>
@@ -190,6 +210,7 @@ export default function ProductsPage() {
                 <td>{p.grade_name}</td>
                 <td style={{ fontWeight: 600 }}>{fmt(p.current_price)} {p.current_price && <span style={{ color: "#94a3b8", fontWeight: 400 }}>per kg</span>}</td>
                 <td>{p.stock} kg</td>
+                <td>{formatHariLalu(p.panen_terakhir)}</td>
                 <td>
                   <button className={`badge ${p.is_active ? "badge-success" : "badge-muted"}`} onClick={() => toggleActive(p.id)} style={{ cursor: "pointer", border: "none" }}>
                     {p.is_active ? "Aktif" : "Nonaktif"}
@@ -203,7 +224,7 @@ export default function ProductsPage() {
                 </td>
               </tr>
             ))}
-            {filtered.length === 0 && <tr><td colSpan={8} style={{ textAlign: "center", padding: 24, color: "#94a3b8" }}>Belum ada produk</td></tr>}
+            {filtered.length === 0 && <tr><td colSpan={9} style={{ textAlign: "center", padding: 24, color: "#94a3b8" }}>Belum ada produk</td></tr>}
           </tbody>
         </table>
         <div className="table-footer">Menampilkan {filtered.length} dari {products.length} produk</div>
@@ -240,6 +261,7 @@ export default function ProductsPage() {
                   ["Grade", detailProduct.grade_name],
                   ["Harga", fmt(detailProduct.current_price)],
                   ["Stok", `${detailProduct.stock} kg`],
+                  ["Panen Terakhir", formatHariLalu(detailProduct.panen_terakhir)],
                   ["Status", detailProduct.is_active ? "Aktif" : "Nonaktif"],
                   ["Dibuat", new Date(detailProduct.created_at).toLocaleString("id-ID")],
                   ["Diperbarui", new Date(detailProduct.updated_at).toLocaleString("id-ID")],
@@ -249,6 +271,16 @@ export default function ProductsPage() {
                     <td>{val}</td>
                   </tr>
                 ))}
+                {detailProduct.keunggulan_produk && detailProduct.keunggulan_produk.length > 0 && (
+                  <tr>
+                    <td style={{ fontWeight: 600, color: "#64748b", whiteSpace: "nowrap", verticalAlign: "top" }}>Keunggulan Produk</td>
+                    <td>
+                      <ul style={{ margin: 0, paddingLeft: 18 }}>
+                        {detailProduct.keunggulan_produk.map((item, i) => <li key={i}>{item}</li>)}
+                      </ul>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -287,6 +319,17 @@ export default function ProductsPage() {
                 <input type="number" value={stock} onChange={(e) => setStock(e.target.value)} min={0} className="form-input-full" /></div>
               <div><label className="form-label">URL Foto</label>
                 <input value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)} className="form-input-full" placeholder="https://..." /></div>
+              <div><label className="form-label">Keunggulan Produk</label>
+                {keunggulanProduk.map((item, i) => (
+                  <div key={i} style={{ display: "flex", gap: 6, marginBottom: 4 }}>
+                    <input value={item} onChange={(e) => { const arr = [...keunggulanProduk]; arr[i] = e.target.value; setKeunggulanProduk(arr); }} className="form-input-full" placeholder={`Keunggulan ${i + 1}`} />
+                    <button type="button" className="btn btn-danger btn-sm" onClick={() => setKeunggulanProduk(keunggulanProduk.filter((_, j) => j !== i))}>✕</button>
+                  </div>
+                ))}
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setKeunggulanProduk([...keunggulanProduk, ""])}>+ Tambah Keunggulan</button>
+              </div>
+              <div><label className="form-label">Panen Terakhir</label>
+                <input type="date" value={panenTerakhir} onChange={(e) => setPanenTerakhir(e.target.value)} className="form-input-full" /></div>
               <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                 <button type="submit" className="btn btn-primary">Simpan</button>
                 <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>Batal</button>
@@ -328,6 +371,17 @@ export default function ProductsPage() {
                 <input type="number" value={editStock} onChange={(e) => setEditStock(e.target.value)} min={0} className="form-input-full" /></div>
               <div><label className="form-label">URL Foto</label>
                 <input value={editPhotoUrl} onChange={(e) => setEditPhotoUrl(e.target.value)} className="form-input-full" /></div>
+              <div><label className="form-label">Keunggulan Produk</label>
+                {editKeunggulanProduk.map((item, i) => (
+                  <div key={i} style={{ display: "flex", gap: 6, marginBottom: 4 }}>
+                    <input value={item} onChange={(e) => { const arr = [...editKeunggulanProduk]; arr[i] = e.target.value; setEditKeunggulanProduk(arr); }} className="form-input-full" placeholder={`Keunggulan ${i + 1}`} />
+                    <button type="button" className="btn btn-danger btn-sm" onClick={() => setEditKeunggulanProduk(editKeunggulanProduk.filter((_, j) => j !== i))}>✕</button>
+                  </div>
+                ))}
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setEditKeunggulanProduk([...editKeunggulanProduk, ""])}>+ Tambah Keunggulan</button>
+              </div>
+              <div><label className="form-label">Panen Terakhir</label>
+                <input type="date" value={editPanenTerakhir} onChange={(e) => setEditPanenTerakhir(e.target.value)} className="form-input-full" /></div>
               <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                 <button type="submit" className="btn btn-primary">Simpan</button>
                 <button type="button" className="btn btn-secondary" onClick={() => setEditProduct(null)}>Batal</button>
