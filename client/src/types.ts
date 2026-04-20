@@ -134,3 +134,22 @@ export interface CommissionReport {
   summary: CommissionReportSummary;
   orders: CommissionOrder[];
 }
+
+export interface SalesReportSummary {
+  total_revenue: string;
+  total_transactions: number;
+  total_farmers: number;
+}
+
+export interface SalesReportFarmer {
+  farmer_id: number;
+  farmer_name: string;
+  total_sales: string;
+  total_transactions: number;
+  avg_order_value: string;
+}
+
+export interface SalesReport {
+  summary: SalesReportSummary;
+  farmers: SalesReportFarmer[];
+}

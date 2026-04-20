@@ -98,6 +98,15 @@ const api = {
     const qs = params.toString();
     return request<import("./types").CommissionReport>("/commissions/report" + (qs ? `?${qs}` : ""));
   },
+
+  // Sales Report
+  getSalesReport: (startDate?: string, endDate?: string) => {
+    const params = new URLSearchParams();
+    if (startDate) params.set("start_date", startDate);
+    if (endDate) params.set("end_date", endDate);
+    const qs = params.toString();
+    return request<import("./types").SalesReport>("/sales-report" + (qs ? `?${qs}` : ""));
+  },
 };
 
 export default api;
