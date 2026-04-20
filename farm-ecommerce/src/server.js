@@ -3,9 +3,10 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
-const { getProducts, getProductById, fetchProductById, fetchProducts, fetchCategories } = require('./controllers/productController');
+const { fetchAllProducts, fetchProductsByCommodity, fetchProductById, fetchCategories } = require('./controllers/productController');
 const { getCart, addToCart, removeFromCart } = require('./controllers/cartController');
 const orderRoutes = require('./routes/order');
+const cartRoutes = require('./routes/cart');
 require('dotenv').config();
 
 const app = express();
@@ -38,9 +39,9 @@ app.get('/', async (req, res) => {
   try {
     var callProducts
     if(req.query.category){
-      callProducts  = fetchProducts(req.query.category)
+      callProducts  = fetchProductsByCommodity(req.query.category)
     }else{
-      callProducts = fetchProducts()
+      callProducts = fetchAllProducts()
     }
     const mappingFuncCall = [callProducts, fetchCategories()]
     let [dataProducts, dataCategories] = await Promise.all(mappingFuncCall)
@@ -76,9 +77,9 @@ app.get('/home', async (req, res) => {
   try {
     var callProducts
     if(req.query.category){
-      callProducts  = fetchProducts(req.query.category)
+      callProducts  = fetchProductsByCommodity(req.query.category)
     }else{
-      callProducts = fetchProducts()
+      callProducts = fetchAllProducts()
     }
     const mappingFuncCall = [callProducts, fetchCategories()]
     let [dataProducts, dataCategories] = await Promise.all(mappingFuncCall)
@@ -165,9 +166,9 @@ app.get('/catalog', async(req, res) => {
   try {
     var callProducts
     if(req.query.category){
-      callProducts  = fetchProducts(req.query.category)
+      callProducts  = fetchProductsByCommodity(req.query.category)
     }else{
-      callProducts = fetchProducts()
+      callProducts = fetchAllProducts()
     }
     const mappingFuncCall = [callProducts, fetchCategories()]
     let [dataProducts, dataCategories] = await Promise.all(mappingFuncCall)
@@ -181,34 +182,25 @@ app.get('/catalog', async(req, res) => {
 });
 
 // Product detail page
-app.get('/product/:id', (req, res) => {
-  const product = getProductById(parseInt(req.params.id));
-  
-  if (!product) {
-    return res.status(404).render('404');
+app.get('/product/:id', async (req, res) => {
+  try {
+    const data = await fetchProductById(req.params.id);
+    
+    if (!data || !data.data || !data.data.items) {
+      return res.status(404).render('404');
+    }
+    
+    const product = data.data.items;
+    res.render('product-detail', { product });
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return res.status(500).render('error', { message: 'Failed to load product' });
   }
-  
-  res.render('product-detail', { product });
 });
 
-// Cart page
+// Cart page - renders empty cart, populated by API call in JS
 app.get('/cart', (req, res) => {
-  const cart = getCart();
-  res.render('cart', { cart });
-});
-
-// Add to cart API
-app.post('/api/cart/add', (req, res) => {
-  const { productId, quantity } = req.body;
-  addToCart(productId, quantity);
-  res.json({ success: true });
-});
-
-// Remove from cart API
-app.post('/api/cart/remove', (req, res) => {
-  const { productId } = req.body;
-  removeFromCart(productId);
-  res.json({ success: true });
+  res.render('cart');
 });
 
 // About page
@@ -297,6 +289,9 @@ app.get('/pesanan-saya', (req, res) => {
 
 // Order routes
 app.use(orderRoutes);
+
+// Cart API routes
+app.use('/api/cart', cartRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

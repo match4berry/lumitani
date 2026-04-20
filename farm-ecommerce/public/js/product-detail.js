@@ -16,8 +16,8 @@ function changeImage(thumbnail) {
     mainImage.src = newSrc;
 }
 
-// Add to cart
-function addToCart(productId) {
+// Add to cart via API
+async function addToCart(productId) {
     try {
         // Get product data from DOM
         const productTitle = document.querySelector('.product-title').textContent.trim().replace('Premium', '').trim();
@@ -32,37 +32,34 @@ function addToCart(productId) {
         
         const productImage = document.getElementById('mainImage').src;
         
-        // Get current cart from localStorage
-        const cart = JSON.parse(localStorage.getItem('lumitani_cart')) || [];
-        
-        // Check if product already exists in cart
-        const existingItem = cart.find(item => item.id === productId);
-        
-        if (existingItem) {
-            // Increment quantity if item already in cart
-            existingItem.quantity += 1;
-        } else {
-            // Add new item to cart
-            cart.push({
-                id: productId,
+        // Call cart API
+        const response = await fetch('/api/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                productId,
+                quantity: 1,
                 name: productTitle,
                 price: priceValue,
-                quantity: 1,
-                image: productImage
-            });
+                photo_url: productImage
+            })
+        });
+        
+        if (response.status === 401) {
+            alert('Silakan login terlebih dahulu');
+            window.location.href = '/login';
+            return;
         }
         
-        // Save updated cart to localStorage
-        localStorage.setItem('lumitani_cart', JSON.stringify(cart));
+        if (!response.ok) throw new Error('Failed to add to cart');
         
-        // Update cart badge
-        updateCartBadgeGlobal();
+        const data = await response.json();
         
         // Show success message
         alert('Produk berhasil ditambahkan ke keranjang!');
         
-    } catch (e) {
-        console.error('Error adding to cart:', e);
+    } catch (error) {
+        console.error('Error adding to cart:', error);
         alert('Gagal menambahkan ke keranjang');
     }
 }

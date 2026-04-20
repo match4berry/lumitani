@@ -116,42 +116,33 @@ function buyNow(productId, productName, productPrice) {
     window.location.href = `/checkout?products=${productsParam}`;
 }
 
-function addToCart(productId) {
-    const productCard = event.target.closest('.product-card-catalog');
-    const productName = productCard.querySelector('.product-name-catalog').textContent;
-    const productPrice = parseInt(productCard.querySelector('.product-price-catalog').textContent.replace(/\D/g, ''));
-    const productImage = productCard.querySelector('.product-image-catalog').src;
-    
+// Add to cart via API
+async function addToCart(productId, productName, productPrice, productImage) {
     try {
-        // Save to localStorage directly  
-        const cart = JSON.parse(localStorage.getItem('lumitani_cart')) || [];
-        const existingItem = cart.find(item => item.id === productId);
-        
-        if (existingItem) {
-            existingItem.quantity += 1;
-        } else {
-            cart.push({
-                id: productId,
+        // Call cart API
+        const response = await fetch('/api/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                productId,
+                quantity: 1,
                 name: productName,
                 price: productPrice,
-                quantity: 1,
-                image: productImage
-            });
+                photo_url: productImage
+            })
+        });
+        
+        if (response.status === 401) {
+            alert('Silakan login terlebih dahulu');
+            window.location.href = '/login';
+            return;
         }
         
-        localStorage.setItem('lumitani_cart', JSON.stringify(cart));
-        
-        // Update badge
-        const cartBadge = document.getElementById('cart-badge');
-        if (cartBadge) {
-            const qty = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
-            cartBadge.textContent = qty;
-            cartBadge.style.display = 'flex';
-        }
+        if (!response.ok) throw new Error('Failed to add to cart');
         
         alert('Produk berhasil ditambahkan ke keranjang!');
-    } catch (e) {
-        console.error('Error adding to cart:', e);
+    } catch (error) {
+        console.error('Error adding to cart:', error);
         alert('Gagal menambahkan ke keranjang');
     }
 }

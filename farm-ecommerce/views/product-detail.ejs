@@ -13,12 +13,12 @@
         <!-- Left: Product Images -->
         <div class="product-images-section">
             <div class="product-image-main">
-                <img id="mainImage" src="<%= product.image || 'https://via.placeholder.com/500' %>" alt="<%= product.name %>">
+                <img id="mainImage" src="<%= product.photo_url || 'https://via.placeholder.com/500' %>" alt="<%= product.name %>">
             </div>
             <div class="product-thumbnails">
                 <% for (let i = 0; i < 4; i++) { %>
                     <div class="thumbnail <%= i === 0 ? 'active' : '' %>" onclick="changeImage(this)">
-                        <img src="<%= product.image || 'https://via.placeholder.com/100' %>" alt="Thumbnail <%= i + 1 %>">
+                        <img src="<%= product.photo_url || 'https://via.placeholder.com/100' %>" alt="Thumbnail <%= i + 1 %>">
                     </div>
                 <% } %>
             </div>
@@ -40,55 +40,54 @@
             </p>
 
             <!-- Product Advantages -->
-            <div class="advantages-section">
-                <h3 class="section-title">Keunggulan Produk</h3>
-                <div class="advantages-list">
-                    <div class="advantage-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        <span>100% organik tanpa pestisida kimia</span>
-                    </div>
-                    <div class="advantage-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        <span>Dipanen segar langsung dari kebun</span>
-                    </div>
-                    <div class="advantage-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        <span>Mendukung petani lokal Desa Manud Jaya</span>
-                    </div>
-                    <div class="advantage-item">
-                        <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        <span>Harga transparan langsung dari petani</span>
+            <% if (product.keunggulan_produk && product.keunggulan_produk.length > 0) { %>
+                <div class="advantages-section">
+                    <h3 class="section-title">Keunggulan Produk</h3>
+                    <div class="advantages-list">
+                        <% product.keunggulan_produk.forEach(function(advantage) { %>
+                            <div class="advantage-item">
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                <span><%= advantage %></span>
+                            </div>
+                        <% }); %>
                     </div>
                 </div>
-            </div>
-
-                    <% if (product.keunggulan_produk && product.keunggulan_produk.length > 0) { %>
-                    <div class="product-advantages">
-                        <h3>Keunggulan Produk</h3>
-                        <ul class="advantages-list">
-                            <% product.keunggulan_produk.forEach(function(item) { %>
-                                <li><span class="check-icon">✓</span> <%= item %></li>
-                            <% }); %>
-                        </ul>
+            <% } else { %>
+                <div class="advantages-section">
+                    <h3 class="section-title">Keunggulan Produk</h3>
+                    <div class="advantages-list">
+                        <div class="advantage-item">
+                            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Produk berkualitas dari petani lokal</span>
+                        </div>
+                        <div class="advantage-item">
+                            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Dipanen segar langsung dari kebun</span>
+                        </div>
+                        <div class="advantage-item">
+                            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span>Harga transparan langsung dari petani</span>
+                        </div>
                     </div>
-                    <% } %>
+                </div>
+            <% } %>
 
                     <div class="product-info-cards">
                         <div class="info-card">
                             <span class="info-label">PETANI</span>
-                            <span class="info-value"><%= product.farmer_name %></span>
+                            <span class="info-value"><%= product.farmer_name || 'Petani Lokal' %></span>
                         </div>
                         <div class="info-card">
                             <span class="info-label">STOK TERSEDIA</span>
-                            <span class="info-value"><%= product.stock %> unit</span>
+                            <span class="info-value"><%= product.stock || 0 %> unit</span>
                         </div>
                         <% if (product.panen_terakhir) { %>
                         <div class="info-card">
@@ -98,41 +97,9 @@
                         <% } %>
                     </div>
 
-                    <div class="stock-info">
-                        <p>Stok tersedia: <strong><%= product.stock %></strong> unit</p>
-                    </div>
-                    <p class="info-value">Pak Budi - Desa Manud Jaya</p>
-                </div>
-
-                <div class="info-card stock-card">
-                    <div class="info-label">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                        </svg>
-                        <span class="info-label-text">Stok Tersedia</span>
-                    </div>
-                    <p class="info-value"><%= product.stock || '50' %> per ikat (250g)</p>
-                </div>
-
-                <div class="info-card harvest-card">
-                    <div class="info-label">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <circle cx="12" cy="12" r="1"/>
-                            <path d="M12 1v6m0 6v6"/>
-                            <path d="M4.22 4.22l4.24 4.24m2.12 2.12l4.24 4.24"/>
-                            <path d="M1 12h6m6 0h6"/>
-                            <path d="M4.22 19.78l4.24-4.24m2.12-2.12l4.24-4.24"/>
-                        </svg>
-                        <span class="info-label-text">Panen Terakhir</span>
-                    </div>
-                    <p class="info-value">2 hari yang lalu</p>
-                </div>
-            </div>
-
             <!-- Price Section -->
             <div class="price-section">
-                <span class="price-text">Rp <%= (product.price || 10000).toLocaleString('id-ID') %></span>
+                <span class="price-text">Rp <%= (product.current_price || product.price || 10000).toLocaleString('id-ID') %></span>
                 <span class="price-unit">per 1/4 kg (250g)</span>
             </div>
 

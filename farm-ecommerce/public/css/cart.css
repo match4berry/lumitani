@@ -48,6 +48,26 @@
     color: #16a34a;
 }
 
+/* Empty Cart */
+.empty-cart {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: white;
+    border-radius: 8px;
+    color: #6b7280;
+}
+
+.empty-cart p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+.empty-cart a {
+    color: #16a34a;
+    font-weight: 600;
+    text-decoration: none;
+}
+
 .back-link svg {
     width: 24px;
     height: 24px;
