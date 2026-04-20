@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api";
 import { showToast } from "../components/Toast";
+import Pagination, { PAGE_SIZE } from "../components/Pagination";
 import type { CommissionSettings, CommissionReport } from "../types";
 
 export default function CommissionPage() {
@@ -11,6 +12,7 @@ export default function CommissionPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [page, setPage] = useState(1);
 
   const load = async () => {
     try {
@@ -30,6 +32,7 @@ export default function CommissionPage() {
   }, []);
 
   const handleFilter = () => {
+    setPage(1);
     load();
   };
 
@@ -206,7 +209,7 @@ export default function CommissionPage() {
             </tr>
           </thead>
           <tbody>
-            {report?.orders.map((o) => (
+            {report?.orders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((o) => (
               <tr key={o.id}>
                 <td style={{ fontWeight: 500 }}>{o.order_code}</td>
                 <td>{o.customer_name}</td>
@@ -227,6 +230,7 @@ export default function CommissionPage() {
             )}
           </tbody>
         </table>
+        <Pagination currentPage={page} totalItems={report?.orders.length ?? 0} onPageChange={setPage} label="pesanan" />
       </div>
 
       {/* Edit rate modal */}

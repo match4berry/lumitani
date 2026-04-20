@@ -58,10 +58,12 @@ const api = {
   createProduct: (data: {
     farmer_id: number; commodity_id: number; grade_id: number;
     name: string; description?: string; stock?: number; photo_url?: string;
+    keunggulan_produk?: string[]; panen_terakhir?: string;
   }) => request<import("./types").Product>("/products", { method: "POST", body: JSON.stringify(data) }),
   updateProduct: (id: number, data: {
     farmer_id: number; commodity_id: number; grade_id: number;
     name: string; description?: string; stock?: number; photo_url?: string;
+    keunggulan_produk?: string[]; panen_terakhir?: string;
   }) => request<import("./types").Product>("/products/" + id, { method: "PUT", body: JSON.stringify(data) }),
   toggleProduct: (id: number) =>
     request<import("./types").Product>("/products/" + id + "/toggle", { method: "PATCH" }),
@@ -95,6 +97,15 @@ const api = {
     if (endDate) params.set("end_date", endDate);
     const qs = params.toString();
     return request<import("./types").CommissionReport>("/commissions/report" + (qs ? `?${qs}` : ""));
+  },
+
+  // Sales Report
+  getSalesReport: (startDate?: string, endDate?: string) => {
+    const params = new URLSearchParams();
+    if (startDate) params.set("start_date", startDate);
+    if (endDate) params.set("end_date", endDate);
+    const qs = params.toString();
+    return request<import("./types").SalesReport>("/sales-report" + (qs ? `?${qs}` : ""));
   },
 };
 

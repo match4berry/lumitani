@@ -9,6 +9,7 @@ import productsRouter from "./routes/products";
 import ordersRouter from "./routes/orders";
 import usersRouter from "./routes/users";
 import commissionsRouter from "./routes/commissions";
+import salesReportRouter from "./routes/salesReport";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -51,6 +52,7 @@ app.use("/api/products", productsRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/commissions", commissionsRouter);
+app.use("/api/sales-report", salesReportRouter);
 
 const start = async () => {
   try {

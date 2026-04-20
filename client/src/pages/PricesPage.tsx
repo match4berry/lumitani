@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api";
 import { showToast } from "../components/Toast";
+import Pagination, { PAGE_SIZE } from "../components/Pagination";
 import type { CommodityPrice, Grade, Commodity } from "../types";
 
 export default function PricesPage() {
@@ -15,6 +16,7 @@ export default function PricesPage() {
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [filterCommodity, setFilterCommodity] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
+  const [groupPages, setGroupPages] = useState<Record<string, number>>({});
 
   // edit states
   const [editPrice, setEditPrice] = useState<CommodityPrice | null>(null);
@@ -108,6 +110,8 @@ export default function PricesPage() {
     return true;
   });
 
+  useEffect(() => { setGroupPages({}); }, [filterCommodity, filterStatus]);
+
   return (
     <div>
       <div className="page-header">
@@ -148,7 +152,10 @@ export default function PricesPage() {
         </select>
       </div>
 
-      {filteredGroups.map(([comName, comPrices]) => (
+      {filteredGroups.map(([comName, comPrices]) => {
+        const groupPage = groupPages[comName] || 1;
+        const paginatedPrices = comPrices.slice((groupPage - 1) * PAGE_SIZE, groupPage * PAGE_SIZE);
+        return (
         <div key={comName} className="card commodity-section">
           <div className="commodity-section-header">
             <div className="commodity-section-title">
@@ -168,7 +175,7 @@ export default function PricesPage() {
               </tr>
             </thead>
             <tbody>
-              {comPrices.map((p) => (
+              {paginatedPrices.map((p) => (
                 <tr key={p.id} style={{ opacity: p.is_active ? 1 : 0.55 }}>
                   <td><span className="badge badge-info">{p.grade_name}</span></td>
                   <td style={{ fontWeight: 600 }}>{fmt(p.price)} <span style={{ color: "#94a3b8", fontWeight: 400 }}>per kg</span></td>
@@ -194,8 +201,10 @@ export default function PricesPage() {
               ))}
             </tbody>
           </table>
+          <Pagination currentPage={groupPage} totalItems={comPrices.length} onPageChange={(p) => setGroupPages(prev => ({ ...prev, [comName]: p }))} label="harga" />
         </div>
-      ))}
+        );
+      })}
 
       {filteredGroups.length === 0 && (
         <div className="card" style={{ padding: 40, textAlign: "center", color: "#94a3b8" }}>Belum ada data harga</div>

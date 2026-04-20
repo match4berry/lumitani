@@ -83,6 +83,8 @@ export interface Product {
   description: string | null;
   stock: number;
   photo_url: string | null;
+  keunggulan_produk: string[];
+  panen_terakhir: string | null;
   is_active: boolean;
   farmer_name?: string;
   commodity_name?: string;
@@ -131,4 +133,23 @@ export interface CommissionOrder {
 export interface CommissionReport {
   summary: CommissionReportSummary;
   orders: CommissionOrder[];
+}
+
+export interface SalesReportSummary {
+  total_revenue: string;
+  total_transactions: number;
+  total_farmers: number;
+}
+
+export interface SalesReportFarmer {
+  farmer_id: number;
+  farmer_name: string;
+  total_sales: string;
+  total_transactions: number;
+  avg_order_value: string;
+}
+
+export interface SalesReport {
+  summary: SalesReportSummary;
+  farmers: SalesReportFarmer[];
 }

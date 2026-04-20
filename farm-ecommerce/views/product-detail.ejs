@@ -70,14 +70,36 @@
                 </div>
             </div>
 
-            <!-- Product Info Cards -->
-            <div class="info-cards">
-                <div class="info-card farmer-card">
-                    <div class="info-label">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20 10c0-3.866-3.582-7-8-7s-8 3.134-8 7c0 2.742 1.436 5.136 3.564 6.414.068.091.15.176.248.267.876.648 1.834 1.2 2.874 1.576.584.25 1.19.382 1.814.382.844 0 1.65-.21 2.406-.607 1.04-.376 1.998-.928 2.874-1.576.098-.091.18-.176.248-.267 2.128-1.278 3.564-3.672 3.564-6.414z"/>
-                        </svg>
-                        <span class="info-label-text">Petani</span>
+                    <% if (product.keunggulan_produk && product.keunggulan_produk.length > 0) { %>
+                    <div class="product-advantages">
+                        <h3>Keunggulan Produk</h3>
+                        <ul class="advantages-list">
+                            <% product.keunggulan_produk.forEach(function(item) { %>
+                                <li><span class="check-icon">✓</span> <%= item %></li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                    <% } %>
+
+                    <div class="product-info-cards">
+                        <div class="info-card">
+                            <span class="info-label">PETANI</span>
+                            <span class="info-value"><%= product.farmer_name %></span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">STOK TERSEDIA</span>
+                            <span class="info-value"><%= product.stock %> unit</span>
+                        </div>
+                        <% if (product.panen_terakhir) { %>
+                        <div class="info-card">
+                            <span class="info-label">PANEN TERAKHIR</span>
+                            <span class="info-value"><%= Math.floor((Date.now() - new Date(product.panen_terakhir).getTime()) / (1000 * 60 * 60 * 24)) %> hari yang lalu</span>
+                        </div>
+                        <% } %>
+                    </div>
+
+                    <div class="stock-info">
+                        <p>Stok tersedia: <strong><%= product.stock %></strong> unit</p>
                     </div>
                     <p class="info-value">Pak Budi - Desa Manud Jaya</p>
                 </div>
