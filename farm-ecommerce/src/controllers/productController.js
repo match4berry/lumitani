@@ -38,10 +38,12 @@ const getProducts = () => {
 const fetchProducts = async (categoryId) => {
   try {
     
-    let endpoint = `${process.env.API_URL}/api/products`
+    let endpoint = `${process.env.API_URL}/api/products/data`
     if(categoryId){
       endpoint = `${endpoint}?c_id=${categoryId}`
     }
+     console.log("INI ENPOINT", endpoint)
+   
     let res = await fetch(endpoint);
     let data = await res.json()
     return data

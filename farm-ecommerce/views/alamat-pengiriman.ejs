@@ -1,0 +1,80 @@
+<% layout = 'layout' %>
+
+<header class="page-header">
+    <div class="header-logo">
+        <img src="/logo.png" alt="LumiTani" class="logo-image">
+    </div>
+</header>
+
+<div class="address-content">
+    <!-- Address Cards -->
+    <div class="address-cards">
+        <div class="address-card primary">
+            <div class="address-header">
+                <div class="address-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 10c0 7-8 12-8 12s-8-5-8-12a8 8 0 1 1 16 0z"/>
+                        <circle cx="12" cy="10" r="3" fill="white"/>
+                    </svg>
+                </div>
+                <div class="address-title">
+                    <h3 class="address-name">Rumah</h3>
+                    <span class="address-label">Alamat Utama</span>
+                </div>
+                <div class="address-actions">
+                    <button class="action-btn edit" onclick="editAddress()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                    </button>
+                    <button class="action-btn delete" onclick="deleteAddress()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            <line x1="10" y1="11" x2="10" y2="17"/>
+                            <line x1="14" y1="11" x2="14" y2="17"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="address-details">
+                <p class="detail-row"><strong>User LumiTani</strong></p>
+                <p class="detail-row">08123456789</p>
+                <p class="detail-row">Jl. Raya Manud Jaya No. 123</p>
+                <p class="detail-row">Bekasi, 17510</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tips Section -->
+    <div class="tips-section">
+        <div class="tips-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3" fill="white"/>
+            </svg>
+        </div>
+        <div class="tips-content">
+            <h4 class="tips-title">Tips Alamat</h4>
+            <p class="tips-text">Pastikan alamat lengkap dan benar untuk pengiriman yang lancar</p>
+        </div>
+    </div>
+</div>
+
+<script>
+function addNewAddress() {
+    alert('Tambah alamat baru - fitur segera hadir');
+}
+
+function editAddress() {
+    alert('Edit alamat - fitur segera hadir');
+}
+
+function deleteAddress() {
+    if (confirm('Hapus alamat ini?')) {
+        alert('Alamat dihapus - fitur segera hadir');
+    }
+}
+</script>

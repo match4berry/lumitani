@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Order Berhasil</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header class="page-header">
+            <div class="header-logo">
+                <img src="/logo.png" alt="LumiTani" class="logo-image">
+            </div>
+        </header>
+
+        <div class="order-success-card">
+
+            <h2 class="success-title">Order Berhasil 🎉</h2>
+
+            <div class="order-info">
+                <p class="info-label">ID Order:</p>
+                <h3 class="info-value">
+                    <%= order.id %>
+                </h3>
+
+                <p class="info-label">Status:</p>
+                <h3 class="info-value">
+                    <%= order.status %>
+                </h3>
+
+                <p class="info-label">Total:</p>
+                <h3 class="info-value">
+                    Rp <%= order.total.toLocaleString('id-ID') %>
+                </h3>
+            </div>
+
+            <a href="/" class="btn-back-home">Kembali ke Beranda</a>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

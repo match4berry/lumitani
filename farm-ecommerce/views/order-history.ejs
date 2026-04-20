@@ -1,0 +1,174 @@
+<% layout = 'layout' %>
+
+<link rel="stylesheet" href="/css/pesanan-saya.css">
+
+<header class="page-header">
+    <div class="header-logo">
+        <img src="/logo.png" alt="LumiTani" class="logo-image">
+    </div>
+</header>
+
+<div class="orders-container">
+    <!-- Sidebar Filter Section -->
+    <aside class="filter-sidebar">
+        <h2 class="filter-title">Urutkan</h2>
+        <div class="filter-buttons">
+            <button class="filter-btn <%= currentStatus === 'all' ? 'active' : '' %>" data-status="all">Semua</button>
+            <button class="filter-btn <%= currentStatus === 'pending' ? 'active' : '' %>" data-status="pending">Menunggu Proses</button>
+            <button class="filter-btn <%= currentStatus === 'processing' ? 'active' : '' %>" data-status="processing">Diproses</button>
+            <button class="filter-btn <%= currentStatus === 'shipped' ? 'active' : '' %>" data-status="shipped">Pengiriman</button>
+            <button class="filter-btn <%= currentStatus === 'completed' ? 'active' : '' %>" data-status="completed">Selesai</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Section -->
+    <main class="orders-main">
+        <!-- Tabs Section -->
+        <div class="tabs-section">
+            <button class="tab-button <%= currentSort === 'newest' ? 'active' : '' %>" data-tab="newest">Terbaru</button>
+            <button class="tab-button <%= currentSort === 'oldest' ? 'active' : '' %>" data-tab="oldest">Terlama</button>
+        </div>
+
+        <!-- Orders List -->
+        <div class="orders-list">
+            <% if (orders && orders.length > 0) { %>
+                <% 
+                    // Group orders by seller
+                    const groupedOrders = {};
+                    orders.forEach(order => {
+                        const seller = order.seller || "Penjual Default";
+                        if (!groupedOrders[seller]) {
+                            groupedOrders[seller] = [];
+                        }
+                        groupedOrders[seller].push(order);
+                    });
+                %>
+                
+                <% Object.entries(groupedOrders).forEach(([sellerName, sellerOrders]) => { %>
+                    <% sellerOrders.forEach((order, index) => { %>
+                        <div class="order-card">
+                            <!-- Order Header -->
+                            <div class="order-header">
+                                <div class="order-info">
+                                    <h3 class="seller-name"><%= sellerName %></h3>
+                                    <p class="order-meta">
+                                        <%= order.id %> - <%= new Date(order.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %> : <%= new Date(order.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %>
+                                    </p>
+                                </div>
+                                <span class="status-badge <%= order.status.toLowerCase().replace(/\s+/g, '-') %>">
+                                    <%= order.status %>
+                                </span>
+                            </div>
+
+                            <!-- Order Items -->
+                            <div class="order-items">
+                                <% if (order.items && Array.isArray(order.items)) { %>
+                                    <% order.items.forEach(item => { %>
+                                        <div class="order-item">
+                                            <div class="item-image">
+                                                <img src="https://via.placeholder.com/80?text=<%= encodeURIComponent(item.name.substring(0, 3)) %>" alt="<%= item.name %>">
+                                            </div>
+                                            <div class="item-details">
+                                                <h4 class="item-name"><%= item.name %></h4>
+                                                <p class="item-price">Rp <%= (item.price * 1000).toLocaleString('id-ID') %> / 250g</p>
+                                            </div>
+                                            <div class="item-qty">
+                                                <span class="qty-label">Kuantitas</span>
+                                                <span class="qty-value"><%= item.quantity %></span>
+                                            </div>
+                                            <div class="item-total">
+                                                <span class="total-label">Total</span>
+                                                <span class="total-value">Rp <%= (item.price * item.quantity * 1000).toLocaleString('id-ID') %></span>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } %>
+                            </div>
+
+                            <!-- Order Footer -->
+                            <div class="order-footer">
+                                <div class="order-total">
+                                    <span class="total-label">Rp <%= (order.total * 1000).toLocaleString('id-ID') %></span>
+                                    <span class="items-count">sub total <%= order.items ? order.items.length : 1 %> item</span>
+                                </div>
+                                <button class="complete-button">Selesaikan Pesanan</button>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% }); %>
+            <% } else { %>
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"/>
+                        <circle cx="20" cy="21" r="1"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                    </svg>
+                    <h2>Belum ada pesanan</h2>
+                    <p>Mulai berbelanja sekarang untuk membuat pesanan Anda</p>
+                    <a href="/catalog" class="cta-button">Belanja Sekarang</a>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Pagination -->
+        <% if (totalPages && totalPages > 1) { %>
+            <div class="pagination">
+                <button class="pagination-btn prev <%= currentPage === 1 ? 'disabled' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                </button>
+                
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <button class="pagination-btn <%= i === currentPage ? 'active' : '' %>" data-page="<%= i %>">
+                        <%= i %>
+                    </button>
+                <% } %>
+                
+                <button class="pagination-btn next <%= currentPage === totalPages ? 'disabled' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </button>
+            </div>
+        <% } %>
+    </main>
+</div>
+
+<script>
+    // Filter functionality
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const status = this.dataset.status;
+            if (status === 'all') {
+                window.location.href = '/order-history';
+            } else {
+                window.location.href = `/order-history?status=${status}`;
+            }
+        });
+    });
+
+    // Tab functionality
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tab = this.dataset.tab;
+            const currentStatus = new URLSearchParams(window.location.search).get('status') || 'all';
+            if (currentStatus === 'all') {
+                window.location.href = `/order-history?sort=${tab}`;
+            } else {
+                window.location.href = `/order-history?status=${currentStatus}&sort=${tab}`;
+            }
+        });
+    });
+
+    // Pagination functionality
+    document.querySelectorAll('.pagination-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (this.classList.contains('disabled')) return;
+            const page = this.dataset.page;
+            window.location.href = `/order-history?page=${page}`;
+        });
+    });
+</script>
