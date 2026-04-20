@@ -21,15 +21,20 @@ router.get("/", async (req: Request, res: Response) => {
   }
 
   // Summary: totals across all completed orders in range
+  // Use CTE to avoid join-induced row duplication on total_price
   const summaryQuery = pool.query(
-    `SELECT
-       COALESCE(SUM(o.total_price), 0)::numeric AS total_revenue,
-       COUNT(DISTINCT o.id)::int AS total_transactions,
-       COUNT(DISTINCT p.farmer_id)::int AS total_farmers
-     FROM orders o
-     JOIN order_items oi ON oi.order_id = o.id
-     JOIN products p ON p.id = oi.product_id
-     WHERE o.status = 'selesai'${dateFilter}`,
+    `WITH completed AS (
+       SELECT id, total_price FROM orders o WHERE o.status = 'selesai'${dateFilter}
+     )
+     SELECT
+       COALESCE(SUM(c.total_price), 0)::numeric AS total_revenue,
+       COUNT(c.id)::int AS total_transactions,
+       (SELECT COUNT(DISTINCT p.farmer_id)
+        FROM order_items oi
+        JOIN products p ON p.id = oi.product_id
+        WHERE oi.order_id IN (SELECT id FROM completed)
+       )::int AS total_farmers
+     FROM completed c`,
     params
   );
 

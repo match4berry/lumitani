@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api";
 import { showToast } from "../components/Toast";
+import Pagination, { PAGE_SIZE } from "../components/Pagination";
 import { useSort } from "../hooks/useSort";
 import type { Product, Farmer, Commodity, Grade } from "../types";
 
@@ -21,6 +22,7 @@ export default function ProductsPage() {
   const [filterCommodity, setFilterCommodity] = useState<number | "">("");
   const [filterFarmer, setFilterFarmer] = useState<number | "">("");
   const [filterStatus, setFilterStatus] = useState<"" | "active" | "inactive">("");
+  const [page, setPage] = useState(1);
 
   // create form
   const [farmerId, setFarmerId] = useState<number | "">("");
@@ -145,6 +147,9 @@ export default function ProductsPage() {
     return true;
   });
 
+  useEffect(() => { setPage(1); }, [search, filterCommodity, filterFarmer, filterStatus]);
+  const paginated = sort.sorted(filtered).slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   return (
     <div>
       <div className="page-header">
@@ -190,7 +195,7 @@ export default function ProductsPage() {
             </tr>
           </thead>
           <tbody>
-            {sort.sorted(filtered).map((p) => (
+            {paginated.map((p) => (
               <tr key={p.id} style={{ opacity: p.is_active ? 1 : 0.55 }}>
                 <td>
                   <div className="product-cell">
@@ -227,7 +232,7 @@ export default function ProductsPage() {
             {filtered.length === 0 && <tr><td colSpan={9} style={{ textAlign: "center", padding: 24, color: "#94a3b8" }}>Belum ada produk</td></tr>}
           </tbody>
         </table>
-        <div className="table-footer">Menampilkan {filtered.length} dari {products.length} produk</div>
+        <Pagination currentPage={page} totalItems={filtered.length} onPageChange={setPage} label="produk" />
       </div>
 
       {/* Image preview lightbox */}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api";
 import { showToast } from "../components/Toast";
+import Pagination, { PAGE_SIZE } from "../components/Pagination";
 import { useSort } from "../hooks/useSort";
 import type { Farmer, Product } from "../types";
 
@@ -17,6 +18,7 @@ export default function FarmersPage() {
   const [editIsActive, setEditIsActive] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
+  const [page, setPage] = useState(1);
   const sort = useSort("id");
 
   const load = () => {
@@ -70,6 +72,9 @@ export default function FarmersPage() {
   const totalProducts = products.length;
   const avgProducts = farmers.length > 0 ? (totalProducts / farmers.length).toFixed(1) : "0";
   const getProductCount = (farmerId: number) => products.filter(p => p.farmer_id === farmerId).length;
+
+  const sorted = sort.sorted(farmers);
+  const paginated = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div>
@@ -130,7 +135,7 @@ export default function FarmersPage() {
             </tr>
           </thead>
           <tbody>
-            {sort.sorted(farmers).map((f) => (
+            {paginated.map((f) => (
               <tr key={f.id}>
                 <td style={{ color: "#64748b" }}>F{String(f.id).padStart(3, "0")}</td>
                 <td style={{ fontWeight: 600 }}>{f.name}</td>
@@ -153,6 +158,7 @@ export default function FarmersPage() {
             {farmers.length === 0 && <tr><td colSpan={7} style={{ textAlign: "center", padding: 24, color: "#94a3b8" }}>Belum ada petani</td></tr>}
           </tbody>
         </table>
+        <Pagination currentPage={page} totalItems={farmers.length} onPageChange={setPage} label="petani" />
       </div>
 
       {/* Add modal */}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api";
 import { showToast } from "../components/Toast";
+import Pagination, { PAGE_SIZE } from "../components/Pagination";
 import type { Order, OrderItem, OrderStatus, OrderStatusSummary } from "../types";
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
@@ -38,6 +39,7 @@ export default function OrdersPage() {
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
   const [detailItems, setDetailItems] = useState<OrderItem[]>([]);
   const [statusModalOrder, setStatusModalOrder] = useState<Order | null>(null);
+  const [page, setPage] = useState(1);
 
   const openDetail = async (order: Order) => {
     try {
@@ -91,6 +93,9 @@ export default function OrdersPage() {
     if (filterStatus !== "" && o.status !== filterStatus) return false;
     return true;
   });
+
+  useEffect(() => { setPage(1); }, [search, filterStatus]);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleStatusChange = async (order: Order, newStatus: OrderStatus) => {
     if (!confirm("Ubah status pesanan?")) return;
@@ -212,7 +217,7 @@ export default function OrdersPage() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((o) => (
+            {paginated.map((o) => (
               <tr key={o.id}>
                 <td style={{ fontWeight: 500 }}>{o.order_code}</td>
                 <td>{o.customer_name}</td>
@@ -261,6 +266,7 @@ export default function OrdersPage() {
             )}
           </tbody>
         </table>
+        <Pagination currentPage={page} totalItems={filtered.length} onPageChange={setPage} label="pesanan" />
       </div>
 
       {/* Status summary cards */}

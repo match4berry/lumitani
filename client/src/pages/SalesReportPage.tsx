@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api";
 import { showToast } from "../components/Toast";
+import Pagination, { PAGE_SIZE } from "../components/Pagination";
 import type { SalesReport, SalesReportFarmer } from "../types";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
@@ -10,6 +11,7 @@ export default function SalesReportPage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [expandedFarmer, setExpandedFarmer] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
 
   const load = async () => {
     try {
@@ -22,7 +24,7 @@ export default function SalesReportPage() {
 
   useEffect(() => { load(); }, []);
 
-  const handleFilter = () => { load(); };
+  const handleFilter = () => { setPage(1); load(); };
 
   const fmt = (v: string | number | null | undefined) =>
     v ? Number(v).toLocaleString("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }) : "Rp 0";
@@ -128,6 +130,7 @@ export default function SalesReportPage() {
       <div className="card" style={{ padding: 20 }}>
         <h3 style={{ marginBottom: 16, fontSize: 16, fontWeight: 600 }}>Rincian Penjualan per Petani</h3>
         {report?.farmers && report.farmers.length > 0 ? (
+        <>
           <table className="data-table">
             <thead>
               <tr>
@@ -139,11 +142,13 @@ export default function SalesReportPage() {
               </tr>
             </thead>
             <tbody>
-              {report.farmers.map((f) => (
+              {report.farmers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((f) => (
                 <FarmerRow key={f.farmer_id} farmer={f} expanded={expandedFarmer === f.farmer_id} onToggle={() => setExpandedFarmer(expandedFarmer === f.farmer_id ? null : f.farmer_id)} fmt={fmt} />
               ))}
             </tbody>
           </table>
+          <Pagination currentPage={page} totalItems={report.farmers.length} onPageChange={setPage} label="petani" />
+        </>
         ) : (
           <div style={{ textAlign: "center", padding: 40, color: "#94a3b8" }}>Belum ada data penjualan</div>
         )}
