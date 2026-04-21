@@ -2,29 +2,15 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 
-// halaman checkout - handle both single product (from catalog) and cart items
+// halaman checkout - fetch cart data from client-side API
 router.get("/checkout", (req, res) => {
-    let items = [];
-    let total = 0;
-
-    // Check if products are passed via query params (from catalog)
-    if (req.query.products) {
-        try {
-            items = JSON.parse(decodeURIComponent(req.query.products));
-            items.forEach(item => {
-                total += item.price * item.quantity;
-            });
-        } catch (e) {
-            console.error("Error parsing products:", e);
-        }
-    } else {
-        // Otherwise, get items from session or localStorage reference (from cart)
-        // For now, empty - client will handle passing cart items via POST
-        items = [];
-        total = 0;
+    // Check if user is logged in
+    if (!req.session.userId) {
+        return res.redirect('/login');
     }
-
-    res.render("checkout", { items, total });
+    
+    // Just render checkout page - client will fetch cart data from API
+    res.render("checkout", { items: [], total: 0 });
 });
 
 // proses order

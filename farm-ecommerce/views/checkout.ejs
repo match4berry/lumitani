@@ -7,6 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .loading { text-align: center; padding: 2rem; color: #999; }
+        .error-message { color: #dc2626; padding: 1rem; background: #fee2e2; border-radius: 4px; margin: 1rem 0; }
+        .product { display: flex; gap: 1rem; margin: 1rem 0; padding: 1rem; border-bottom: 1px solid #eee; }
+    </style>
 </head>
 
 <body>
@@ -28,44 +33,17 @@
         <div>
             <div class="card">
                 <h3>Ringkasan Pesanan</h3>
-
-                <% if (items && items.length > 0) { %>
-                    <% items.forEach(item => { %>
-                        <div class="product">
-                            <div class="product-icon">
-                                <% 
-                                    // Map product names to emojis
-                                    let emoji = '🥬';
-                                    const name = item.name.toLowerCase();
-                                    if (name.includes('bayam')) emoji = '🥬';
-                                    else if (name.includes('kangkung')) emoji = '🥬';
-                                    else if (name.includes('tomat')) emoji = '🍅';
-                                    else if (name.includes('wortel')) emoji = '🥕';
-                                    else if (name.includes('mentimun')) emoji = '🥒';
-                                    else if (name.includes('cabai')) emoji = '🌶️';
-                                    else if (name.includes('lada')) emoji = '🌶️';
-                                    else if (name.includes('uni') || name.includes('ungu')) emoji = '🌶️';
-                                %>
-                                <%= emoji %>
-                            </div>
-                            <div class="product-info">
-                                <p><%= item.name %></p>
-                                <small>Rp <%= item.price.toLocaleString('id-ID') %> x <%= item.quantity %></small>
-                                <div class="price">Rp <%= (item.price * item.quantity).toLocaleString('id-ID') %></div>
-                            </div>
-                        </div>
-                    <% }); %>
-                    <hr>
-                    <p><b>Total: Rp <%= total.toLocaleString('id-ID') %></b></p>
-                <% } else { %>
-                    <p>Tidak ada produk dalam pesanan</p>
-                <% } %>
+                <div id="orderSummary">
+                    <div class="loading">
+                        <p>Memuat data cart...</p>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- KANAN -->
         <div>
-            <form action="/order" method="POST">
+            <form id="checkoutForm" action="/order" method="POST">
 
                 <div class="card">
                     <h3>Alamat Pengiriman</h3>
@@ -105,11 +83,11 @@
                     <label><input type="radio" name="payment" value="cod"> COD</label>
                 </div>
 
-                <!-- Hidden fields to pass items and total -->
-                <input type="hidden" name="items" value='<%= JSON.stringify(items) %>'>
-                <input type="hidden" name="total" value="<%= total %>">
+                <!-- Hidden fields to pass items and total (populated by JavaScript) -->
+                <input type="hidden" id="itemsField" name="items" value="[]">
+                <input type="hidden" id="totalField" name="total" value="0">
 
-                <button type="submit">Order Now</button>
+                <button type="submit" id="orderBtn">Order Now</button>
 
             </form>
         </div>
@@ -117,6 +95,116 @@
     </div>
 
 </div>
+
+<script>
+    // Fetch cart from API and populate checkout
+    async function loadCheckoutData() {
+        try {
+            console.log('[CHECKOUT] Loading cart data from API...');
+            
+            const response = await fetch('/api/cart', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+            
+            if (response.status === 401) {
+                document.getElementById('orderSummary').innerHTML = `
+                    <div class="error-message">
+                        Silakan <a href="/login">login terlebih dahulu</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch cart (${response.status})`);
+            }
+            
+            const data = await response.json();
+            
+            if (!data.items || data.items.length === 0) {
+                document.getElementById('orderSummary').innerHTML = `
+                    <div class="error-message">
+                        Keranjang Anda kosong. <a href="/catalog">Mulai belanja di sini</a>
+                    </div>
+                `;
+                document.getElementById('orderBtn').disabled = true;
+                return;
+            }
+            
+            renderCheckoutItems(data.items);
+            updateHiddenFields(data.items);
+            
+        } catch (error) {
+            console.error('[CHECKOUT] Error loading cart:', error);
+            document.getElementById('orderSummary').innerHTML = `
+                <div class="error-message">
+                    Terjadi kesalahan saat memuat keranjang. Silakan coba kembali.
+                </div>
+            `;
+            document.getElementById('orderBtn').disabled = true;
+        }
+    }
+    
+    // Render cart items to checkout summary
+    function renderCheckoutItems(items) {
+        let html = '';
+        let total = 0;
+        
+        items.forEach(item => {
+            const itemTotal = (item.price || 0) * (item.quantity || 1);
+            total += itemTotal;
+            
+            // Use actual product image
+            const imageUrl = item.photo_url || item.image || 'https://via.placeholder.com/100';
+            
+            html += `
+                <div class="product">
+                    <div class="product-icon">
+                        <img src="${imageUrl}" alt="${item.name || 'Produk'}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;">
+                    </div>
+                    <div class="product-info">
+                        <p>${item.name || 'Produk'}</p>
+                        <small>Rp ${(item.price || 0).toLocaleString('id-ID')} x ${item.quantity || 1}</small>
+                        <div class="price">Rp ${itemTotal.toLocaleString('id-ID')}</div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `<hr><p><b>Total: Rp ${total.toLocaleString('id-ID')}</b></p>`;
+        
+        document.getElementById('orderSummary').innerHTML = html;
+    }
+    
+    // Update hidden form fields with cart data
+    function updateHiddenFields(items) {
+        const itemsField = document.getElementById('itemsField');
+        const totalField = document.getElementById('totalField');
+        
+        let total = 0;
+        const itemsForOrder = items.map(item => {
+            const itemTotal = (item.price || 0) * (item.quantity || 1);
+            total += itemTotal;
+            return {
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity
+            };
+        });
+        
+        itemsField.value = JSON.stringify(itemsForOrder);
+        totalField.value = total;
+        
+        console.log('[CHECKOUT] Updated hidden fields with', itemsForOrder.length, 'items, total:', total);
+    }
+    
+    // Load checkout data when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadCheckoutData();
+    });
+</script>
 
 </body>
 </html>

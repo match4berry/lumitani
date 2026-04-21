@@ -71,13 +71,50 @@ function saveToStorage() {
 
 function updateCartBadge() {
     const badge = document.getElementById('cart-badge');
-    const count = state.cart.reduce((sum, item) => sum + item.quantity, 0);
-    if (count > 0) {
-        badge.textContent = count;
-        badge.style.display = 'block';
-    } else {
-        badge.style.display = 'none';
-    }
+    
+    // Try to get cart count from API first
+    fetch('/api/cart', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+    })
+    .then(r => {
+        if (r.ok) return r.json();
+        return null;
+    })
+    .then(data => {
+        if (data && data.items) {
+            // Use API data as source of truth
+            const totalQty = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            if (totalQty > 0 && badge) {
+                badge.textContent = totalQty;
+                badge.style.display = 'block';
+            } else if (badge) {
+                badge.style.display = 'none';
+            }
+        } else {
+            // Fallback to localStorage if API not available
+            const count = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            if (count > 0 && badge) {
+                badge.textContent = count;
+                badge.style.display = 'block';
+            } else if (badge) {
+                badge.style.display = 'none';
+            }
+        }
+    })
+    .catch(() => {
+        // Fallback to localStorage on error
+        if (badge) {
+            const count = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    });
 }
 
 // ===== CART FUNCTIONS =====
@@ -142,6 +179,30 @@ async function addToCart(productId) {
         
         const data = await response.json();
         console.log('[SCRIPT] Added successfully:', data);
+        
+        // Sync cart badge with latest data from API
+        try {
+            const cartData = await fetch('/api/cart', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            }).then(r => r.json());
+            
+            if (cartData.items) {
+                const totalQty = cartData.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                const badge = document.getElementById('cart-badge');
+                if (badge) {
+                    if (totalQty > 0) {
+                        badge.textContent = totalQty;
+                        badge.style.display = 'block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Error updating badge:', err);
+        }
         
         // Show success message
         alert('Produk berhasil ditambahkan ke keranjang!');
