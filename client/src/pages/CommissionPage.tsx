@@ -43,10 +43,10 @@ export default function CommissionPage() {
       return;
     }
     try {
-      const updated = await api.updateCommissionSettings(rate);
-      setSettings(updated);
+      await api.updateCommissionSettings(rate);
       setShowEditModal(false);
       showToast("Persentase komisi berhasil diperbarui", "success");
+      load();
     } catch (e: unknown) {
       showToast(e instanceof Error ? e.message : "Gagal menyimpan", "error");
     }

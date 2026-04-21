@@ -140,6 +140,7 @@ export interface CommissionReport {
 }
 
 export interface SalesReportSummary {
+  gross_revenue: string;
   total_revenue: string;
   total_transactions: number;
   total_farmers: number;
