@@ -7,6 +7,7 @@ const { fetchAllProducts, fetchProductsByCommodity, fetchProductById, fetchCateg
 const { getCart, addToCart, removeFromCart } = require('./controllers/cartController');
 const orderRoutes = require('./routes/order');
 const cartRoutes = require('./routes/cart');
+const pool = require('./db');
 require('dotenv').config();
 
 const app = express();
@@ -98,7 +99,7 @@ app.get('/registration', (req, res) => {
 });
 
 // Registration POST
-app.post('/register', (req, res) => {
+app.post('/register', async (req, res) => {
   const { name, email, password, confirm_password } = req.body;
   
   // Basic validation
@@ -116,12 +117,36 @@ app.post('/register', (req, res) => {
     });
   }
   
-  // Create session
-  req.session.userId = email;
-  req.session.userName = name;
-  
-  // Redirect to home after successful registration
-  res.redirect('/home');
+  try {
+    // Insert user into database
+    const result = await pool.query(
+      'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id',
+      [name, email]
+    );
+    
+    const userId = result.rows[0].id;
+    
+    // Create session with numeric user_id
+    req.session.userId = userId;
+    req.session.userEmail = email;
+    req.session.userName = name;
+    
+    // Redirect to home after successful registration
+    res.redirect('/home');
+  } catch (err) {
+    console.error('Registration error:', err);
+    // If user already exists, try to login instead
+    if (err.code === '23505') { // UNIQUE constraint violation
+      return res.render('registration', { 
+        layout: false, 
+        error: 'Email sudah terdaftar' 
+      });
+    }
+    res.render('registration', { 
+      layout: false, 
+      error: 'Gagal melakukan registrasi' 
+    });
+  }
 });
 
 // Login page
@@ -130,7 +155,7 @@ app.get('/login', (req, res) => {
 });
 
 // Login POST
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   
   // Basic validation
@@ -141,12 +166,36 @@ app.post('/login', (req, res) => {
     });
   }
   
-  // Create session (simple - just save email and a dummy name)
-  req.session.userId = email;
-  req.session.userName = email.split('@')[0];
-  
-  // Redirect to home after successful login
-  res.redirect('/home');
+  try {
+    // Query user from database
+    const result = await pool.query(
+      'SELECT id, name FROM users WHERE email = $1',
+      [email]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.render('login', { 
+        layout: false, 
+        error: 'Email atau password salah' 
+      });
+    }
+    
+    const user = result.rows[0];
+    
+    // Create session with numeric user_id
+    req.session.userId = user.id;
+    req.session.userEmail = email;
+    req.session.userName = user.name;
+    
+    // Redirect to home after successful login
+    res.redirect('/home');
+  } catch (err) {
+    console.error('Login error:', err);
+    res.render('login', { 
+      layout: false, 
+      error: 'Gagal melakukan login' 
+    });
+  }
 });
 
 // Logout
@@ -156,6 +205,16 @@ app.get('/logout', (req, res) => {
       return res.render('error', { message: 'Failed to logout' });
     }
     res.redirect('/');
+  });
+});
+
+// API: Get configuration (for frontend to access API URLs and user info)
+app.get('/api/config', (req, res) => {
+  res.json({
+    cartApiUrl: process.env.CART_API_URL || 'https://lumitani.elcyone.my.id/api/cart',
+    userId: req.session.userId || null,
+    userName: req.session.userName || null,
+    userEmail: req.session.userEmail || null
   });
 });
 

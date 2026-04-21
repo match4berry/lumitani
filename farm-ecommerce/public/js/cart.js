@@ -1,19 +1,50 @@
 /**
- * Cart Page Functionality - API-driven with PostgreSQL backend
- * Manages cart interactions through /api/cart endpoints
+ * Cart Page Functionality - API-driven with External Cart API
+ * Calls external cart API at https://lumitani.elcyone.my.id/api/cart
  */
 
-// Load cart items from API when page loads
+let cartApiUrl = 'http://localhost:5000/api/cart'; // Default local, will be replaced by config
+let userId = null;
+
+// Load configuration first (API URLs and user info)
+async function loadConfig() {
+  try {
+    const response = await fetch('/api/config');
+    const config = await response.json();
+    cartApiUrl = config.cartApiUrl;
+    userId = config.userId;
+    
+    // Now load the cart
+    if (userId) {
+      loadCartFromAPI();
+    } else {
+      showNotLoggedIn();
+    }
+  } catch (error) {
+    console.error('Error loading config:', error);
+    showError('Gagal memuat konfigurasi');
+  }
+}
+
+// Load cart items from external API when page loads
 async function loadCartFromAPI() {
   try {
-    const response = await fetch('/api/cart');
+    // Call external cart API with user_id
+    const response = await fetch(`${cartApiUrl}?user_id=${userId}`, {
+      method: 'GET',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userId}`
+      },
+      credentials: 'include'
+    });
     
     if (!response.ok) {
       if (response.status === 401) {
-        showEmptyCart('Silakan <a href="/login">login terlebih dahulu</a>');
+        showNotLoggedIn();
         return;
       }
-      throw new Error('Failed to fetch cart');
+      throw new Error(`Failed to fetch cart (${response.status})`);
     }
     
     const data = await response.json();
@@ -22,18 +53,44 @@ async function loadCartFromAPI() {
       renderCartItems(data.items);
       updateCartSummary(data.items);
     } else {
-      showEmptyCart('Keranjang Anda kosong. <a href="/catalog">Mulai belanja di sini</a>');
+      showEmptyCart();
     }
   } catch (error) {
     console.error('Error fetching cart:', error);
-    showEmptyCart('Terjadi kesalahan. <a href="/catalog">Kembali ke katalog</a>');
+    showError('Terjadi kesalahan saat memuat keranjang');
   }
 }
 
-// Display empty cart message
-function showEmptyCart(message) {
+// Display "not logged in" message
+function showNotLoggedIn() {
   const container = document.getElementById('cartItemsContainer');
-  container.innerHTML = `<div class="empty-cart"><p>${message}</p></div>`;
+  container.innerHTML = `
+    <div class="empty-cart">
+      <p>Silakan <a href="/login">login terlebih dahulu</a></p>
+    </div>
+  `;
+}
+
+// Display generic error message
+function showError(message) {
+  const container = document.getElementById('cartItemsContainer');
+  container.innerHTML = `
+    <div class="empty-cart">
+      <p>${message}</p>
+      <p><a href="/catalog">Kembali ke katalog</a></p>
+    </div>
+  `;
+}
+
+// Display empty cart message
+function showEmptyCart() {
+  const container = document.getElementById('cartItemsContainer');
+  container.innerHTML = `
+    <div class="empty-cart">
+      <p>Keranjang Anda kosong</p>
+      <p><a href="/catalog">Mulai belanja di sini</a></p>
+    </div>
+  `;
 }
 
 // Render cart items to DOM from API response
@@ -41,33 +98,33 @@ function renderCartItems(items) {
   const container = document.getElementById('cartItemsContainer');
   
   if (items.length === 0) {
-    showEmptyCart('Keranjang Anda kosong. <a href="/catalog">Mulai belanja</a>');
+    showEmptyCart();
     return;
   }
   
   const itemsHTML = items.map(item => {
     const itemTotal = (item.price || 0) * (item.quantity || 1);
     return `
-      <div class="cart-item" data-product-id="${item.productId}">
+      <div class="cart-item" data-product-id="${item.productId || item.product_id}">
         <div class="item-checkbox">
           <input type="checkbox" class="item-check" checked>
         </div>
         <div class="item-image">
-          <img src="${item.photo_url || 'https://via.placeholder.com/100'}" alt="${item.name}">
+          <img src="${item.photo_url || item.image || 'https://via.placeholder.com/100'}" alt="${item.name}">
         </div>
         <div class="item-info">
           <h4 class="item-name">${item.name || 'Produk'}</h4>
           <p class="item-price">Rp ${(item.price || 0).toLocaleString('id-ID')} / 250g</p>
         </div>
         <div class="item-quantity">
-          <button class="qty-btn minus" onclick="decreaseQty(this, ${item.productId})">
+          <button class="qty-btn minus" onclick="decreaseQty(this, ${item.productId || item.product_id})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
           </button>
           <input type="number" class="qty-input" value="${item.quantity || 1}" min="1" 
-                 onchange="updateQuantityAPI(this, ${item.productId})">
-          <button class="qty-btn plus" onclick="increaseQty(this, ${item.productId})">
+                 onchange="updateQuantityAPI(this, ${item.productId || item.product_id})">
+          <button class="qty-btn plus" onclick="increaseQty(this, ${item.productId || item.product_id})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19"/>
               <line x1="5" y1="12" x2="19" y2="12"/>
@@ -78,7 +135,7 @@ function renderCartItems(items) {
           <div class="total-label">Total</div>
           <div class="total-price">Rp ${itemTotal.toLocaleString('id-ID')}</div>
         </div>
-        <button class="item-delete" onclick="deleteFromCartAPI(${item.productId})">
+        <button class="item-delete" onclick="deleteFromCartAPI(${item.productId || item.product_id})">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-9l-1 1H5v2h14V4z"/>
           </svg>
@@ -175,7 +232,7 @@ function updateCartSummary(items) {
   document.querySelector('.total-items').textContent = `sub total ${totalItems} item`;
 }
 
-// Call API to update item quantity
+// Call external API to update item quantity
 async function updateQuantityAPI(input, productId) {
   const quantity = parseInt(input.value);
   
@@ -185,10 +242,14 @@ async function updateQuantityAPI(input, productId) {
   }
   
   try {
-    const response = await fetch(`/api/cart/${productId}`, {
+    const response = await fetch(`${cartApiUrl}/${productId}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ quantity })
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userId}`
+      },
+      body: JSON.stringify({ quantity, user_id: userId }),
+      credentials: 'include'
     });
     
     if (!response.ok) throw new Error('Failed to update quantity');
@@ -201,13 +262,19 @@ async function updateQuantityAPI(input, productId) {
   }
 }
 
-// Call API to delete item from cart
+// Call external API to delete item from cart
 async function deleteFromCartAPI(productId) {
   if (!confirm('Yakin ingin menghapus item ini?')) return;
   
   try {
-    const response = await fetch(`/api/cart/${productId}`, { 
-      method: 'DELETE' 
+    const response = await fetch(`${cartApiUrl}/${productId}`, { 
+      method: 'DELETE',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userId}`
+      },
+      body: JSON.stringify({ user_id: userId }),
+      credentials: 'include'
     });
     
     if (!response.ok) throw new Error('Failed to delete item');
@@ -250,7 +317,7 @@ function proceedToCheckout() {
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
-  loadCartFromAPI();
+  loadConfig();
   
   const orderBtn = document.querySelector('.btn-order-now');
   if (orderBtn) {

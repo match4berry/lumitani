@@ -116,20 +116,35 @@ function buyNow(productId, productName, productPrice) {
     window.location.href = `/checkout?products=${productsParam}`;
 }
 
-// Add to cart via API
+// Add to cart via External Cart API
 async function addToCart(productId, productName, productPrice, productImage) {
     try {
-        // Call cart API
-        const response = await fetch('/api/cart/add', {
+        // Get config (cart API URL and user_id)
+        const configRes= await fetch('/api/config');
+        const config = await configRes.json();
+        
+        if (!config.userId) {
+            alert('Silakan login terlebih dahulu');
+            window.location.href = '/login';
+            return;
+        }
+        
+        // Call external cart API
+        const response = await fetch(`${config.cartApiUrl}/add`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${config.userId}`
+            },
             body: JSON.stringify({
+                user_id: config.userId,
                 productId,
                 quantity: 1,
                 name: productName,
                 price: productPrice,
                 photo_url: productImage
-            })
+            }),
+            credentials: 'include'
         });
         
         if (response.status === 401) {

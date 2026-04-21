@@ -10,6 +10,7 @@ import ordersRouter from "./routes/orders";
 import usersRouter from "./routes/users";
 import commissionsRouter from "./routes/commissions";
 import salesReportRouter from "./routes/salesReport";
+import cartRouter from "./routes/cart";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -53,11 +54,12 @@ app.use("/api/orders", ordersRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/commissions", commissionsRouter);
 app.use("/api/sales-report", salesReportRouter);
+app.use("/api/cart", cartRouter);
 
 const start = async () => {
   try {
     await connectDB();
-    app.listen(PORT, (data) => {
+    app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (err) {
@@ -66,4 +68,7 @@ const start = async () => {
   }
 };
 
-start()
+start().catch((err) => {
+  console.error("Failed to start application:", err);
+  process.exit(1);
+});

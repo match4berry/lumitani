@@ -16,9 +16,19 @@ function changeImage(thumbnail) {
     mainImage.src = newSrc;
 }
 
-// Add to cart via API
+// Add to cart via External API
 async function addToCart(productId) {
     try {
+        // Get config (cart API URL and user_id)
+        const configRes = await fetch('/api/config');
+        const config = await configRes.json();
+        
+        if (!config.userId) {
+            alert('Silakan login terlebih dahulu');
+            window.location.href = '/login';
+            return;
+        }
+        
         // Get product data from DOM
         const productTitle = document.querySelector('.product-title').textContent.trim().replace('Premium', '').trim();
         const priceText = document.querySelector('.price-text').textContent;
@@ -32,17 +42,23 @@ async function addToCart(productId) {
         
         const productImage = document.getElementById('mainImage').src;
         
-        // Call cart API
-        const response = await fetch('/api/cart/add', {
+        console.log("${config.cartApiUrl}/add")
+        // Call external cart API
+        const response = await fetch(`${config.cartApiUrl}/add`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${config.userId}`
+            },
             body: JSON.stringify({
+                user_id: config.userId,
                 productId,
                 quantity: 1,
                 name: productTitle,
                 price: priceValue,
                 photo_url: productImage
-            })
+            }),
+            credentials: 'include'
         });
         
         if (response.status === 401) {

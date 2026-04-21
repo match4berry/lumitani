@@ -79,21 +79,87 @@ function updateCartBadge() {
 }
 
 // ===== CART FUNCTIONS =====
-function addToCart(product) {
-    const existingItem = state.cart.find(item => item.name === product.name);
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        state.cart.push({
-            name: product.name,
-            price: product.price,
-            image: product.image,
-            quantity: 1
+// function addToCart(product) {
+//     const existingItem = state.cart.find(item => item.name === product.name);
+//     if (existingItem) {
+//         existingItem.quantity += 1;
+//     } else {
+//         state.cart.push({
+//             name: product.name,
+//             price: product.price,
+//             image: product.image,
+//             quantity: 1
+//         });
+//     }
+//     saveToStorage();
+//     showToast('Produk ditambahkan ke keranjang!');
+// }
+
+async function addToCart(productId) {
+    try {
+        // Get config (cart API URL and user_id)
+        const configRes = await fetch('/api/config');
+        const config = await configRes.json();
+        
+        console.log(config)
+
+        // if (!config.userId) {
+        //     // alert('Silakan login terlebih dahulu');
+        //     // window.location.href = '/login';
+        //     // return;
+        // }
+        
+        // Get product data from DOM
+        const productTitle = document.querySelector('.product-title').textContent.trim().replace('Premium', '').trim();
+        const priceText = document.querySelector('.price-text').textContent;
+        const priceMatch = priceText.match(/\d+/g);
+        let priceValue = 0;
+        
+        if (priceMatch) {
+            // Join all numbers and parse (e.g., "Rp 10.000" -> "10000")
+            priceValue = parseInt(priceMatch.join(''));
+        }
+        
+        const productImage = document.getElementById('mainImage').src;
+        
+        console.log("${config.cartApiUrl}/add")
+        // Call external cart API
+        const response = await fetch(`${config.cartApiUrl}/add`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${config.userId}`
+            },
+            body: JSON.stringify({
+                user_id: config.userId,
+                productId,
+                quantity: 1,
+                name: productTitle,
+                price: priceValue,
+                photo_url: productImage
+            }),
+            credentials: 'include'
         });
+        
+        if (response.status === 401) {
+            alert('Silakan login terlebih dahulu');
+            window.location.href = '/login';
+            return;
+        }
+        
+        if (!response.ok) throw new Error('Failed to add to cart');
+        
+        const data = await response.json();
+        
+        // Show success message
+        alert('Produk berhasil ditambahkan ke keranjang!');
+        
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        alert('Gagal menambahkan ke keranjang');
     }
-    saveToStorage();
-    showToast('Produk ditambahkan ke keranjang!');
 }
+
 
 function removeFromCart(productName) {
     state.cart = state.cart.filter(item => item.name !== productName);
