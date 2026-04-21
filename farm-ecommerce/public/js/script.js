@@ -40,11 +40,13 @@ function showToast(message) {
 }
 
 function showLoading() {
-    document.getElementById('loading').style.display = 'flex';
+    const loading = document.getElementById('loading');
+    if (loading) loading.style.display = 'flex';
 }
 
 function hideLoading() {
-    document.getElementById('loading').style.display = 'none';
+    const loading = document.getElementById('loading');
+    if (loading) loading.style.display = 'none';
 }
 
 // ===== LOCAL STORAGE =====
@@ -97,46 +99,32 @@ function updateCartBadge() {
 
 async function addToCart(productId) {
     try {
-        // Get config (cart API URL and user_id)
-        const configRes = await fetch('/api/config');
-        const config = await configRes.json();
+        console.log('[SCRIPT] Checking login status...');
         
-        console.log(config)
-
-        // if (!config.userId) {
-        //     // alert('Silakan login terlebih dahulu');
-        //     // window.location.href = '/login';
-        //     // return;
-        // }
+        // Check if user is logged in by making a test request
+        const cartRes = await fetch('/api/cart', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+        });
         
-        // Get product data from DOM
-        const productTitle = document.querySelector('.product-title').textContent.trim().replace('Premium', '').trim();
-        const priceText = document.querySelector('.price-text').textContent;
-        const priceMatch = priceText.match(/\d+/g);
-        let priceValue = 0;
-        
-        if (priceMatch) {
-            // Join all numbers and parse (e.g., "Rp 10.000" -> "10000")
-            priceValue = parseInt(priceMatch.join(''));
+        if (cartRes.status === 401) {
+            alert('Silakan login terlebih dahulu');
+            window.location.href = '/login';
+            return;
         }
         
-        const productImage = document.getElementById('mainImage').src;
+        console.log('[SCRIPT] Adding to cart:', { productId });
         
-        console.log("${config.cartApiUrl}/add")
-        // Call external cart API
-        const response = await fetch(`${config.cartApiUrl}/add`, {
+        // Call local proxy cart API
+        const response = await fetch('/api/cart', {
             method: 'POST',
             headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${config.userId}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                user_id: config.userId,
-                productId,
-                quantity: 1,
-                name: productTitle,
-                price: priceValue,
-                photo_url: productImage
+                product_id: productId,
+                quantity: 1
             }),
             credentials: 'include'
         });
@@ -147,16 +135,20 @@ async function addToCart(productId) {
             return;
         }
         
-        if (!response.ok) throw new Error('Failed to add to cart');
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to add to cart');
+        }
         
         const data = await response.json();
+        console.log('[SCRIPT] Added successfully:', data);
         
         // Show success message
         alert('Produk berhasil ditambahkan ke keranjang!');
         
     } catch (error) {
-        console.error('Error adding to cart:', error);
-        alert('Gagal menambahkan ke keranjang');
+        console.error('[SCRIPT] Error adding to cart:', error);
+        alert('Gagal menambahkan ke keranjang: ' + error.message);
     }
 }
 

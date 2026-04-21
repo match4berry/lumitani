@@ -1,40 +1,26 @@
 /**
- * Cart Page Functionality - API-driven with External Cart API
- * Calls external cart API at https://lumitani.elcyone.my.id/api/cart
+ * Cart Page Functionality - API-driven with Local Proxy
+ * Uses local /api/cart proxy endpoints that authenticate via session
  */
 
-let cartApiUrl = 'http://localhost:5000/api/cart'; // Default local, will be replaced by config
+const cartApiUrl = '/api/cart';
 let userId = null;
 
-// Load configuration first (API URLs and user info)
-async function loadConfig() {
-  try {
-    const response = await fetch('/api/config');
-    const config = await response.json();
-    cartApiUrl = config.cartApiUrl;
-    userId = config.userId;
-    
-    // Now load the cart
-    if (userId) {
-      loadCartFromAPI();
-    } else {
-      showNotLoggedIn();
-    }
-  } catch (error) {
-    console.error('Error loading config:', error);
-    showError('Gagal memuat konfigurasi');
-  }
-}
+// Initialize cart on page load
+document.addEventListener('DOMContentLoaded', function() {
+  loadCartFromAPI();
+});
 
-// Load cart items from external API when page loads
+// Load cart items from local proxy API when page loads
 async function loadCartFromAPI() {
   try {
-    // Call external cart API with user_id
-    const response = await fetch(`${cartApiUrl}?user_id=${userId}`, {
+    console.log('[CART] Loading cart from', cartApiUrl);
+    
+    // Call local proxy endpoint - authentication via session
+    const response = await fetch(cartApiUrl, {
       method: 'GET',
       headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userId}`
+        'Content-Type': 'application/json'
       },
       credentials: 'include'
     });
@@ -104,8 +90,9 @@ function renderCartItems(items) {
   
   const itemsHTML = items.map(item => {
     const itemTotal = (item.price || 0) * (item.quantity || 1);
+    // Store both cart item ID and product ID for proper operations
     return `
-      <div class="cart-item" data-product-id="${item.productId || item.product_id}">
+      <div class="cart-item" data-item-id="${item.id}" data-product-id="${item.product_id}">
         <div class="item-checkbox">
           <input type="checkbox" class="item-check" checked>
         </div>
@@ -117,14 +104,14 @@ function renderCartItems(items) {
           <p class="item-price">Rp ${(item.price || 0).toLocaleString('id-ID')} / 250g</p>
         </div>
         <div class="item-quantity">
-          <button class="qty-btn minus" onclick="decreaseQty(this, ${item.productId || item.product_id})">
+          <button class="qty-btn minus" onclick="decreaseQty(this, ${item.id})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
           </button>
           <input type="number" class="qty-input" value="${item.quantity || 1}" min="1" 
-                 onchange="updateQuantityAPI(this, ${item.productId || item.product_id})">
-          <button class="qty-btn plus" onclick="increaseQty(this, ${item.productId || item.product_id})">
+                 onchange="updateQuantityAPI(this, ${item.id})">
+          <button class="qty-btn plus" onclick="increaseQty(this, ${item.id})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19"/>
               <line x1="5" y1="12" x2="19" y2="12"/>
@@ -135,7 +122,7 @@ function renderCartItems(items) {
           <div class="total-label">Total</div>
           <div class="total-price">Rp ${itemTotal.toLocaleString('id-ID')}</div>
         </div>
-        <button class="item-delete" onclick="deleteFromCartAPI(${item.productId || item.product_id})">
+        <button class="item-delete" onclick="deleteFromCartAPI(${item.id})">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-9l-1 1H5v2h14V4z"/>
           </svg>
@@ -232,8 +219,8 @@ function updateCartSummary(items) {
   document.querySelector('.total-items').textContent = `sub total ${totalItems} item`;
 }
 
-// Call external API to update item quantity
-async function updateQuantityAPI(input, productId) {
+// Call local proxy API to update item quantity
+async function updateQuantityAPI(input, cartItemId) {
   const quantity = parseInt(input.value);
   
   if (quantity < 1) {
@@ -242,18 +229,20 @@ async function updateQuantityAPI(input, productId) {
   }
   
   try {
-    const response = await fetch(`${cartApiUrl}/${productId}`, {
+    console.log('[CART] Updating item', cartItemId, 'to quantity', quantity);
+    
+    const response = await fetch(`${cartApiUrl}/${cartItemId}`, {
       method: 'PUT',
       headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userId}`
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ quantity, user_id: userId }),
+      body: JSON.stringify({ quantity }),
       credentials: 'include'
     });
     
     if (!response.ok) throw new Error('Failed to update quantity');
     
+    console.log('[CART] Updated successfully');
     updateItemTotal(input.closest('.item-quantity').querySelector('.qty-btn'));
   } catch (error) {
     console.error('Error updating quantity:', error);
@@ -262,23 +251,24 @@ async function updateQuantityAPI(input, productId) {
   }
 }
 
-// Call external API to delete item from cart
-async function deleteFromCartAPI(productId) {
+// Call local proxy API to delete item from cart
+async function deleteFromCartAPI(cartItemId) {
   if (!confirm('Yakin ingin menghapus item ini?')) return;
   
   try {
-    const response = await fetch(`${cartApiUrl}/${productId}`, { 
+    console.log('[CART] Deleting item', cartItemId);
+    
+    const response = await fetch(`${cartApiUrl}/${cartItemId}`, { 
       method: 'DELETE',
       headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userId}`
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ user_id: userId }),
       credentials: 'include'
     });
     
     if (!response.ok) throw new Error('Failed to delete item');
     
+    console.log('[CART] Deleted successfully');
     loadCartFromAPI();
   } catch (error) {
     console.error('Error deleting item:', error);
@@ -317,7 +307,7 @@ function proceedToCheckout() {
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
-  loadConfig();
+  loadCartFromAPI();
   
   const orderBtn = document.querySelector('.btn-order-now');
   if (orderBtn) {

@@ -67,12 +67,7 @@
                                     </svg>
                                 </a>
                                 <a href="javascript:void(0)" class="btn-add-cart" 
-                                    onclick="addToCart(
-                                        '<%= product.id %>',
-                                        '<%= product.name %>',
-                                        <%= product.current_price || product.price || 0 %>,
-                                        '<%= product.photo_url || (product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/300') %>'
-                                    ); return false;">
+                                    onclick="addToCart('<%= product.id %>'); return false;">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <circle cx="9" cy="21" r="1"/>
                                         <circle cx="20" cy="21" r="1"/>
@@ -116,33 +111,35 @@ function buyNow(productId, productName, productPrice) {
     window.location.href = `/checkout?products=${productsParam}`;
 }
 
-// Add to cart via External Cart API
-async function addToCart(productId, productName, productPrice, productImage) {
+// Add to cart via Local Proxy API
+async function addToCart(productId) {
     try {
-        // Get config (cart API URL and user_id)
-        const configRes= await fetch('/api/config');
-        const config = await configRes.json();
+        console.log('[CATALOG] Checking login status...');
         
-        if (!config.userId) {
+        // Check if user is logged in by making a test request
+        const cartRes = await fetch('/api/cart', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+        });
+        
+        if (cartRes.status === 401) {
             alert('Silakan login terlebih dahulu');
             window.location.href = '/login';
             return;
         }
         
-        // Call external cart API
-        const response = await fetch(`${config.cartApiUrl}/add`, {
+        console.log('[CATALOG] Adding to cart:', { productId });
+        
+        // Call local proxy cart API
+        const response = await fetch('/api/cart', {
             method: 'POST',
             headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${config.userId}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                user_id: config.userId,
-                productId,
-                quantity: 1,
-                name: productName,
-                price: productPrice,
-                photo_url: productImage
+                product_id: productId,
+                quantity: 1
             }),
             credentials: 'include'
         });
@@ -153,12 +150,19 @@ async function addToCart(productId, productName, productPrice, productImage) {
             return;
         }
         
-        if (!response.ok) throw new Error('Failed to add to cart');
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to add to cart');
+        }
         
+        const data = await response.json();
+        console.log('[CATALOG] Added successfully:', data);
+        
+        // Show success message
         alert('Produk berhasil ditambahkan ke keranjang!');
     } catch (error) {
-        console.error('Error adding to cart:', error);
-        alert('Gagal menambahkan ke keranjang');
+        console.error('[CATALOG] Error adding to cart:', error);
+        alert('Gagal menambahkan ke keranjang: ' + error.message);
     }
 }
 </script>

@@ -98,7 +98,7 @@ app.get('/registration', (req, res) => {
   res.render('registration', { layout: false });
 });
 
-// Registration POST
+// Registration POST - Call external API
 app.post('/register', async (req, res) => {
   const { name, email, password, confirm_password } = req.body;
   
@@ -118,30 +118,36 @@ app.post('/register', async (req, res) => {
   }
   
   try {
-    // Insert user into database
-    const result = await pool.query(
-      'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id',
-      [name, email]
-    );
+    console.log('[REGISTER] Calling external API at http://localhost:5001/api/users/register');
     
-    const userId = result.rows[0].id;
+    // Call external API
+    const apiResponse = await fetch('http://localhost:5001/api/users/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
     
-    // Create session with numeric user_id
-    req.session.userId = userId;
-    req.session.userEmail = email;
-    req.session.userName = name;
+    const data = await apiResponse.json();
     
-    // Redirect to home after successful registration
-    res.redirect('/home');
-  } catch (err) {
-    console.error('Registration error:', err);
-    // If user already exists, try to login instead
-    if (err.code === '23505') { // UNIQUE constraint violation
+    if (!apiResponse.ok) {
+      console.log('[REGISTER] API error:', data);
       return res.render('registration', { 
         layout: false, 
-        error: 'Email sudah terdaftar' 
+        error: data.error || 'Gagal melakukan registrasi' 
       });
     }
+    
+    // API succeeded, save to session
+    console.log('[REGISTER] User registered successfully, saving to session');
+    req.session.userId = data.user.id;
+    req.session.userEmail = data.user.email;
+    req.session.userName = data.user.name;
+    req.session.userToken = data.token;
+    
+    // Redirect to home
+    res.redirect('/home');
+  } catch (err) {
+    console.error('[REGISTER] Error calling API:', err);
     res.render('registration', { 
       layout: false, 
       error: 'Gagal melakukan registrasi' 
@@ -154,7 +160,7 @@ app.get('/login', (req, res) => {
   res.render('login', { layout: false });
 });
 
-// Login POST
+// Login POST - Call external API
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   
@@ -167,30 +173,36 @@ app.post('/login', async (req, res) => {
   }
   
   try {
-    // Query user from database
-    const result = await pool.query(
-      'SELECT id, name FROM users WHERE email = $1',
-      [email]
-    );
+    console.log('[LOGIN] Calling external API at http://localhost:5001/api/users/login');
     
-    if (result.rows.length === 0) {
+    // Call external API
+    const apiResponse = await fetch('http://localhost:5001/api/users/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await apiResponse.json();
+    
+    if (!apiResponse.ok) {
+      console.log('[LOGIN] API error:', data);
       return res.render('login', { 
         layout: false, 
-        error: 'Email atau password salah' 
+        error: data.error || 'Email atau password salah' 
       });
     }
     
-    const user = result.rows[0];
+    // API succeeded, save to session
+    console.log('[LOGIN] User logged in successfully, saving to session');
+    req.session.userId = data.user.id;
+    req.session.userEmail = data.user.email;
+    req.session.userName = data.user.name;
+    req.session.userToken = data.token;
     
-    // Create session with numeric user_id
-    req.session.userId = user.id;
-    req.session.userEmail = email;
-    req.session.userName = user.name;
-    
-    // Redirect to home after successful login
+    // Redirect to home
     res.redirect('/home');
   } catch (err) {
-    console.error('Login error:', err);
+    console.error('[LOGIN] Error calling API:', err);
     res.render('login', { 
       layout: false, 
       error: 'Gagal melakukan login' 
@@ -269,7 +281,11 @@ app.get('/about', (req, res) => {
 
 // Profile page
 app.get('/profile', (req, res) => {
-  res.render('profile');
+  res.render('profile', {
+    userName: req.session.userName || null,
+    userEmail: req.session.userEmail || null,
+    userId: req.session.userId || null
+  });
 });
 
 // Alamat Pengiriman (Shipping Address) page
@@ -344,6 +360,150 @@ app.get('/order-history', (req, res) => {
 // Redirect from old pesanan-saya route
 app.get('/pesanan-saya', (req, res) => {
   res.redirect('/order-history');
+});
+
+// ===== CART PROXY API (calls external API) =====
+
+// GET cart items for logged-in user
+app.get('/api/cart', async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  try {
+    console.log('[CART GET] Fetching cart for user:', req.session.userId);
+    
+    // Call external API
+    const apiResponse = await fetch(`http://localhost:5001/api/cart/user/${req.session.userId}`, {
+      method: 'GET',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${req.session.userToken}`
+      }
+    });
+
+    const data = await apiResponse.json();
+
+    if (!apiResponse.ok) {
+      return res.status(apiResponse.status).json(data);
+    }
+
+    res.json(data);
+  } catch (err) {
+    console.error('[CART GET] Error:', err);
+    res.status(500).json({ error: 'Failed to fetch cart' });
+  }
+});
+
+// POST add item to cart
+app.post('/api/cart', async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  const { product_id, quantity = 1 } = req.body;
+
+  if (!product_id) {
+    return res.status(400).json({ error: 'product_id is required' });
+  }
+
+  try {
+    console.log('[CART ADD] Adding to cart for user:', req.session.userId);
+    
+    // Call external API
+    const apiResponse = await fetch('http://localhost:5001/api/cart', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${req.session.userToken}`
+      },
+      body: JSON.stringify({
+        user_id: req.session.userId,
+        product_id,
+        quantity
+      })
+    });
+
+    const data = await apiResponse.json();
+
+    if (!apiResponse.ok) {
+      return res.status(apiResponse.status).json(data);
+    }
+
+    res.status(apiResponse.status).json(data);
+  } catch (err) {
+    console.error('[CART ADD] Error:', err);
+    res.status(500).json({ error: 'Failed to add to cart' });
+  }
+});
+
+// PUT update cart item quantity
+app.put('/api/cart/:id', async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  const { quantity } = req.body;
+
+  if (!quantity || quantity < 1) {
+    return res.status(400).json({ error: 'quantity must be at least 1' });
+  }
+
+  try {
+    console.log('[CART UPDATE] Updating quantity for user:', req.session.userId);
+    
+    // Call external API
+    const apiResponse = await fetch(`http://localhost:5001/api/cart/${req.params.id}`, {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${req.session.userToken}`
+      },
+      body: JSON.stringify({ quantity })
+    });
+
+    const data = await apiResponse.json();
+
+    if (!apiResponse.ok) {
+      return res.status(apiResponse.status).json(data);
+    }
+
+    res.json(data);
+  } catch (err) {
+    console.error('[CART UPDATE] Error:', err);
+    res.status(500).json({ error: 'Failed to update cart' });
+  }
+});
+
+// DELETE remove item from cart
+app.delete('/api/cart/:id', async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  try {
+    console.log('[CART DELETE] Deleting cart item for user:', req.session.userId);
+    
+    // Call external API
+    const apiResponse = await fetch(`http://localhost:5001/api/cart/${req.params.id}`, {
+      method: 'DELETE',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${req.session.userToken}`
+      }
+    });
+
+    const data = await apiResponse.json();
+
+    if (!apiResponse.ok) {
+      return res.status(apiResponse.status).json(data);
+    }
+
+    res.json(data);
+  } catch (err) {
+    console.error('[CART DELETE] Error:', err);
+    res.status(500).json({ error: 'Failed to delete from cart' });
+  }
 });
 
 // Order routes

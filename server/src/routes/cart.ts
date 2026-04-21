@@ -14,19 +14,22 @@ router.get("/user/:user_id", async (req: Request, res: Response) => {
         ci.user_id,
         ci.product_id,
         ci.quantity,
-        p.name as product_name,
-        p.price,
+        p.name,
         p.photo_url,
+        COALESCE(cp.price, 0) as price,
         ci.added_at,
         ci.updated_at
       FROM cart_items ci
       JOIN products p ON ci.product_id = p.id
+      LEFT JOIN commodity_prices cp ON p.grade_id = cp.grade_id 
+        AND cp.is_active = TRUE 
+        AND CURRENT_DATE BETWEEN cp.start_date AND cp.end_date
       WHERE ci.user_id = $1
       ORDER BY ci.added_at DESC`,
       [user_id]
     );
 
-    const total = rows.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const total = rows.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
     const itemCount = rows.length;
 
     res.json({
@@ -53,13 +56,16 @@ router.get("/:id", async (req: Request, res: Response) => {
         ci.user_id,
         ci.product_id,
         ci.quantity,
-        p.name as product_name,
-        p.price,
+        p.name,
         p.photo_url,
+        COALESCE(cp.price, 0) as price,
         ci.added_at,
         ci.updated_at
       FROM cart_items ci
       JOIN products p ON ci.product_id = p.id
+      LEFT JOIN commodity_prices cp ON p.grade_id = cp.grade_id 
+        AND cp.is_active = TRUE 
+        AND CURRENT_DATE BETWEEN cp.start_date AND cp.end_date
       WHERE ci.id = $1`,
       [id]
     );

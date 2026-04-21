@@ -16,47 +16,35 @@ function changeImage(thumbnail) {
     mainImage.src = newSrc;
 }
 
-// Add to cart via External API
+// Add to cart via Local Proxy API
 async function addToCart(productId) {
     try {
-        // Get config (cart API URL and user_id)
-        const configRes = await fetch('/api/config');
-        const config = await configRes.json();
+        console.log('[PRODUCT] Checking login status...');
         
-        if (!config.userId) {
+        // Check if user is logged in by making a test request
+        const cartRes = await fetch('/api/cart', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+        });
+        
+        if (cartRes.status === 401) {
             alert('Silakan login terlebih dahulu');
             window.location.href = '/login';
             return;
         }
         
-        // Get product data from DOM
-        const productTitle = document.querySelector('.product-title').textContent.trim().replace('Premium', '').trim();
-        const priceText = document.querySelector('.price-text').textContent;
-        const priceMatch = priceText.match(/\d+/g);
-        let priceValue = 0;
+        console.log('[PRODUCT] Adding to cart:', { productId });
         
-        if (priceMatch) {
-            // Join all numbers and parse (e.g., "Rp 10.000" -> "10000")
-            priceValue = parseInt(priceMatch.join(''));
-        }
-        
-        const productImage = document.getElementById('mainImage').src;
-        
-        console.log("${config.cartApiUrl}/add")
-        // Call external cart API
-        const response = await fetch(`${config.cartApiUrl}/add`, {
+        // Call local proxy cart API - just send product_id and quantity
+        const response = await fetch('/api/cart', {
             method: 'POST',
             headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${config.userId}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                user_id: config.userId,
-                productId,
-                quantity: 1,
-                name: productTitle,
-                price: priceValue,
-                photo_url: productImage
+                product_id: productId,
+                quantity: 1
             }),
             credentials: 'include'
         });
@@ -67,16 +55,20 @@ async function addToCart(productId) {
             return;
         }
         
-        if (!response.ok) throw new Error('Failed to add to cart');
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to add to cart');
+        }
         
         const data = await response.json();
+        console.log('[PRODUCT] Added successfully:', data);
         
         // Show success message
         alert('Produk berhasil ditambahkan ke keranjang!');
         
     } catch (error) {
-        console.error('Error adding to cart:', error);
-        alert('Gagal menambahkan ke keranjang');
+        console.error('[PRODUCT] Error adding to cart:', error);
+        alert('Gagal menambahkan ke keranjang: ' + error.message);
     }
 }
 

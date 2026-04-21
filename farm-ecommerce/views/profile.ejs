@@ -17,8 +17,8 @@
         </svg>
     </div>
     <div class="profile-info">
-        <h2 class="profile-name">hiya</h2>
-        <p class="profile-email">hiya@gmail.com</p>
+        <h2 class="profile-name"><%= typeof userName !== 'undefined' ? userName : 'User' %></h2>
+        <p class="profile-email"><%= typeof userEmail !== 'undefined' ? userEmail : 'user@email.com' %></p>
     </div>
 </section>
 
