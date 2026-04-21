@@ -24,10 +24,23 @@ router.get('/', checkAuth, async (req, res) => {
     // Get cart items for this user
     const cart = userCarts[userId] || [];
     
+    // Normalize response with consistent field names
+    const normalizedItems = cart.map(item => ({
+      id: item.productId,
+      product_id: item.productId,
+      productId: item.productId,
+      quantity: item.quantity,
+      name: item.name,
+      price: item.price,
+      photo_url: item.photo_url,
+      added_at: item.added_at,
+      updated_at: item.updated_at
+    }));
+    
     res.json({ 
       success: true,
-      items: cart,
-      total: cart.length 
+      items: normalizedItems,
+      total: normalizedItems.length 
     });
   } catch (error) {
     console.error('Error fetching cart:', error);
@@ -93,22 +106,35 @@ router.put('/:productId', checkAuth, async (req, res) => {
     const { productId } = req.params;
     const { quantity } = req.body;
     
+    console.log('[CART-API] PUT update - userId:', userId, 'productId:', productId, 'quantity:', quantity);
+    console.log('[CART-API] Current cart for user:', userCarts[userId]);
+    
     if (!quantity || quantity < 1) {
+      console.log('[CART-API] Invalid quantity:', quantity);
       return res.status(400).json({ error: "Invalid quantity" });
     }
     
     if (!userCarts[userId]) {
+      console.log('[CART-API] Cart not found for userId:', userId);
       return res.status(404).json({ error: "Cart not found" });
     }
     
-    const item = userCarts[userId].find(item => String(item.productId) === String(productId));
+    const item = userCarts[userId].find(item => {
+      console.log('[CART-API] Checking item:', item.productId, 'against:', productId, 'match:', String(item.productId) === String(productId));
+      return String(item.productId) === String(productId);
+    });
     
     if (!item) {
+      console.log('[CART-API] Item not found in cart. Available products:', userCarts[userId].map(i => i.productId));
       return res.status(404).json({ error: "Item not found in cart" });
     }
     
+    console.log('[CART-API] Found item:', item, 'setting quantity to:', quantity);
     item.quantity = parseInt(quantity);
     item.updated_at = new Date();
+    
+    console.log('[CART-API] Updated item:', item);
+    console.log('[CART-API] Updated cart:', userCarts[userId]);
     
     res.json({ 
       success: true, 
@@ -116,7 +142,7 @@ router.put('/:productId', checkAuth, async (req, res) => {
       item
     });
   } catch (error) {
-    console.error('Error updating cart:', error);
+    console.error('[CART-API] Error updating cart:', error);
     res.status(500).json({ error: "Failed to update cart" });
   }
 });

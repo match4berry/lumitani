@@ -97,14 +97,20 @@
 </div>
 
 <script>
+    let refreshInterval = null;
+    
     // Fetch cart from API and populate checkout
     async function loadCheckoutData() {
         try {
             console.log('[CHECKOUT] Loading cart data from API...');
             
-            const response = await fetch('/api/cart', {
+            // Add timestamp to bypass any cache
+            const response = await fetch('/api/cart?t=' + Date.now(), {
                 method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
                 credentials: 'include'
             });
             
@@ -122,6 +128,7 @@
             }
             
             const data = await response.json();
+            console.log('[CHECKOUT] Cart data received:', data);
             
             if (!data.items || data.items.length === 0) {
                 document.getElementById('orderSummary').innerHTML = `
@@ -158,6 +165,8 @@
             
             // Use actual product image
             const imageUrl = item.photo_url || item.image || 'https://via.placeholder.com/100';
+            
+            console.log('[CHECKOUT] Item:', item.name, 'Quantity:', item.quantity, 'Price:', item.price);
             
             html += `
                 <div class="product">
@@ -203,6 +212,17 @@
     // Load checkout data when page loads
     document.addEventListener('DOMContentLoaded', function() {
         loadCheckoutData();
+        
+        // Refresh every 5 seconds to catch updates
+        refreshInterval = setInterval(loadCheckoutData, 5000);
+        
+        // Stop auto-refresh when form is about to submit
+        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+            console.log('[CHECKOUT] Form submitted, stopping auto-refresh');
+            clearInterval(refreshInterval);
+            // Ensure final data sync before submission
+            loadCheckoutData();
+        });
     });
 </script>
 
