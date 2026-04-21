@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import api from "../api";
-import { showToast } from "../components/Toast";
 import Pagination, { PAGE_SIZE } from "../components/Pagination";
 import type { SalesReport, SalesReportFarmer } from "../types";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -40,10 +39,6 @@ export default function SalesReportPage() {
     total: Number(f.total_sales),
   }));
 
-  const handleExport = () => {
-    showToast("Fitur export Excel akan segera tersedia", "info");
-  };
-
   return (
     <div>
       <div className="page-header">
@@ -51,12 +46,6 @@ export default function SalesReportPage() {
           <h1>Laporan Penjualan</h1>
           <p className="page-subtitle">Analisis performa penjualan per petani</p>
         </div>
-        <button className="btn btn-primary" onClick={handleExport} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-          Export Excel
-        </button>
       </div>
 
       {error && <div className="alert alert-danger"><span>{error}</span></div>}
@@ -65,11 +54,13 @@ export default function SalesReportPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }}>
         <div className="card" style={{ padding: 20 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <span style={{ fontSize: 14, color: "#64748b" }}>Total Penjualan</span>
+            <span style={{ fontSize: 14, color: "#64748b" }}>Total Penjualan (Net)</span>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>
           </div>
           <div style={{ fontSize: 28, fontWeight: 700, color: "#16a34a" }}>{fmt(report?.summary.total_revenue)}</div>
-          <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>Dari pesanan selesai</div>
+          <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
+            Setelah dipotong komisi{report?.summary.gross_revenue ? ` (omset: ${fmt(report.summary.gross_revenue)})` : ""}
+          </div>
         </div>
         <div className="card" style={{ padding: 20 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>

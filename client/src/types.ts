@@ -47,6 +47,10 @@ export interface Order {
   customer_name: string;
   user_id: number | null;
   user_name?: string;
+  alamat?: string | null;
+  pengiriman?: string | null;
+  no_hp?: string | null;
+  metode_pembayaran?: string | null;
   status: OrderStatus;
   total_price: string;
   commission_rate: string | null;
@@ -136,6 +140,7 @@ export interface CommissionReport {
 }
 
 export interface SalesReportSummary {
+  gross_revenue: string;
   total_revenue: string;
   total_transactions: number;
   total_farmers: number;

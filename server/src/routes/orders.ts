@@ -42,9 +42,13 @@ router.get("/summary", async (_req: Request, res: Response) => {
 
 // GET single order with items
 router.get("/:id", async (req: Request, res: Response) => {
-  const { rows } = await pool.query("SELECT * FROM orders WHERE id = $1", [
-    req.params.id,
-  ]);
+  const { rows } = await pool.query(
+    `SELECT o.*, u.name AS user_name, u.address AS alamat
+     FROM orders o
+     LEFT JOIN users u ON u.id = o.user_id
+     WHERE o.id = $1`,
+    [req.params.id]
+  );
   if (rows.length === 0) {
     res.status(404).json({ error: "Order not found" });
     return;
@@ -64,7 +68,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 // POST create a new order
 router.post("/", async (req: Request, res: Response) => {
-  const { customer_name, items, user_id } = req.body;
+  const { customer_name, items, user_id, pengiriman, no_hp, metode_pembayaran } = req.body;
 
   // --- 1. Validate the request body ---
   if (!customer_name || !Array.isArray(items) || items.length === 0) {
@@ -127,9 +131,10 @@ router.post("/", async (req: Request, res: Response) => {
 
     // --- 5. Insert the order row ---
     const { rows: orderRows } = await client.query(
-      `INSERT INTO orders (order_code, customer_name, total_price, user_id, commission_rate, commission_amount)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [order_code, customer_name, total_price, user_id || null, commission_rate, commission_amount]
+      `INSERT INTO orders (order_code, customer_name, total_price, user_id, commission_rate, commission_amount, pengiriman, no_hp, metode_pembayaran)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+      [order_code, customer_name, total_price, user_id || null, commission_rate, commission_amount,
+       pengiriman || null, no_hp || null, metode_pembayaran || null]
     );
     const order = orderRows[0];
 
