@@ -306,7 +306,11 @@ export default function OrdersPage() {
                 {(
                   [
                     ["ID Pesanan", detailOrder.order_code],
-                    ["Nama Pelanggan", detailOrder.customer_name],
+                    ["Nama Petani", detailOrder.customer_name],
+                    ["Alamat", detailOrder.alamat ?? "—"],
+                    ["Pengiriman", detailOrder.pengiriman ?? "—"],
+                    ["No. HP", detailOrder.no_hp ?? "—"],
+                    ["Metode Pembayaran", detailOrder.metode_pembayaran ?? "—"],
                     ["Tanggal Pesanan", fmtDate(detailOrder.order_date)],
                     ["Total Harga", fmt(detailOrder.total_price)],
                     [
