@@ -75,10 +75,76 @@
                 <div class="card payment">
                     <h3>Metode Pembayaran</h3>
 
-                    <label><input type="radio" name="payment" value="bank" required> Transfer Bank</label>
-                    <label><input type="radio" name="payment" value="ewallet"> E-Wallet</label>
-                    <label><input type="radio" name="payment" value="cod"> COD</label>
-                </div>
+                    <div class="card payment">
+    <h3>Metode Pembayaran</h3>
+
+    <!-- BANK -->
+    <p><b>Transfer Bank</b></p>
+
+    <div class="bank-list">
+
+    <label class="bank-item">
+        <input type="radio" name="payment" value="bca" required>
+        <div class="bank-content">
+            <img src="/bca.png">
+            <span>BCA</span>
+        </div>
+    </label>
+
+    <label class="bank-item">
+        <input type="radio" name="payment" value="mandiri">
+        <div class="bank-content">
+            <img src="/mandiri.png">
+            <span>Mandiri</span>
+        </div>
+    </label>
+
+    <label class="bank-item">
+        <input type="radio" name="payment" value="bni">
+        <div class="bank-content">
+            <img src="/bni.png">
+            <span>BNI</span>
+        </div>
+    </label>
+
+</div>
+
+    <!-- LAINNYA -->
+    <p style="margin-top:15px;"><b>Lainnya</b></p>
+
+    <p style="margin-top:15px;"><b>E-Wallet</b></p>
+
+<div class="bank-list">
+
+    <label class="bank-item">
+        <input type="radio" name="payment" value="dana">
+        <div class="bank-content">
+            <img src="/dana.png">
+            <span>DANA</span>
+        </div>
+    </label>
+
+    <label class="bank-item">
+        <input type="radio" name="payment" value="ovo">
+        <div class="bank-content">
+            <img src="/ovo.png">
+            <span>OVO</span>
+        </div>
+    </label>
+
+    <label class="bank-item">
+        <input type="radio" name="payment" value="gopay">
+        <div class="bank-content">
+            <img src="/gopay.png">
+            <span>GoPay</span>
+        </div>
+    </label>
+
+</div>
+
+    <label><input type="radio" name="payment" value="cod"> COD</label>
+
+                    
 
                 <button type="submit">Order Now</button>
 

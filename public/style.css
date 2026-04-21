@@ -39,7 +39,7 @@ p {
 }
 
 /* Input */
-input {
+input:not([type="radio"]) {
     width: 100%;
     padding: 12px;
     margin-top: 10px;
@@ -199,4 +199,77 @@ textarea {
         width: 80px;
     }
 
+}
+
+.bank-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.payment p {
+    margin-top: 15px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Card tiap bank */
+.bank-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid #eee;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: white;
+}
+
+/* Hover */
+.bank-item:hover {
+    border-color: #2ecc71;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.15);
+}
+
+/* Isi kiri */
+.bank-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Logo */
+.bank-content img {
+    width: 28px !important;
+    height: 28px !important;
+    object-fit: contain;
+    display: block;
+}
+
+/* Text */
+.bank-content span {
+    font-weight: 500;
+}
+
+/* Radio di kanan */
+.bank-item input {
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+/* Saat dipilih (🔥 ini penting) */
+.bank-item input:checked + .bank-content {
+    font-weight: bold;
+}
+
+.bank-item:has(input:checked) {
+    border: 2px solid #2ecc71;
+    background: #f0fff5;
+}
+
+.bank-item input[type="radio"] {
+    width: auto;
+    margin: 0;
 }
