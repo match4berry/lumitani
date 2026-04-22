@@ -75,6 +75,13 @@ router.post('/order', (req, res) => {
 // confirm and process order - final submission
 router.post('/order/confirm', async (req, res) => {
     const { name, phone, address, city, postal, note, payment, items, total } = req.body;
+    
+    // Log session for debugging
+    console.log('[ORDER/CONFIRM] ========== ORDER CONFIRMATION START ==========');
+    console.log('[ORDER/CONFIRM] Session userId:', req.session.userId);
+    console.log('[ORDER/CONFIRM] Session userName:', req.session.userName);
+    console.log('[ORDER/CONFIRM] Session userEmail:', req.session.userEmail);
+    console.log('[ORDER/CONFIRM] Order data received:', { name, phone, address, city, payment, itemCount: items?.length, total });
 
     // Parse items if it's a string (form submission)
     let orderItems = [];
@@ -161,6 +168,7 @@ router.post('/order/confirm', async (req, res) => {
             metode_pembayaran: metode_pembayaran
         };
 
+        console.log('[ORDER] Sending to backend with user_id:', req.session.userId);
         console.log('[ORDER] Backend order data:', JSON.stringify(backendOrderData, null, 2));
 
         const apiResponse = await fetch('http://localhost:8000/api/orders', {
@@ -186,7 +194,9 @@ router.post('/order/confirm', async (req, res) => {
     }
 
     // Always redirect to order history after saving locally
-    console.log('[ORDER] Redirecting to /order-history?new=true');
+    console.log('[ORDER/CONFIRM] ========== ORDER CONFIRMATION COMPLETE ==========');
+    console.log('[ORDER/CONFIRM] Order saved locally and sent to backend');
+    console.log('[ORDER/CONFIRM] Redirecting to /order-history?new=true');
     return res.redirect('/order-history?new=true');
 });
 

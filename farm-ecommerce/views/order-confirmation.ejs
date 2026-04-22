@@ -437,51 +437,52 @@
         confirmBtn.textContent = 'Memproses...';
         
         try {
-            // Prepare form data
-            const formData = new FormData(confirmForm);
-            console.log('[ORDER CONFIRMATION] Form data prepared:', {
-                name: formData.get('name'),
-                phone: formData.get('phone'),
-                items: formData.get('items').substring(0, 100) + '...'
+            // Get form values
+            const name = document.querySelector('input[name="name"]').value;
+            const phone = document.querySelector('input[name="phone"]').value;
+            const address = document.querySelector('input[name="address"]').value;
+            const city = document.querySelector('input[name="city"]').value;
+            const postal = document.querySelector('input[name="postal"]').value;
+            const payment = document.querySelector('input[name="payment"]').value;
+            const items = JSON.parse(document.querySelector('input[name="items"]').value);
+            const total = parseInt(document.querySelector('input[name="total"]').value);
+            
+            console.log('[ORDER CONFIRMATION] Submitting order with data:', {
+                name, 
+                phone, 
+                address,
+                payment, 
+                itemCount: items.length,
+                total
             });
             
-            // Submit form using fetch for better error handling
+            // Submit as JSON instead of FormData - preserves session context
             const response = await fetch('/order/confirm', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name, phone, address, city, postal, payment, items, total
+                })
             });
             
             console.log('[ORDER CONFIRMATION] Response status:', response.status);
             
             if (!response.ok) {
                 console.error('[ORDER CONFIRMATION] Error response:', response.status);
-                const text = await response.text();
-                console.error('[ORDER CONFIRMATION] Response text:', text);
-                throw new Error(`Server error: ${response.status}`);
+                const errorData = await response.json().catch(() => ({}));
+                console.error('[ORDER CONFIRMATION] Error data:', errorData);
+                throw new Error(errorData.error || `Server error: ${response.status}`);
             }
             
-            // Check if response is a redirect or HTML
-            const contentType = response.headers.get('content-type');
-            console.log('[ORDER CONFIRMATION] Response content-type:', contentType);
+            const data = await response.json();
+            console.log('[ORDER CONFIRMATION] Success response:', data);
             
-            if (response.redirected) {
-                console.log('[ORDER CONFIRMATION] Redirect detected, going to:', response.url);
-                window.location.href = response.url;
-                return;
-            }
+            // Redirect to order history
+            console.log('[ORDER CONFIRMATION] Success, redirecting to order-history...');
+            window.location.href = '/order-history?new=true';
             
-            const text = await response.text();
-            console.log('[ORDER CONFIRMATION] Response received, length:', text.length);
-            
-            // If response is HTML (redirect page), navigate
-            if (text.includes('order-history')) {
-                console.log('[ORDER CONFIRMATION] Detected order-history redirect, navigating...');
-                window.location.href = '/order-history?new=true';
-            } else {
-                // Fallback redirect
-                console.log('[ORDER CONFIRMATION] Manual redirect to order-history');
-                window.location.href = '/order-history?new=true';
-            }
         } catch (error) {
             console.error('[ORDER CONFIRMATION] Error during submission:', error);
             confirmBtn.disabled = false;

@@ -6,11 +6,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    allowedHosts: ['elcyone.my.id', 'www.elcyone.my.id', 'localhost'],
+    allowedHosts: ['elcyone.my.id', 'www.elcyone.my.id', 'cms-lumitani.elcyone.my.id', 'localhost'],
     hmr: false,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:8000',
         changeOrigin: true,
       },
     },

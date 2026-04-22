@@ -4,11 +4,16 @@
 const fetchAllProducts = async () => {
   try {
     const endpoint = `${process.env.API_URL}/api/products/data`;
-    const res = await fetch(endpoint);
+    console.log('[PRODUCTS] Fetching from:', endpoint);
+    const res = await fetch(endpoint, { timeout: 5000 });
+    if (!res.ok) {
+      console.warn('[PRODUCTS] API returned status:', res.status);
+      return { items: [] };
+    }
     const data = await res.json();
     return data;
   } catch (error) {
-    console.error('Error fetching all products:', error);
+    console.error('[PRODUCTS] Error fetching all products:', error.message);
     return { items: [] };
   }
 };
@@ -16,11 +21,16 @@ const fetchAllProducts = async () => {
 const fetchProductsByCommodity = async (commodityId) => {
   try {
     const endpoint = `${process.env.API_URL}/api/products/data?c_id=${commodityId}`;
-    const res = await fetch(endpoint);
+    console.log('[PRODUCTS] Fetching by commodity:', endpoint);
+    const res = await fetch(endpoint, { timeout: 5000 });
+    if (!res.ok) {
+      console.warn('[PRODUCTS] API returned status:', res.status);
+      return { items: [] };
+    }
     const data = await res.json();
     return data;
   } catch (error) {
-    console.error(`Error fetching products for commodity ${commodityId}:`, error);
+    console.error(`[PRODUCTS] Error fetching products for commodity ${commodityId}:`, error.message);
     return { items: [] };
   }
 };
@@ -28,11 +38,15 @@ const fetchProductsByCommodity = async (commodityId) => {
 const fetchProductById = async (productId) => {
   try {
     const endpoint = `${process.env.API_URL}/api/products/data/${productId}`;
-    const res = await fetch(endpoint);
+    const res = await fetch(endpoint, { timeout: 5000 });
+    if (!res.ok) {
+      console.warn('[PRODUCTS] API returned status:', res.status);
+      return null;
+    }
     const data = await res.json();
     return data;
   } catch (error) {
-    console.error(`Error fetching product ${productId}:`, error);
+    console.error(`[PRODUCTS] Error fetching product ${productId}:`, error.message);
     return null;
   }
 };
@@ -40,11 +54,16 @@ const fetchProductById = async (productId) => {
 const fetchCategories = async () => {
   try {
     const endpoint = `${process.env.API_URL}/api/commodities`;
-    const res = await fetch(endpoint);
+    console.log('[CATEGORIES] Fetching from:', endpoint);
+    const res = await fetch(endpoint, { timeout: 5000 });
+    if (!res.ok) {
+      console.warn('[CATEGORIES] API returned status:', res.status);
+      return [];
+    }
     const data = await res.json();
     return data;
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    console.error('[CATEGORIES] Error fetching categories:', error.message);
     return [];
   }
 };
