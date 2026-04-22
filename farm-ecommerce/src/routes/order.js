@@ -13,7 +13,7 @@ router.get("/checkout", (req, res) => {
     res.render("checkout", { items: [], total: 0 });
 });
 
-// proses order
+// halaman order confirmation - show order review before final submission
 router.post('/order', (req, res) => {
     const { name, phone, address, city, postal, note, payment, items, total } = req.body;
 
@@ -37,7 +37,80 @@ router.post('/order', (req, res) => {
         orderTotal = total || 0;
     }
 
-    const order = {
+    // Payment method mapping
+    const paymentMap = {
+        'bca': 'Transfer Bank BCA',
+        'mandiri': 'Transfer Bank Mandiri',
+        'bni': 'Transfer Bank BNI',
+        'dana': 'E-Wallet DANA',
+        'ovo': 'E-Wallet OVO',
+        'gopay': 'E-Wallet GoPay',
+        'cod': 'Bayar di Tempat (COD)'
+    };
+
+    const paymentLabel = paymentMap[payment] || payment;
+
+    // Store order data in session for confirmation
+    req.session.orderData = {
+        name,
+        phone,
+        address,
+        city,
+        postal,
+        note,
+        payment,
+        paymentLabel,
+        items: orderItems,
+        total: orderTotal
+    };
+
+    console.log('[ORDER] Showing confirmation page with data:', req.session.orderData);
+
+    // Render order confirmation page
+    res.render("order-confirmation", { 
+        orderData: req.session.orderData
+    });
+});
+
+// confirm and process order - final submission
+router.post('/order/confirm', async (req, res) => {
+    const { name, phone, address, city, postal, note, payment, items, total } = req.body;
+
+    // Parse items if it's a string (form submission)
+    let orderItems = [];
+    let orderTotal = 0;
+
+    if (typeof items === 'string') {
+        try {
+            orderItems = JSON.parse(items);
+        } catch (e) {
+            orderItems = [];
+        }
+    } else {
+        orderItems = items || [];
+    }
+
+    if (typeof total === 'string') {
+        orderTotal = parseInt(total.replace(/\D/g, ''));
+    } else {
+        orderTotal = total || 0;
+    }
+
+    // Map payment value to backend format
+    const paymentMethodMap = {
+        'bca': 'Transfer Bank BCA',
+        'mandiri': 'Transfer Bank Mandiri',
+        'bni': 'Transfer Bank BNI',
+        'dana': 'E-Wallet DANA',
+        'ovo': 'E-Wallet OVO',
+        'gopay': 'E-Wallet GoPay',
+        'cod': 'Bayar di Tempat (COD)'
+    };
+
+    const metode_pembayaran = paymentMethodMap[payment] || payment;
+
+    // Create order object for local storage
+    const localOrder = {
         id: 'ORD-' + Date.now(),
         name,
         phone,
@@ -46,27 +119,71 @@ router.post('/order', (req, res) => {
         postal,
         note,
         payment,
-        items: orderItems.length > 0 ? orderItems : [
-            { name: "Bayam Organik", price: 10000, quantity: 1 },
-            { name: "Kangkung Segar", price: 10000, quantity: 1 }
-        ],
-        total: orderTotal > 0 ? orderTotal : 20000,
+        items: orderItems.length > 0 ? orderItems : [],
+        total: orderTotal > 0 ? orderTotal : 0,
         status: "Menunggu Diproses",
         createdAt: new Date()
     };
 
-    // Save order to file
+    // Save order to local file for backup
     try {
         const ordersFilePath = require('path').join(__dirname, '../../data/orders.json');
         const ordersData = fs.readFileSync(ordersFilePath, 'utf8');
         const orders = JSON.parse(ordersData);
-        orders.push(order);
+        orders.push(localOrder);
         fs.writeFileSync(ordersFilePath, JSON.stringify(orders, null, 2));
+        console.log('[ORDER] Order saved locally:', localOrder.id);
     } catch (e) {
-        console.error("Error saving order:", e);
+        console.error("[ORDER] Error saving local order:", e);
     }
 
-    res.render("order-success", { order });
+    // Try to send to backend API
+    try {
+        console.log('[ORDER] Sending order to backend API at http://localhost:5001/api/orders');
+        
+        // Transform items to backend format (items from checkout might not have product_id)
+        const backendItems = orderItems.map(item => ({
+            product_id: item.product_id || null, // Will be NULL if not from cart
+            quantity: item.quantity || 1,
+            unit_price: item.price || 0,
+            subtotal: (item.price || 0) * (item.quantity || 1)
+        })).filter(item => item.product_id !== null); // Only include items with product_id
+
+        const backendOrderData = {
+            customer_name: name,
+            items: backendItems.length > 0 ? backendItems : [],
+            user_id: req.session.userId || null,
+            pengiriman: address,
+            no_hp: phone,
+            metode_pembayaran: metode_pembayaran
+        };
+
+        console.log('[ORDER] Backend order data:', JSON.stringify(backendOrderData, null, 2));
+
+        const apiResponse = await fetch('http://localhost:5001/api/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${req.session.userToken || ''}`
+            },
+            body: JSON.stringify(backendOrderData)
+        });
+
+        if (!apiResponse.ok) {
+            const errorData = await apiResponse.json();
+            console.warn('[ORDER] Backend API error (non-critical):', errorData);
+            // Don't throw - continue with local order
+        } else {
+            const backendOrder = await apiResponse.json();
+            console.log('[ORDER] Order sent to backend successfully:', backendOrder.id);
+        }
+    } catch (err) {
+        console.error('[ORDER] Error sending to backend API (non-critical):', err);
+        // Don't throw - user sees success page anyway since local order was saved
+    }
+
+    // Redirect to order history instead of showing success page
+    res.redirect('/order-history?new=true');
 });
 
 module.exports = router;

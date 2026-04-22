@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Konfirmasi Pesanan - Lumitani</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .confirmation-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .confirmation-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .confirmation-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .confirmation-header p {
+            margin: 0.5rem 0 0;
+            opacity: 0.95;
+        }
+
+        .confirmation-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .confirmation-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .confirmation-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .confirmation-card:hover {
+            border-color: #10b981;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+        }
+
+        .confirmation-card h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.2rem;
+            color: #1f2937;
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 0.75rem;
+        }
+
+        .confirmation-card .card-icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.95rem;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-row .label {
+            font-weight: 600;
+            color: #6b7280;
+            flex: 1;
+        }
+
+        .info-row .value {
+            color: #1f2937;
+            font-weight: 500;
+            text-align: right;
+            flex: 1;
+        }
+
+        .address-box {
+            background: #f9fafb;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 0.75rem 0;
+        }
+
+        .address-box p {
+            margin: 0.25rem 0;
+            line-height: 1.6;
+        }
+
+        .address-box .address-name {
+            font-weight: 600;
+            color: #10b981;
+            margin-bottom: 0.5rem;
+        }
+
+        .address-box .address-phone {
+            color: #059669;
+            font-weight: 500;
+        }
+
+        /* Order Items */
+        .order-items {
+            grid-column: 1 / -1;
+        }
+
+        .items-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+            background: #ffffff;
+            transition: background 0.2s ease;
+        }
+
+        .item-row:hover {
+            background: #f9fafb;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-details {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .item-price {
+            text-align: right;
+            min-width: 120px;
+            font-weight: 600;
+            color: #10b981;
+        }
+
+        .total-section {
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: right;
+            grid-column: 1 / -1;
+        }
+
+        .total-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #10b981;
+            margin: 0.5rem 0;
+        }
+
+        .payment-method {
+            display: inline-block;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            border: 1px solid #10b981;
+            color: #10b981;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        .btn-confirm {
+            flex: 1;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-confirm:active {
+            transform: translateY(0);
+        }
+
+        .btn-back {
+            flex: 1;
+            padding: 1rem 2rem;
+            background: white;
+            color: #6b7280;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-back:hover {
+            border-color: #10b981;
+            color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .empty-items {
+            text-align: center;
+            padding: 2rem;
+            color: #9ca3af;
+        }
+
+        .confirmation-note {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .confirmation-note strong {
+            color: #d97706;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="page-header">
+        <div class="header-logo">
+            <img src="/logo.png" alt="LumiTani" class="logo-image">
+        </div>
+    </header>
+
+    <div class="confirmation-container">
+
+        <div class="confirmation-note">
+            <strong>📋 Periksa kembali</strong> semua data pesanan Anda sebelum melakukan pembayaran
+        </div>
+
+        <div class="confirmation-header">
+            <h1>✓ Verifikasi Pesanan</h1>
+            <p>Mohon periksa kembali semua detail sebelum konfirmasi</p>
+        </div>
+
+        <div class="confirmation-grid">
+
+            <!-- LEFT COLUMN -->
+
+            <!-- ALAMAT PENGIRIMAN -->
+            <div class="confirmation-card">
+                <h3><span class="card-icon">📍</span>Alamat Pengiriman</h3>
+                
+                <% if (orderData.name) { %>
+                    <div class="address-box">
+                        <div class="address-name"><%= orderData.name %></div>
+                        <div class="address-phone">📱 <%= orderData.phone %></div>
+                        <p><%= orderData.address %></p>
+                        <p><%= orderData.city %><% if (orderData.postal) { %>, <%= orderData.postal %><% } %></p>
+                    </div>
+                <% } else { %>
+                    <p style="color: #dc2626;">Data alamat tidak ditemukan</p>
+                <% } %>
+            </div>
+
+            <!-- METODE PEMBAYARAN -->
+            <div class="confirmation-card">
+                <h3><span class="card-icon">💳</span>Metode Pembayaran</h3>
+                
+                <div class="info-row">
+                    <div class="label">Pilihan:</div>
+                    <div class="value" style="text-align: left; margin-top: 0.5rem;">
+                        <div style="background: #f0fdf4; padding: 0.75rem; border-radius: 6px; color: #10b981; font-weight: 600;">
+                            <%= orderData.paymentLabel %>
+                        </div>
+                    </div>
+                </div>
+                
+                <% if (orderData.payment === 'cod') { %>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: #6b7280;">
+                        ℹ️ Pembayaran akan dilakukan saat barang sampai ke tangan Anda
+                    </p>
+                <% } else { %>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: #6b7280;">
+                        ℹ️ Instruksi pembayaran akan dikirim setelah konfirmasi pesanan
+                    </p>
+                <% } %>
+            </div>
+
+            <!-- ITEMS -->
+            <div class="confirmation-card order-items">
+                <h3><span class="card-icon">📦</span>Item Pesanan</h3>
+                
+                <% if (orderData.items && orderData.items.length > 0) { %>
+                    <ul class="items-list">
+                        <% orderData.items.forEach(item => { %>
+                            <li class="item-row">
+                                <div class="item-info">
+                                    <div class="item-name"><%= item.name %></div>
+                                    <div class="item-details">
+                                        Rp <%= item.price.toLocaleString('id-ID') %> × <%= item.quantity %> pcs
+                                    </div>
+                                </div>
+                                <div class="item-price">
+                                    Rp <%= (item.price * item.quantity).toLocaleString('id-ID') %>
+                                </div>
+                            </li>
+                        <% }); %>
+                    </ul>
+                <% } else { %>
+                    <div class="empty-items">
+                        <p>Tidak ada item dalam pesanan</p>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- TOTAL -->
+            <div class="total-section">
+                <p style="margin: 0; color: #6b7280; font-size: 0.95rem;">Total Pembayaran</p>
+                <div class="total-amount">
+                    Rp <%= orderData.total.toLocaleString('id-ID') %>
+                </div>
+                <div class="payment-method">
+                    <%= orderData.paymentLabel %>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="action-buttons">
+            <button type="button" class="btn-back" onclick="window.history.back()">
+                ← Kembali Ubah
+            </button>
+            <form id="confirmForm" method="POST" action="/order/confirm" style="flex: 1;">
+                <input type="hidden" name="name" value="<%= orderData.name %>">
+                <input type="hidden" name="phone" value="<%= orderData.phone %>">
+                <input type="hidden" name="address" value="<%= orderData.address %>">
+                <input type="hidden" name="city" value="<%= orderData.city %>">
+                <input type="hidden" name="postal" value="<%= orderData.postal %>">
+                <input type="hidden" name="payment" value="<%= orderData.payment %>">
+                <input type="hidden" name="items" value="<%= JSON.stringify(orderData.items).replace(/"/g, '&quot;') %>">
+                <input type="hidden" name="total" value="<%= orderData.total %>">
+                <button type="submit" class="btn-confirm" id="confirmBtn">
+                    ✓ Konfirmasi Pesanan
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    document.getElementById('confirmBtn').addEventListener('click', function(e) {
+        console.log('[ORDER CONFIRMATION] Submitting confirmation...');
+        this.disabled = true;
+        this.textContent = 'Memproses...';
+        // Form will submit automatically
+    });
+
+    // Log order data for verification
+    window.orderDataDebug = {
+        name: '<%= orderData.name %>',
+        phone: '<%= orderData.phone %>',
+        address: '<%= orderData.address %>',
+        city: '<%= orderData.city %>',
+        postal: '<%= orderData.postal %>',
+        payment: '<%= orderData.payment %>',
+        total: <%= orderData.total %>
+    };
+    
+    const itemsData = <%- JSON.stringify(orderData.items) %>;
+    window.orderDataDebug.items = itemsData;
+    
+    console.log('[ORDER CONFIRMATION] Order data:', window.orderDataDebug);
+</script>
+
+</body>
+
+</html>

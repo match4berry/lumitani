@@ -2,6 +2,40 @@
 
 <link rel="stylesheet" href="/css/pesanan-saya.css">
 
+<style>
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #999;
+    }
+    
+    .success-banner {
+        background: #d1fae5;
+        border: 2px solid #10b981;
+        color: #047857;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        display: none;
+    }
+    
+    .success-banner.show {
+        display: block;
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
 <header class="page-header">
     <div class="header-logo">
         <img src="/logo.png" alt="LumiTani" class="logo-image">
@@ -9,15 +43,20 @@
 </header>
 
 <div class="orders-container">
+    <!-- Success Banner -->
+    <div class="success-banner" id="successBanner">
+        <strong>✓ Pesanan Berhasil Dibuat!</strong> Pesanan Anda telah ditambahkan ke daftar pesanan.
+    </div>
+
     <!-- Sidebar Filter Section -->
     <aside class="filter-sidebar">
         <h2 class="filter-title">Urutkan</h2>
         <div class="filter-buttons">
-            <button class="filter-btn <%= currentStatus === 'all' ? 'active' : '' %>" data-status="all">Semua</button>
-            <button class="filter-btn <%= currentStatus === 'pending' ? 'active' : '' %>" data-status="pending">Menunggu Proses</button>
-            <button class="filter-btn <%= currentStatus === 'processing' ? 'active' : '' %>" data-status="processing">Diproses</button>
-            <button class="filter-btn <%= currentStatus === 'shipped' ? 'active' : '' %>" data-status="shipped">Pengiriman</button>
-            <button class="filter-btn <%= currentStatus === 'completed' ? 'active' : '' %>" data-status="completed">Selesai</button>
+            <button class="filter-btn active" data-status="all">Semua</button>
+            <button class="filter-btn" data-status="Menunggu Diproses">Menunggu Proses</button>
+            <button class="filter-btn" data-status="Diproses">Diproses</button>
+            <button class="filter-btn" data-status="Pengiriman">Pengiriman</button>
+            <button class="filter-btn" data-status="Selesai">Selesai</button>
         </div>
     </aside>
 
@@ -25,78 +64,246 @@
     <main class="orders-main">
         <!-- Tabs Section -->
         <div class="tabs-section">
-            <button class="tab-button <%= currentSort === 'newest' ? 'active' : '' %>" data-tab="newest">Terbaru</button>
-            <button class="tab-button <%= currentSort === 'oldest' ? 'active' : '' %>" data-tab="oldest">Terlama</button>
+            <button class="tab-button active" data-tab="newest">Terbaru</button>
+            <button class="tab-button" data-tab="oldest">Terlama</button>
         </div>
 
         <!-- Orders List -->
-        <div class="orders-list">
-            <% if (orders && orders.length > 0) { %>
-                <% 
-                    // Group orders by seller
-                    const groupedOrders = {};
-                    orders.forEach(order => {
-                        const seller = order.seller || "Penjual Default";
-                        if (!groupedOrders[seller]) {
-                            groupedOrders[seller] = [];
-                        }
-                        groupedOrders[seller].push(order);
-                    });
-                %>
+        <div class="orders-list" id="ordersList">
+            <div class="loading">
+                <p>Memuat pesanan...</p>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="paginationContainer" style="display: none;">
+            <button class="pagination-btn prev">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"/>
+                </svg>
+            </button>
+            
+            <div id="paginationBtns"></div>
+            
+            <button class="pagination-btn next">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"/>
+                </svg>
+            </button>
+        </div>
+    </main>
+</div>
+
+<script>
+    const PAGE_SIZE = 5;
+    let authToken = null;
+    let allOrders = [];
+    let filteredOrders = [];
+    let currentPage = 1;
+    let currentStatus = 'all';
+    let currentSort = 'newest';
+    
+    // Get auth token from session
+    async function loadAuthToken() {
+        try {
+            const response = await fetch('/api/users/me');
+            if (!response.ok) return false;
+            const data = await response.json();
+            authToken = data.token;
+            console.log('[ORDER-HISTORY] Auth token obtained');
+            return true;
+        } catch (error) {
+            console.error('[ORDER-HISTORY] Error getting auth token:', error);
+            return false;
+        }
+    }
+    
+    // Load orders from local file (farm-ecommerce data)
+    async function loadLocalOrders() {
+        try {
+            console.log('[ORDER-HISTORY] Loading local orders');
+            // Read from /data/orders.json via server endpoint
+            const response = await fetch('/order-history-json', {
+                method: 'GET'
+            });
+            if (!response.ok) return [];
+            const data = await response.json();
+            return data.orders || [];
+        } catch (error) {
+            console.error('[ORDER-HISTORY] Error loading local orders:', error);
+            return [];
+        }
+    }
+    
+    // Load orders from backend API
+    async function loadBackendOrders() {
+        try {
+            if (!authToken) {
+                console.log('[ORDER-HISTORY] No token, skipping backend orders');
+                return [];
+            }
+            console.log('[ORDER-HISTORY] Loading orders from backend API');
+            const response = await fetch('http://localhost:5001/api/orders', {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            if (!response.ok) {
+                console.warn('[ORDER-HISTORY] Backend API returned status', response.status);
+                return [];
+            }
+            const data = await response.json();
+            return data || [];
+        } catch (error) {
+            console.error('[ORDER-HISTORY] Error loading backend orders:', error);
+            return [];
+        }
+    }
+    
+    // Transform orders to unified format
+    function transformOrders(orders) {
+        return orders.map(order => {
+            // Handle both farm-ecommerce format and backend format
+            if (order.order_code) {
+                // Backend format
+                return {
+                    id: order.order_code,
+                    name: order.customer_name,
+                    phone: order.no_hp,
+                    address: order.pengiriman,
+                    total: parseInt(order.total_price),
+                    status: order.status === 'menunggu_proses' ? 'Menunggu Diproses' : 
+                           order.status === 'diproses' ? 'Diproses' :
+                           order.status === 'dikirim' ? 'Pengiriman' :
+                           order.status === 'selesai' ? 'Selesai' : order.status,
+                    items: (order.items || []).map(item => ({
+                        name: item.product_name || item.name,
+                        quantity: item.quantity,
+                        price: parseInt(item.unit_price || item.price) / 1000,
+                        subtotal: parseInt(item.subtotal || (item.unit_price * item.quantity)) / 1000
+                    })),
+                    createdAt: order.order_date || order.created_at || new Date(),
+                    source: 'backend'
+                };
+            } else {
+                // Farm-ecommerce local format
+                // Handle both old and new structure
+                let items = [];
+                let total = 0;
                 
-                <% Object.entries(groupedOrders).forEach(([sellerName, sellerOrders]) => { %>
-                    <% sellerOrders.forEach((order, index) => { %>
-                        <div class="order-card">
-                            <!-- Order Header -->
-                            <div class="order-header">
-                                <div class="order-info">
-                                    <h3 class="seller-name"><%= sellerName %></h3>
-                                    <p class="order-meta">
-                                        <%= order.id %> - <%= new Date(order.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %> : <%= new Date(order.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %>
-                                    </p>
-                                </div>
-                                <span class="status-badge <%= order.status.toLowerCase().replace(/\s+/g, '-') %>">
-                                    <%= order.status %>
-                                </span>
-                            </div>
-
-                            <!-- Order Items -->
-                            <div class="order-items">
-                                <% if (order.items && Array.isArray(order.items)) { %>
-                                    <% order.items.forEach(item => { %>
-                                        <div class="order-item">
-                                            <div class="item-image">
-                                                <img src="https://via.placeholder.com/80?text=<%= encodeURIComponent(item.name.substring(0, 3)) %>" alt="<%= item.name %>">
-                                            </div>
-                                            <div class="item-details">
-                                                <h4 class="item-name"><%= item.name %></h4>
-                                                <p class="item-price">Rp <%= (item.price * 1000).toLocaleString('id-ID') %> / 250g</p>
-                                            </div>
-                                            <div class="item-qty">
-                                                <span class="qty-label">Kuantitas</span>
-                                                <span class="qty-value"><%= item.quantity %></span>
-                                            </div>
-                                            <div class="item-total">
-                                                <span class="total-label">Total</span>
-                                                <span class="total-value">Rp <%= (item.price * item.quantity * 1000).toLocaleString('id-ID') %></span>
-                                            </div>
-                                        </div>
-                                    <% }); %>
-                                <% } %>
-                            </div>
-
-                            <!-- Order Footer -->
-                            <div class="order-footer">
-                                <div class="order-total">
-                                    <span class="total-label">Rp <%= (order.total * 1000).toLocaleString('id-ID') %></span>
-                                    <span class="items-count">sub total <%= order.items ? order.items.length : 1 %> item</span>
-                                </div>
-                                <button class="complete-button">Selesaikan Pesanan</button>
-                            </div>
-                        </div>
-                    <% }); %>
-                <% }); %>
-            <% } else { %>
+                if (order.items && Array.isArray(order.items)) {
+                    // New format with items array
+                    items = order.items.map(item => ({
+                        name: item.name,
+                        quantity: item.quantity || 1,
+                        price: (item.price || 0) * 1000,  // Convert from "10" to "10000"
+                        subtotal: (item.price || 0) * (item.quantity || 1) * 1000
+                    }));
+                    total = (order.total || 0) * 1000;  // Convert from "75" to "75000"
+                } else {
+                    // Old format with single product
+                    if (order.product) {
+                        items = [{
+                            name: order.product,
+                            quantity: order.qty || 1,
+                            price: order.price || 0,
+                            subtotal: (order.price || 0) * (order.qty || 1)
+                        }];
+                        total = order.total || 0;
+                    }
+                }
+                
+                return {
+                    id: order.id,
+                    name: order.name,
+                    phone: order.phone || '',
+                    address: order.address,
+                    total: total,
+                    status: order.status || 'Menunggu Diproses',
+                    items: items,
+                    createdAt: new Date(order.createdAt),
+                    source: 'local'
+                };
+            }
+        });
+    }
+    
+    // Load and merge all orders
+    async function loadOrders() {
+        try {
+            await loadAuthToken();
+            
+            const [localOrders, backendOrders] = await Promise.all([
+                loadLocalOrders(),
+                loadBackendOrders()
+            ]);
+            
+            console.log('[ORDER-HISTORY] Loaded', localOrders.length, 'local orders and', backendOrders.length, 'backend orders');
+            
+            // Merge and deduplicate orders
+            const merged = [...localOrders, ...backendOrders];
+            const uniqueOrders = [];
+            const seen = new Set();
+            
+            merged.forEach(order => {
+                const key = order.id || order.order_code;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    uniqueOrders.push(order);
+                }
+            });
+            
+            allOrders = transformOrders(uniqueOrders);
+            console.log('[ORDER-HISTORY] Total unique orders:', allOrders.length);
+            
+            // Show success banner if new order was just created
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('new') === 'true') {
+                const banner = document.getElementById('successBanner');
+                banner.classList.add('show');
+                // Remove the ?new=true parameter
+                window.history.replaceState({}, document.title, '/order-history');
+            }
+            
+            filterAndPaginate();
+        } catch (error) {
+            console.error('[ORDER-HISTORY] Error loading orders:', error);
+            document.getElementById('ordersList').innerHTML = `
+                <div class="empty-state">
+                    <p style="color: #dc2626;">Gagal memuat pesanan. <a href="javascript:location.reload()">Coba lagi</a></p>
+                </div>
+            `;
+        }
+    }
+    
+    // Filter and paginate orders
+    function filterAndPaginate() {
+        // Filter by status
+        filteredOrders = allOrders.filter(order => {
+            if (currentStatus === 'all') return true;
+            return order.status === currentStatus;
+        });
+        
+        // Sort
+        if (currentSort === 'oldest') {
+            filteredOrders.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        } else {
+            filteredOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }
+        
+        currentPage = 1;
+        renderOrders();
+        setupPagination();
+    }
+    
+    // Render orders
+    function renderOrders() {
+        const startIdx = (currentPage - 1) * PAGE_SIZE;
+        const endIdx = startIdx + PAGE_SIZE;
+        const pageOrders = filteredOrders.slice(startIdx, endIdx);
+        
+        if (pageOrders.length === 0) {
+            document.getElementById('ordersList').innerHTML = `
                 <div class="empty-state">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="9" cy="21" r="1"/>
@@ -107,68 +314,134 @@
                     <p>Mulai berbelanja sekarang untuk membuat pesanan Anda</p>
                     <a href="/catalog" class="cta-button">Belanja Sekarang</a>
                 </div>
-            <% } %>
-        </div>
+            `;
+            return;
+        }
+        
+        const html = pageOrders.map(order => `
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-info">
+                        <h3 class="seller-name">${order.address || 'Pengiriman'}</h3>
+                        <p class="order-meta">
+                            ${order.id} - ${new Date(order.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })} : ${new Date(order.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                    </div>
+                    <span class="status-badge ${order.status.toLowerCase().replace(/\s+/g, '-')}">
+                        ${order.status}
+                    </span>
+                </div>
 
-        <!-- Pagination -->
-        <% if (totalPages && totalPages > 1) { %>
-            <div class="pagination">
-                <button class="pagination-btn prev <%= currentPage === 1 ? 'disabled' : '' %>">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="15 18 9 12 15 6"/>
-                    </svg>
-                </button>
-                
-                <% for (let i = 1; i <= totalPages; i++) { %>
-                    <button class="pagination-btn <%= i === currentPage ? 'active' : '' %>" data-page="<%= i %>">
-                        <%= i %>
-                    </button>
-                <% } %>
-                
-                <button class="pagination-btn next <%= currentPage === totalPages ? 'disabled' : '' %>">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                </button>
+                <div class="order-items">
+                    ${order.items && order.items.length > 0 ? order.items.map(item => `
+                        <div class="order-item">
+                            <div class="item-image">
+                                <img src="https://via.placeholder.com/80?text=${encodeURIComponent(item.name.substring(0, 10))}" alt="${item.name}">
+                            </div>
+                            <div class="item-details">
+                                <h4 class="item-name">${item.name}</h4>
+                                <p class="item-price">Rp ${(item.price || 0).toLocaleString('id-ID')} / pcs</p>
+                            </div>
+                            <div class="item-qty">
+                                <span class="qty-label">Kuantitas</span>
+                                <span class="qty-value">${item.quantity || 0}</span>
+                            </div>
+                            <div class="item-total">
+                                <span class="total-label">Total</span>
+                                <span class="total-value">Rp ${(item.subtotal || 0).toLocaleString('id-ID')}</span>
+                            </div>
+                        </div>
+                    `).join('') : '<p style="padding: 1rem; color: #999;">Tidak ada item</p>'}
+                </div>
+
+                <div class="order-footer">
+                    <div class="order-total">
+                        <span class="total-label">Rp ${(order.total || 0).toLocaleString('id-ID')}</span>
+                        <span class="items-count">sub total ${order.items ? order.items.length : 0} item</span>
+                    </div>
+                    <button class="complete-button">Lihat Detail</button>
+                </div>
             </div>
-        <% } %>
-    </main>
-</div>
-
-<script>
-    // Filter functionality
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const status = this.dataset.status;
-            if (status === 'all') {
-                window.location.href = '/order-history';
-            } else {
-                window.location.href = `/order-history?status=${status}`;
+        `).join('');
+        
+        document.getElementById('ordersList').innerHTML = html;
+    }
+    
+    // Setup pagination
+    function setupPagination() {
+        const totalPages = Math.ceil(filteredOrders.length / PAGE_SIZE);
+        const container = document.getElementById('paginationContainer');
+        
+        if (totalPages <= 1) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        container.style.display = 'flex';
+        
+        const btnsContainer = document.getElementById('paginationBtns');
+        let btnsHtml = '';
+        
+        for (let i = 1; i <= totalPages; i++) {
+            btnsHtml += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+        }
+        
+        btnsContainer.innerHTML = btnsHtml;
+        
+        // Attach event listeners
+        document.querySelectorAll('#paginationBtns .pagination-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentPage = parseInt(btn.dataset.page);
+                renderOrders();
+                setupPagination();
+            });
+        });
+        
+        // Previous/Next buttons
+        document.querySelector('.pagination-btn.prev').onclick = () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderOrders();
+                setupPagination();
             }
-        });
-    });
-
-    // Tab functionality
-    document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tab = this.dataset.tab;
-            const currentStatus = new URLSearchParams(window.location.search).get('status') || 'all';
-            if (currentStatus === 'all') {
-                window.location.href = `/order-history?sort=${tab}`;
-            } else {
-                window.location.href = `/order-history?status=${currentStatus}&sort=${tab}`;
+        };
+        
+        document.querySelector('.pagination-btn.next').onclick = () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderOrders();
+                setupPagination();
             }
+        };
+    }
+    
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentStatus = btn.dataset.status;
+                filterAndPaginate();
+            });
         });
-    });
-
-    // Pagination functionality
-    document.querySelectorAll('.pagination-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (this.classList.contains('disabled')) return;
-            const page = this.dataset.page;
-            window.location.href = `/order-history?page=${page}`;
+        
+        // Tab buttons
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentSort = btn.dataset.tab;
+                filterAndPaginate();
+            });
         });
+        
+        // Load orders
+        loadOrders();
+        
+        // Refresh every 10 seconds
+        setInterval(loadOrders, 10000);
     });
 </script>
+

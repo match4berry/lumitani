@@ -11,6 +11,152 @@
         .loading { text-align: center; padding: 2rem; color: #999; }
         .error-message { color: #dc2626; padding: 1rem; background: #fee2e2; border-radius: 4px; margin: 1rem 0; }
         .product { display: flex; gap: 1rem; margin: 1rem 0; padding: 1rem; border-bottom: 1px solid #eee; }
+        
+        /* Address Cards Styling */
+        .addresses-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .address-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .address-card:hover {
+            border-color: #10b981;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+        }
+        
+        .address-card.selected {
+            border-color: #10b981;
+            background-color: #f0fdf4;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+        
+        .address-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background-color: #10b981;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .address-label {
+            display: inline-block;
+            background-color: #dbeafe;
+            color: #0369a1;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .address-label.primary {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+        
+        .address-card h4 {
+            margin: 0.5rem 0 0.25rem 0;
+            font-size: 1rem;
+        }
+        
+        .address-card p {
+            margin: 0.25rem 0;
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        .address-card .phone {
+            color: #0369a1;
+            font-weight: 500;
+        }
+        
+        .address-divider {
+            border-top: 1px solid #e5e7eb;
+            margin: 1.5rem 0;
+            padding-top: 1.5rem;
+        }
+        
+        .address-divider h3 {
+            margin-top: 0;
+        }
+        
+        /* Payment Methods Styling */
+        .bank-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .bank-item {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .bank-item input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .bank-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background-color: #ffffff;
+        }
+        
+        .bank-item input[type="radio"]:checked + .bank-content {
+            border-color: #10b981;
+            background-color: #f0fdf4;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+        
+        .bank-content:hover {
+            border-color: #10b981;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+        }
+        
+        .bank-content img {
+            max-width: 60px;
+            max-height: 40px;
+            object-fit: contain;
+        }
+        
+        .bank-content span {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .bank-item input[type="radio"]:checked + .bank-content span {
+            color: #10b981;
+        }
     </style>
 </head>
 
@@ -45,32 +191,45 @@
         <div>
             <form id="checkoutForm" action="/order" method="POST">
 
+                <!-- SAVED ADDRESSES SECTION -->
                 <div class="card">
-                    <h3>Alamat Pengiriman</h3>
+                    <h3>Pilih Alamat Pengiriman Tersimpan</h3>
+                    <div id="addressesList" class="addresses-container">
+                        <div class="loading">
+                            <p>Memuat alamat tersimpan...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="address-divider"></div>
+
+                <!-- OR NEW ADDRESS FORM -->
+                <div class="card">
+                    <h3>atau Masukkan Alamat Baru</h3>
 
                     <div class="form-group">
                         <label>Nama Penerima</label>
-                        <input type="text" name="name" placeholder="Masukkan nama penerima" required>
+                        <input type="text" id="addressName" name="name" placeholder="Masukkan nama penerima">
                     </div>
 
                     <div class="form-group">
                         <label>Nomor Telepon</label>
-                        <input type="text" name="phone" placeholder="Masukkan nomor telepon">
+                        <input type="text" id="addressPhone" name="phone" placeholder="Masukkan nomor telepon">
                     </div>
 
                     <div class="form-group">
                         <label>Alamat Lengkap</label>
-                        <textarea name="address" placeholder="Masukkan alamat lengkap" required></textarea>
+                        <textarea id="addressAddress" name="address" placeholder="Masukkan alamat lengkap"></textarea>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label>Kota</label>
-                            <input type="text" name="city" placeholder="Masukkan kota">
+                            <input type="text" id="addressCity" name="city" placeholder="Masukkan kota">
                         </div>
                         <div class="form-group">
                             <label>Kode Pos</label>
-                            <input type="text" name="postal" placeholder="Masukkan kode pos">
+                            <input type="text" id="addressPostal" name="postal" placeholder="Masukkan kode pos">
                         </div>
                     </div>
                 </div>
@@ -78,9 +237,70 @@
                 <div class="card payment">
                     <h3>Metode Pembayaran</h3>
 
-                    <label><input type="radio" name="payment" value="bank" required> Transfer Bank</label>
-                    <label><input type="radio" name="payment" value="ewallet"> E-Wallet</label>
-                    <label><input type="radio" name="payment" value="cod"> COD</label>
+                    <!-- BANK -->
+                    <p><b>Transfer Bank</b></p>
+
+                    <div class="bank-list">
+                        <label class="bank-item">
+                            <input type="radio" name="payment" value="bca" required>
+                            <div class="bank-content">
+                                <img src="/bca.png" alt="BCA">
+                                <span>BCA</span>
+                            </div>
+                        </label>
+
+                        <label class="bank-item">
+                            <input type="radio" name="payment" value="mandiri">
+                            <div class="bank-content">
+                                <img src="/mandiri.png" alt="Mandiri">
+                                <span>Mandiri</span>
+                            </div>
+                        </label>
+
+                        <label class="bank-item">
+                            <input type="radio" name="payment" value="bni">
+                            <div class="bank-content">
+                                <img src="/bni.png" alt="BNI">
+                                <span>BNI</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- E-WALLET -->
+                    <p style="margin-top: 1.5rem;"><b>E-Wallet</b></p>
+
+                    <div class="bank-list">
+                        <label class="bank-item">
+                            <input type="radio" name="payment" value="dana">
+                            <div class="bank-content">
+                                <img src="/dana.png" alt="DANA">
+                                <span>DANA</span>
+                            </div>
+                        </label>
+
+                        <label class="bank-item">
+                            <input type="radio" name="payment" value="ovo">
+                            <div class="bank-content">
+                                <img src="/ovo.png" alt="OVO">
+                                <span>OVO</span>
+                            </div>
+                        </label>
+
+                        <label class="bank-item">
+                            <input type="radio" name="payment" value="gopay">
+                            <div class="bank-content">
+                                <img src="/gopay.png" alt="GoPay">
+                                <span>GoPay</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- COD -->
+                    <p style="margin-top: 1.5rem;"><b>Lainnya</b></p>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                        <input type="radio" name="payment" value="cod">
+                        <span>Bayar di Tempat (COD)</span>
+                    </label>
                 </div>
 
                 <!-- Hidden fields to pass items and total (populated by JavaScript) -->
@@ -98,6 +318,134 @@
 
 <script>
     let refreshInterval = null;
+    let authToken = null;
+    const API_BASE_URL = 'http://localhost:5001/api';
+    let savedAddresses = [];
+    let selectedAddressId = null;
+    
+    // Load user token from session
+    async function loadAuthToken() {
+        try {
+            console.log('[CHECKOUT] Fetching auth token from session...');
+            const response = await fetch('/api/users/me');
+            if (!response.ok) {
+                console.log('[CHECKOUT] Not authenticated, addresses not available');
+                return false;
+            }
+            const data = await response.json();
+            authToken = data.token;
+            console.log('[CHECKOUT] Auth token obtained');
+            return true;
+        } catch (error) {
+            console.error('[CHECKOUT] Error getting auth token:', error);
+            return false;
+        }
+    }
+    
+    // Load saved addresses from backend API
+    async function loadSavedAddresses() {
+        try {
+            if (!authToken) {
+                console.log('[CHECKOUT] No auth token, skipping address load');
+                document.getElementById('addressesList').innerHTML = '<p style="color: #999;">Login untuk melihat alamat tersimpan</p>';
+                return;
+            }
+            
+            console.log('[CHECKOUT] Loading addresses from backend API...');
+            const response = await fetch(`${API_BASE_URL}/addresses`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            
+            if (!response.ok) {
+                console.log('[CHECKOUT] Failed to load addresses');
+                document.getElementById('addressesList').innerHTML = '<p style="color: #999;">Tidak ada alamat tersimpan</p>';
+                return;
+            }
+            
+            const data = await response.json();
+            savedAddresses = data.addresses || [];
+            console.log('[CHECKOUT] Addresses loaded:', savedAddresses.length, 'found');
+            
+            if (savedAddresses.length === 0) {
+                document.getElementById('addressesList').innerHTML = '<p style="color: #999;">Tidak ada alamat tersimpan. Tambahkan alamat di halaman Alamat Pengiriman</p>';
+                return;
+            }
+            
+            renderAddressCards();
+            
+        } catch (error) {
+            console.error('[CHECKOUT] Error loading addresses:', error);
+            document.getElementById('addressesList').innerHTML = '<p style="color: #dc2626;">Gagal memuat alamat tersimpan</p>';
+        }
+    }
+    
+    // Render address cards
+    function renderAddressCards() {
+        let html = '';
+        
+        savedAddresses.forEach(address => {
+            const isSelected = selectedAddressId === address.id;
+            const isPrimary = address.is_primary;
+            const labelTag = isPrimary ? '<span class="address-label primary">Utama</span>' : '<span class="address-label">Tersimpan</span>';
+            
+            // If no address selected yet and this is primary, select it
+            if (!selectedAddressId && isPrimary) {
+                selectedAddressId = address.id;
+                populateAddressForm(address);
+            }
+            
+            html += `
+                <div class="address-card ${isSelected ? 'selected' : ''}" onclick="selectAddress(${address.id})">
+                    ${labelTag}
+                    <h4>${address.label || 'Alamat'}</h4>
+                    <p><strong>${address.name}</strong></p>
+                    <p class="phone">📱 ${address.phone}</p>
+                    <p>📍 ${address.address}</p>
+                    <p>${address.city}${address.postal_code ? ', ' + address.postal_code : ''}</p>
+                </div>
+            `;
+        });
+        
+        document.getElementById('addressesList').innerHTML = html;
+    }
+    
+    // Select address and populate form
+    function selectAddress(addressId) {
+        selectedAddressId = addressId;
+        
+        // Update card UI
+        document.querySelectorAll('.address-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        event.currentTarget.classList.add('selected');
+        
+        // Find and populate form
+        const address = savedAddresses.find(a => a.id === addressId);
+        if (address) {
+            populateAddressForm(address);
+            console.log('[CHECKOUT] Address selected:', address.label);
+        }
+    }
+    
+    // Populate form fields with address data
+    function populateAddressForm(address) {
+        document.getElementById('addressName').value = address.name || '';
+        document.getElementById('addressPhone').value = address.phone || '';
+        document.getElementById('addressAddress').value = address.address || '';
+        document.getElementById('addressCity').value = address.city || '';
+        document.getElementById('addressPostal').value = address.postal_code || '';
+        console.log('[CHECKOUT] Form populated with address:', address.label);
+    }
+    
+    // Clear address selection
+    function clearAddressSelection() {
+        selectedAddressId = null;
+        document.querySelectorAll('.address-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+    }
     
     // Fetch cart from API and populate checkout
     async function loadCheckoutData() {
@@ -197,6 +545,7 @@
             const itemTotal = (item.price || 0) * (item.quantity || 1);
             total += itemTotal;
             return {
+                product_id: item.product_id || null, // Include product_id if available
                 name: item.name,
                 price: item.price,
                 quantity: item.quantity
@@ -209,19 +558,73 @@
         console.log('[CHECKOUT] Updated hidden fields with', itemsForOrder.length, 'items, total:', total);
     }
     
+    // Validate form before submit
+    function validateCheckoutForm() {
+        const name = document.getElementById('addressName').value.trim();
+        const phone = document.getElementById('addressPhone').value.trim();
+        const address = document.getElementById('addressAddress').value.trim();
+        const payment = document.querySelector('input[name="payment"]:checked');
+
+        if (!name) {
+            alert('❌ Mohon isi Nama Penerima');
+            document.getElementById('addressName').focus();
+            return false;
+        }
+
+        if (!phone) {
+            alert('❌ Mohon isi Nomor Telepon');
+            document.getElementById('addressPhone').focus();
+            return false;
+        }
+
+        if (!address) {
+            alert('❌ Mohon isi Alamat Lengkap');
+            document.getElementById('addressAddress').focus();
+            return false;
+        }
+
+        if (!payment) {
+            alert('❌ Mohon pilih Metode Pembayaran');
+            return false;
+        }
+
+        const items = JSON.parse(document.getElementById('itemsField').value || '[]');
+        if (items.length === 0) {
+            alert('❌ Keranjang Anda kosong. Silakan tambah produk terlebih dahulu');
+            return false;
+        }
+
+        console.log('[CHECKOUT] Form validation passed');
+        return true;
+    }
+    
     // Load checkout data when page loads
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Load auth token and addresses
+        const isAuthenticated = await loadAuthToken();
+        if (isAuthenticated) {
+            await loadSavedAddresses();
+        }
+        
+        // Load cart data
         loadCheckoutData();
         
         // Refresh every 5 seconds to catch updates
         refreshInterval = setInterval(loadCheckoutData, 5000);
         
-        // Stop auto-refresh when form is about to submit
+        // Handle form submission with validation
         document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-            console.log('[CHECKOUT] Form submitted, stopping auto-refresh');
+            console.log('[CHECKOUT] Form submit handler triggered');
             clearInterval(refreshInterval);
-            // Ensure final data sync before submission
-            loadCheckoutData();
+            
+            // Validate before submit
+            if (!validateCheckoutForm()) {
+                e.preventDefault();
+                return false;
+            }
+            
+            console.log('[CHECKOUT] All validations passed, proceeding to confirmation page');
+            // Form will naturally submit to POST /order
         });
     });
 </script>

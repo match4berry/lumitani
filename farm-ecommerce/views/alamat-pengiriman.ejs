@@ -292,17 +292,22 @@ let authToken = null;
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
-    // Get auth token from localStorage
-    const auth = JSON.parse(localStorage.getItem('lumitani_auth') || '{}');
-    authToken = auth.token;
-    
-    if (!authToken) {
-        alert('Silakan login terlebih dahulu');
-        window.location.href = '/login';
-        return;
-    }
-    
-    loadAddresses();
+    // Get auth token from server session
+    fetch('/api/users/me')
+        .then(response => {
+            if (!response.ok) throw new Error('Not authenticated');
+            return response.json();
+        })
+        .then(data => {
+            authToken = data.token;
+            console.log('[ADDRESS] User authenticated, token obtained');
+            loadAddresses();
+        })
+        .catch(error => {
+            console.error('[ADDRESS] Authentication error:', error);
+            alert('Silakan login terlebih dahulu');
+            window.location.href = '/login';
+        });
 });
 
 // Load addresses from API

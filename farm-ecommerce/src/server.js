@@ -220,6 +220,24 @@ app.get('/logout', (req, res) => {
   });
 });
 
+// API: Get current user token (for authenticated API calls)
+app.get('/api/users/me', (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  console.log('[AUTH] User authenticated, returning token');
+  res.json({
+    success: true,
+    token: req.session.userToken || null,
+    user: {
+      id: req.session.userId,
+      email: req.session.userEmail,
+      name: req.session.userName
+    }
+  });
+});
+
 // API: Get configuration (for frontend to access API URLs and user info)
 app.get('/api/config', (req, res) => {
   res.json({
@@ -228,6 +246,57 @@ app.get('/api/config', (req, res) => {
     userName: req.session.userName || null,
     userEmail: req.session.userEmail || null
   });
+});
+
+// API: Get local orders from orders.json (for order-history page)
+app.get('/order-history-json', (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ orders: [] });
+  }
+
+  try {
+    const fs = require('fs');
+    const ordersPath = path.join(__dirname, '../data/orders.json');
+    const ordersData = fs.readFileSync(ordersPath, 'utf8');
+    const allOrders = JSON.parse(ordersData);
+    
+    // Transform flat order format to items format
+    const transformedOrders = [];
+    allOrders.forEach(order => {
+      // Group items by order id (collapse duplicate order ids into single order with items array)
+      let existingOrder = transformedOrders.find(o => o.id === order.id);
+      
+      if (!existingOrder) {
+        existingOrder = {
+          id: order.id,
+          name: order.name,
+          phone: order.phone || '',
+          address: order.address,
+          status: order.status,
+          items: [],
+          total: 0,
+          createdAt: order.createdAt
+        };
+        transformedOrders.push(existingOrder);
+      }
+      
+      // Add item to order
+      existingOrder.items.push({
+        name: order.product || order.name,
+        quantity: order.qty || 1,
+        price: order.price || 0
+      });
+      
+      // Update total
+      existingOrder.total = parseInt(order.total || 0);
+    });
+    
+    console.log('[ORDER-HISTORY] Serving', transformedOrders.length, 'local orders');
+    res.json({ orders: transformedOrders });
+  } catch (error) {
+    console.error('[ORDER-HISTORY] Error reading orders:', error);
+    res.json({ orders: [] });
+  }
 });
 
 // Catalog with category filter
