@@ -407,14 +407,6 @@
                 ← Kembali Ubah
             </button>
             <form id="confirmForm" method="POST" action="/order/confirm" style="flex: 1;">
-                <input type="hidden" name="name" value="<%= orderData.name %>">
-                <input type="hidden" name="phone" value="<%= orderData.phone %>">
-                <input type="hidden" name="address" value="<%= orderData.address %>">
-                <input type="hidden" name="city" value="<%= orderData.city %>">
-                <input type="hidden" name="postal" value="<%= orderData.postal %>">
-                <input type="hidden" name="payment" value="<%= orderData.payment %>">
-                <input type="hidden" name="items" value="<%= JSON.stringify(orderData.items).replace(/"/g, '&quot;') %>">
-                <input type="hidden" name="total" value="<%= orderData.total %>">
                 <button type="submit" class="btn-confirm" id="confirmBtn">
                     ✓ Konfirmasi Pesanan
                 </button>
@@ -424,6 +416,23 @@
     </div>
 
 </div>
+
+<!-- Store order data safely in JavaScript object -->
+<script>
+    // Store order data on window object (avoid HTML escaping issues)
+    window.orderFormData = {
+        name: '<%= orderData.name %>',
+        phone: '<%= orderData.phone %>',
+        address: '<%= orderData.address %>',
+        city: '<%= orderData.city %>',
+        postal: '<%= orderData.postal %>',
+        payment: '<%= orderData.payment %>',
+        items: <%- JSON.stringify(orderData.items) %>,
+        total: <%= orderData.total %>
+    };
+    
+    console.log('[ORDER CONFIRMATION] Page loaded, order data:', window.orderFormData);
+</script>
 
 <script>
     const confirmForm = document.getElementById('confirmForm');
@@ -437,15 +446,8 @@
         confirmBtn.textContent = 'Memproses...';
         
         try {
-            // Get form values
-            const name = document.querySelector('input[name="name"]').value;
-            const phone = document.querySelector('input[name="phone"]').value;
-            const address = document.querySelector('input[name="address"]').value;
-            const city = document.querySelector('input[name="city"]').value;
-            const postal = document.querySelector('input[name="postal"]').value;
-            const payment = document.querySelector('input[name="payment"]').value;
-            const items = JSON.parse(document.querySelector('input[name="items"]').value);
-            const total = parseInt(document.querySelector('input[name="total"]').value);
+            // Use data from window object instead of parsing HTML attributes
+            const { name, phone, address, city, postal, payment, items, total } = window.orderFormData;
             
             console.log('[ORDER CONFIRMATION] Submitting order with data:', {
                 name, 
@@ -490,22 +492,6 @@
             alert('Gagal mengkonfirmasi pesanan: ' + error.message);
         }
     });
-
-    // Log order data for verification
-    window.orderDataDebug = {
-        name: '<%= orderData.name %>',
-        phone: '<%= orderData.phone %>',
-        address: '<%= orderData.address %>',
-        city: '<%= orderData.city %>',
-        postal: '<%= orderData.postal %>',
-        payment: '<%= orderData.payment %>',
-        total: <%= orderData.total %>
-    };
-    
-    const itemsData = <%- JSON.stringify(orderData.items) %>;
-    window.orderDataDebug.items = itemsData;
-    
-    console.log('[ORDER CONFIRMATION] Page loaded, order data:', window.orderDataDebug);
 </script>
 
 </body>

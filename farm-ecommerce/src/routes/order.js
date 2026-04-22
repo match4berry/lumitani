@@ -193,11 +193,14 @@ router.post('/order/confirm', async (req, res) => {
         // Don't throw - user sees redirect anyway since local order was saved
     }
 
-    // Always redirect to order history after saving locally
+    // Return JSON response (frontend will handle redirect)
     console.log('[ORDER/CONFIRM] ========== ORDER CONFIRMATION COMPLETE ==========');
     console.log('[ORDER/CONFIRM] Order saved locally and sent to backend');
-    console.log('[ORDER/CONFIRM] Redirecting to /order-history?new=true');
-    return res.redirect('/order-history?new=true');
+    return res.status(200).json({ 
+        success: true, 
+        message: 'Order created successfully',
+        redirectUrl: '/order-history?new=true'
+    });
 });
 
 module.exports = router;
