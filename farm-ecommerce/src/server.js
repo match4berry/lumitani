@@ -118,10 +118,10 @@ app.post('/register', async (req, res) => {
   }
   
   try {
-    console.log('[REGISTER] Calling external API at http://localhost:5001/api/users/register');
+    console.log('[REGISTER] Calling external API at http://localhost:8000/api/users/register');
     
     // Call external API
-    const apiResponse = await fetch('http://localhost:5001/api/users/register', {
+    const apiResponse = await fetch('http://localhost:8000/api/users/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password })
@@ -173,10 +173,10 @@ app.post('/login', async (req, res) => {
   }
   
   try {
-    console.log('[LOGIN] Calling external API at http://localhost:5001/api/users/login');
+    console.log('[LOGIN] Calling external API at http://localhost:8000/api/users/login');
     
     // Call external API
-    const apiResponse = await fetch('http://localhost:5001/api/users/login', {
+    const apiResponse = await fetch('http://localhost:8000/api/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -443,7 +443,7 @@ app.get('/api/cart', async (req, res) => {
     console.log('[CART GET] Fetching cart for user:', req.session.userId);
     
     // Call external API
-    const apiResponse = await fetch(`http://localhost:5001/api/cart/user/${req.session.userId}`, {
+    const apiResponse = await fetch(`http://localhost:8000/api/cart/user/${req.session.userId}`, {
       method: 'GET',
       headers: { 
         'Content-Type': 'application/json',
@@ -480,7 +480,7 @@ app.post('/api/cart', async (req, res) => {
     console.log('[CART ADD] Adding to cart for user:', req.session.userId);
     
     // Call external API
-    const apiResponse = await fetch('http://localhost:5001/api/cart', {
+    const apiResponse = await fetch('http://localhost:8000/api/cart', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -522,7 +522,7 @@ app.put('/api/cart/:id', async (req, res) => {
     console.log('[CART UPDATE] Updating quantity for user:', req.session.userId);
     
     // Call external API
-    const apiResponse = await fetch(`http://localhost:5001/api/cart/${req.params.id}`, {
+    const apiResponse = await fetch(`http://localhost:8000/api/cart/${req.params.id}`, {
       method: 'PUT',
       headers: { 
         'Content-Type': 'application/json',
@@ -554,7 +554,7 @@ app.delete('/api/cart/:id', async (req, res) => {
     console.log('[CART DELETE] Deleting cart item for user:', req.session.userId);
     
     // Call external API
-    const apiResponse = await fetch(`http://localhost:5001/api/cart/${req.params.id}`, {
+    const apiResponse = await fetch(`http://localhost:8000/api/cart/${req.params.id}`, {
       method: 'DELETE',
       headers: { 
         'Content-Type': 'application/json',

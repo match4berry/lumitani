@@ -139,7 +139,7 @@ router.post('/order/confirm', async (req, res) => {
 
     // Try to send to backend API
     try {
-        console.log('[ORDER] Sending order to backend API at http://localhost:5001/api/orders');
+        console.log('[ORDER] Sending order to backend API at http://localhost:8000/api/orders');
         
         // Transform items to backend format (items from checkout might not have product_id)
         const backendItems = orderItems.map(item => ({
@@ -160,7 +160,7 @@ router.post('/order/confirm', async (req, res) => {
 
         console.log('[ORDER] Backend order data:', JSON.stringify(backendOrderData, null, 2));
 
-        const apiResponse = await fetch('http://localhost:5001/api/orders', {
+        const apiResponse = await fetch('http://localhost:8000/api/orders', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
