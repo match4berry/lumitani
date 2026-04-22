@@ -426,11 +426,68 @@
 </div>
 
 <script>
-    document.getElementById('confirmBtn').addEventListener('click', function(e) {
-        console.log('[ORDER CONFIRMATION] Submitting confirmation...');
-        this.disabled = true;
-        this.textContent = 'Memproses...';
-        // Form will submit automatically
+    const confirmForm = document.getElementById('confirmForm');
+    
+    confirmForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        console.log('[ORDER CONFIRMATION] Form submit triggered');
+        
+        const confirmBtn = document.getElementById('confirmBtn');
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Memproses...';
+        
+        try {
+            // Prepare form data
+            const formData = new FormData(confirmForm);
+            console.log('[ORDER CONFIRMATION] Form data prepared:', {
+                name: formData.get('name'),
+                phone: formData.get('phone'),
+                items: formData.get('items').substring(0, 100) + '...'
+            });
+            
+            // Submit form using fetch for better error handling
+            const response = await fetch('/order/confirm', {
+                method: 'POST',
+                body: formData
+            });
+            
+            console.log('[ORDER CONFIRMATION] Response status:', response.status);
+            
+            if (!response.ok) {
+                console.error('[ORDER CONFIRMATION] Error response:', response.status);
+                const text = await response.text();
+                console.error('[ORDER CONFIRMATION] Response text:', text);
+                throw new Error(`Server error: ${response.status}`);
+            }
+            
+            // Check if response is a redirect or HTML
+            const contentType = response.headers.get('content-type');
+            console.log('[ORDER CONFIRMATION] Response content-type:', contentType);
+            
+            if (response.redirected) {
+                console.log('[ORDER CONFIRMATION] Redirect detected, going to:', response.url);
+                window.location.href = response.url;
+                return;
+            }
+            
+            const text = await response.text();
+            console.log('[ORDER CONFIRMATION] Response received, length:', text.length);
+            
+            // If response is HTML (redirect page), navigate
+            if (text.includes('order-history')) {
+                console.log('[ORDER CONFIRMATION] Detected order-history redirect, navigating...');
+                window.location.href = '/order-history?new=true';
+            } else {
+                // Fallback redirect
+                console.log('[ORDER CONFIRMATION] Manual redirect to order-history');
+                window.location.href = '/order-history?new=true';
+            }
+        } catch (error) {
+            console.error('[ORDER CONFIRMATION] Error during submission:', error);
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = '❌ Error - Coba lagi';
+            alert('Gagal mengkonfirmasi pesanan: ' + error.message);
+        }
     });
 
     // Log order data for verification
@@ -447,7 +504,7 @@
     const itemsData = <%- JSON.stringify(orderData.items) %>;
     window.orderDataDebug.items = itemsData;
     
-    console.log('[ORDER CONFIRMATION] Order data:', window.orderDataDebug);
+    console.log('[ORDER CONFIRMATION] Page loaded, order data:', window.orderDataDebug);
 </script>
 
 </body>

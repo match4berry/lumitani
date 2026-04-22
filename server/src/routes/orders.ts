@@ -17,8 +17,25 @@ router.get("/", async (req: Request, res: Response) => {
     params.push(user_id);
   }
   query += " ORDER BY o.order_date DESC";
+  
   const { rows } = await pool.query(query, params);
-  res.json(rows);
+  
+  // Fetch items for each order
+  const ordersWithItems = await Promise.all(
+    rows.map(async (order) => {
+      const { rows: items } = await pool.query(
+        `SELECT oi.*, p.name AS product_name
+         FROM order_items oi
+         LEFT JOIN products p ON p.id = oi.product_id
+         WHERE oi.order_id = $1
+         ORDER BY oi.id`,
+        [order.id]
+      );
+      return { ...order, items };
+    })
+  );
+  
+  res.json(ordersWithItems);
 });
 
 // GET order status summary counts
@@ -90,36 +107,49 @@ router.post("/", async (req: Request, res: Response) => {
 
     // --- 3. Look up product prices and calculate totals ---
     let total_price = 0;
-    const orderItems: { product_id: number; quantity: number; unit_price: number; subtotal: number }[] = [];
+    const orderItems: { product_id: number | null; quantity: number; unit_price: number; subtotal: number }[] = [];
 
     for (const item of items) {
-      if (!item.product_id || !item.quantity || item.quantity <= 0) {
-        throw new Error("Each item needs a valid product_id and quantity > 0");
+      if (!item.quantity || item.quantity <= 0) {
+        throw new Error("Each item needs quantity > 0");
       }
-      // Look up the product, its stock, and its current active price via grade_id
-      const { rows: productRows } = await client.query(
-        `SELECT p.id, p.name, p.stock, cp.price
-         FROM products p
-         JOIN commodity_prices cp ON cp.grade_id = p.grade_id
-           AND cp.is_active = true
-           AND CURRENT_DATE BETWEEN cp.start_date AND cp.end_date
-         WHERE p.id = $1
-         LIMIT 1`,
-        [item.product_id]
-      );
-      if (productRows.length === 0) {
-        throw new Error(`Product ${item.product_id} not found or has no active price`);
-      }
-      const product = productRows[0];
-      if (product.stock < item.quantity) {
-        throw new Error(
-          `Stok tidak cukup untuk "${product.name}": tersedia ${product.stock}, diminta ${item.quantity}`
+
+      // If product_id is provided, look it up in database
+      if (item.product_id) {
+        // Look up the product, its stock, and its current active price via grade_id
+        const { rows: productRows } = await client.query(
+          `SELECT p.id, p.name, p.stock, cp.price
+           FROM products p
+           JOIN commodity_prices cp ON cp.grade_id = p.grade_id
+             AND cp.is_active = true
+             AND CURRENT_DATE BETWEEN cp.start_date AND cp.end_date
+           WHERE p.id = $1
+           LIMIT 1`,
+          [item.product_id]
         );
+        if (productRows.length === 0) {
+          throw new Error(`Product ${item.product_id} not found or has no active price`);
+        }
+        const product = productRows[0];
+        if (product.stock < item.quantity) {
+          throw new Error(
+            `Stok tidak cukup untuk "${product.name}": tersedia ${product.stock}, diminta ${item.quantity}`
+          );
+        }
+        const unit_price = Number(product.price);
+        const subtotal = unit_price * item.quantity;
+        total_price += subtotal;
+        orderItems.push({ product_id: item.product_id, quantity: item.quantity, unit_price, subtotal });
+      } else {
+        // No product_id - use unit_price provided from frontend
+        if (!item.unit_price || item.unit_price <= 0) {
+          throw new Error("If product_id is not provided, unit_price must be provided");
+        }
+        const unit_price = Number(item.unit_price);
+        const subtotal = unit_price * item.quantity;
+        total_price += subtotal;
+        orderItems.push({ product_id: null, quantity: item.quantity, unit_price, subtotal });
       }
-      const unit_price = Number(product.price);
-      const subtotal = unit_price * item.quantity;
-      total_price += subtotal;
-      orderItems.push({ product_id: item.product_id, quantity: item.quantity, unit_price, subtotal });
     }
 
     // --- 4. Fetch current commission rate & calculate commission upfront ---
@@ -143,12 +173,15 @@ router.post("/", async (req: Request, res: Response) => {
       await client.query(
         `INSERT INTO order_items (order_id, product_id, quantity, unit_price, subtotal)
          VALUES ($1, $2, $3, $4, $5)`,
-        [order.id, oi.product_id, oi.quantity, oi.unit_price, oi.subtotal]
+        [order.id, oi.product_id || null, oi.quantity, oi.unit_price, oi.subtotal]
       );
-      await client.query(
-        `UPDATE products SET stock = stock - $1 WHERE id = $2`,
-        [oi.quantity, oi.product_id]
-      );
+      // Only reduce stock if product_id is provided
+      if (oi.product_id) {
+        await client.query(
+          `UPDATE products SET stock = stock - $1 WHERE id = $2`,
+          [oi.quantity, oi.product_id]
+        );
+      }
     }
 
     await client.query("COMMIT");

@@ -230,6 +230,7 @@ app.get('/api/users/me', (req, res) => {
   res.json({
     success: true,
     token: req.session.userToken || null,
+    user_id: req.session.userId,  // Include user_id at top level for API compatibility
     user: {
       id: req.session.userId,
       email: req.session.userEmail,
@@ -250,49 +251,17 @@ app.get('/api/config', (req, res) => {
 
 // API: Get local orders from orders.json (for order-history page)
 app.get('/order-history-json', (req, res) => {
-  if (!req.session.userId) {
-    return res.status(401).json({ orders: [] });
-  }
-
+  // No auth required - this is called by client-side JS
   try {
     const fs = require('fs');
     const ordersPath = path.join(__dirname, '../data/orders.json');
     const ordersData = fs.readFileSync(ordersPath, 'utf8');
     const allOrders = JSON.parse(ordersData);
     
-    // Transform flat order format to items format
-    const transformedOrders = [];
-    allOrders.forEach(order => {
-      // Group items by order id (collapse duplicate order ids into single order with items array)
-      let existingOrder = transformedOrders.find(o => o.id === order.id);
-      
-      if (!existingOrder) {
-        existingOrder = {
-          id: order.id,
-          name: order.name,
-          phone: order.phone || '',
-          address: order.address,
-          status: order.status,
-          items: [],
-          total: 0,
-          createdAt: order.createdAt
-        };
-        transformedOrders.push(existingOrder);
-      }
-      
-      // Add item to order
-      existingOrder.items.push({
-        name: order.product || order.name,
-        quantity: order.qty || 1,
-        price: order.price || 0
-      });
-      
-      // Update total
-      existingOrder.total = parseInt(order.total || 0);
-    });
+    console.log('[ORDER-HISTORY] Read', allOrders.length, 'orders from JSON file');
     
-    console.log('[ORDER-HISTORY] Serving', transformedOrders.length, 'local orders');
-    res.json({ orders: transformedOrders });
+    // Return orders directly - let client-side code handle transformation
+    res.json({ orders: allOrders });
   } catch (error) {
     console.error('[ORDER-HISTORY] Error reading orders:', error);
     res.json({ orders: [] });

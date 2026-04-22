@@ -141,13 +141,16 @@ router.post('/order/confirm', async (req, res) => {
     try {
         console.log('[ORDER] Sending order to backend API at http://localhost:8000/api/orders');
         
-        // Transform items to backend format (items from checkout might not have product_id)
+        // Transform items to backend format
+        // Allow items without product_id if they don't have it (will be sent as null)
         const backendItems = orderItems.map(item => ({
             product_id: item.product_id || null, // Will be NULL if not from cart
             quantity: item.quantity || 1,
             unit_price: item.price || 0,
             subtotal: (item.price || 0) * (item.quantity || 1)
-        })).filter(item => item.product_id !== null); // Only include items with product_id
+        }));
+        // NOTE: Don't filter - send all items, even if product_id is null
+        // Backend will handle items without product_id
 
         const backendOrderData = {
             customer_name: name,
@@ -175,15 +178,16 @@ router.post('/order/confirm', async (req, res) => {
             // Don't throw - continue with local order
         } else {
             const backendOrder = await apiResponse.json();
-            console.log('[ORDER] Order sent to backend successfully:', backendOrder.id);
+            console.log('[ORDER] Order sent to backend successfully:', backendOrder.id || backendOrder.order_code);
         }
     } catch (err) {
         console.error('[ORDER] Error sending to backend API (non-critical):', err);
-        // Don't throw - user sees success page anyway since local order was saved
+        // Don't throw - user sees redirect anyway since local order was saved
     }
 
-    // Redirect to order history instead of showing success page
-    res.redirect('/order-history?new=true');
+    // Always redirect to order history after saving locally
+    console.log('[ORDER] Redirecting to /order-history?new=true');
+    return res.redirect('/order-history?new=true');
 });
 
 module.exports = router;

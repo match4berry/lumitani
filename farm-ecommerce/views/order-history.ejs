@@ -103,57 +103,56 @@
     let currentStatus = 'all';
     let currentSort = 'newest';
     
-    // Get auth token from session
-    async function loadAuthToken() {
+    // Get auth token and user ID from session
+    async function loadAuthInfo() {
         try {
             const response = await fetch('/api/users/me');
-            if (!response.ok) return false;
+            if (!response.ok) {
+                console.log('[ORDER-HISTORY] Failed to get user info');
+                return null;
+            }
             const data = await response.json();
             authToken = data.token;
-            console.log('[ORDER-HISTORY] Auth token obtained');
-            return true;
+            const userId = data.user?.id;
+            console.log('[ORDER-HISTORY] Auth info obtained - user_id:', userId, 'token:', !!authToken);
+            return { 
+                user_id: userId,
+                token: authToken,
+                user: data.user
+            };
         } catch (error) {
-            console.error('[ORDER-HISTORY] Error getting auth token:', error);
-            return false;
+            console.error('[ORDER-HISTORY] Error getting auth info:', error);
+            return null;
         }
     }
     
-    // Load orders from local file (farm-ecommerce data)
-    async function loadLocalOrders() {
-        try {
-            console.log('[ORDER-HISTORY] Loading local orders');
-            // Read from /data/orders.json via server endpoint
-            const response = await fetch('/order-history-json', {
-                method: 'GET'
-            });
-            if (!response.ok) return [];
-            const data = await response.json();
-            return data.orders || [];
-        } catch (error) {
-            console.error('[ORDER-HISTORY] Error loading local orders:', error);
-            return [];
-        }
-    }
-    
-    // Load orders from backend API
-    async function loadBackendOrders() {
+    // Load orders from backend API only (filtered by user_id)
+    async function loadBackendOrders(userId) {
         try {
             if (!authToken) {
-                console.log('[ORDER-HISTORY] No token, skipping backend orders');
+                console.log('[ORDER-HISTORY] No token, cannot load orders');
                 return [];
             }
-            console.log('[ORDER-HISTORY] Loading orders from backend API');
-            const response = await fetch('http://localhost:8000/api/orders', {
+            
+            // Fetch only authenticated user's orders
+            const apiUrl = userId 
+                ? `http://localhost:8000/api/orders?user_id=${userId}`
+                : `http://localhost:8000/api/orders`;
+            
+            console.log('[ORDER-HISTORY] Loading orders from backend API:', apiUrl);
+            const response = await fetch(apiUrl, {
                 headers: {
                     'Authorization': `Bearer ${authToken}`
                 }
             });
+            
             if (!response.ok) {
                 console.warn('[ORDER-HISTORY] Backend API returned status', response.status);
                 return [];
             }
             const data = await response.json();
-            return data || [];
+            console.log('[ORDER-HISTORY] Loaded', Array.isArray(data) ? data.length : 0, 'orders from backend');
+            return Array.isArray(data) ? data : [];
         } catch (error) {
             console.error('[ORDER-HISTORY] Error loading backend orders:', error);
             return [];
@@ -163,116 +162,133 @@
     // Transform orders to unified format
     function transformOrders(orders) {
         return orders.map(order => {
-            // Handle both farm-ecommerce format and backend format
+            // Backend format from PostgreSQL 
             if (order.order_code) {
-                // Backend format
                 return {
                     id: order.order_code,
+                    databaseId: order.id,
                     name: order.customer_name,
                     phone: order.no_hp,
                     address: order.pengiriman,
-                    total: parseInt(order.total_price),
+                    city: order.city || '',
+                    postal: order.postal || '',
+                    total: parseInt(order.total_price || 0),
                     status: order.status === 'menunggu_proses' ? 'Menunggu Diproses' : 
                            order.status === 'diproses' ? 'Diproses' :
                            order.status === 'dikirim' ? 'Pengiriman' :
                            order.status === 'selesai' ? 'Selesai' : order.status,
                     items: (order.items || []).map(item => ({
-                        name: item.product_name || item.name,
-                        quantity: item.quantity,
-                        price: parseInt(item.unit_price || item.price) / 1000,
-                        subtotal: parseInt(item.subtotal || (item.unit_price * item.quantity)) / 1000
+                        id: item.id,
+                        product_id: item.product_id,
+                        name: item.product_name || item.name || 'Unknown Product',
+                        quantity: parseInt(item.quantity || 0),
+                        price: parseInt(item.unit_price || 0),
+                        subtotal: parseInt(item.subtotal || 0)
                     })),
                     createdAt: order.order_date || order.created_at || new Date(),
+                    userId: order.user_id,
                     source: 'backend'
                 };
             } else {
-                // Farm-ecommerce local format
-                // Handle both old and new structure
-                let items = [];
-                let total = 0;
-                
-                if (order.items && Array.isArray(order.items)) {
-                    // New format with items array
-                    items = order.items.map(item => ({
-                        name: item.name,
-                        quantity: item.quantity || 1,
-                        price: (item.price || 0) * 1000,  // Convert from "10" to "10000"
-                        subtotal: (item.price || 0) * (item.quantity || 1) * 1000
-                    }));
-                    total = (order.total || 0) * 1000;  // Convert from "75" to "75000"
-                } else {
-                    // Old format with single product
-                    if (order.product) {
-                        items = [{
-                            name: order.product,
-                            quantity: order.qty || 1,
-                            price: order.price || 0,
-                            subtotal: (order.price || 0) * (order.qty || 1)
-                        }];
-                        total = order.total || 0;
-                    }
-                }
-                
-                return {
-                    id: order.id,
-                    name: order.name,
-                    phone: order.phone || '',
-                    address: order.address,
-                    total: total,
-                    status: order.status || 'Menunggu Diproses',
-                    items: items,
-                    createdAt: new Date(order.createdAt),
-                    source: 'local'
-                };
+                // Fallback: if someone passes non-backend format, skip it
+                console.warn('[ORDER-HISTORY] Unknown order format:', order);
+                return null;
             }
-        });
+        }).filter(order => order !== null);
     }
     
-    // Load and merge all orders
+    // Load and parse orders
     async function loadOrders() {
         try {
-            await loadAuthToken();
+            console.log('[ORDER-HISTORY] Starting to load orders...');
             
-            const [localOrders, backendOrders] = await Promise.all([
-                loadLocalOrders(),
-                loadBackendOrders()
-            ]);
-            
-            console.log('[ORDER-HISTORY] Loaded', localOrders.length, 'local orders and', backendOrders.length, 'backend orders');
-            
-            // Merge and deduplicate orders
-            const merged = [...localOrders, ...backendOrders];
-            const uniqueOrders = [];
-            const seen = new Set();
-            
-            merged.forEach(order => {
-                const key = order.id || order.order_code;
-                if (!seen.has(key)) {
-                    seen.add(key);
-                    uniqueOrders.push(order);
+            // Get user info including user_id
+            const userInfo = await loadAuthInfo();
+            if (!userInfo) {
+                console.warn('[ORDER-HISTORY] Could not get user info, redirecting to login');
+                // Don't redirect - show message instead
+                const ordersList = document.getElementById('ordersList');
+                if (ordersList) {
+                    ordersList.innerHTML = `
+                        <div class="empty-state" style="text-align: center; padding: 2rem;">
+                            <p style="color: #dc2626; margin-bottom: 1rem;">Silakan login untuk melihat pesanan Anda</p>
+                            <a href="/login" class="cta-button" style="display: inline-block; background: #10b981; color: white; padding: 0.5rem 1.5rem; border-radius: 6px; text-decoration: none;">Login</a>
+                        </div>
+                    `;
                 }
-            });
+                return;
+            }
             
-            allOrders = transformOrders(uniqueOrders);
-            console.log('[ORDER-HISTORY] Total unique orders:', allOrders.length);
+            const userId = userInfo.user_id;
+            console.log('[ORDER-HISTORY] User ID:', userId, 'Token available:', !!authToken);
+            
+            if (!userId) {
+                console.warn('[ORDER-HISTORY] No user_id in session');
+                const ordersList = document.getElementById('ordersList');
+                if (ordersList) {
+                    ordersList.innerHTML = '<div class="empty-state"><p style="color: #dc2626;">Session expired, silakan login kembali</p></div>';
+                }
+                return;
+            }
+            
+            // Load ONLY backend orders for this user
+            console.log('[ORDER-HISTORY] Fetching orders for user_id:', userId);
+            const backendOrders = await loadBackendOrders(userId);
+            console.log('[ORDER-HISTORY] Backend returned', backendOrders.length, 'orders');
+            
+            if (backendOrders.length === 0) {
+                console.log('[ORDER-HISTORY] No orders found, checking if API is accessible...');
+                // Try to fetch all orders to see if API is working
+                try {
+                    const testResponse = await fetch('http://localhost:8000/api/orders', {
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+                    const allOrders = await testResponse.json();
+                    console.log('[ORDER-HISTORY] Total orders in DB:', allOrders.length);
+                    console.log('[ORDER-HISTORY] Sample order user_id values:', allOrders.slice(0, 3).map(o => o.user_id));
+                } catch (e) {
+                    console.error('[ORDER-HISTORY] Could not test API:', e);
+                }
+            }
+            
+            // Transform orders to unified format
+            allOrders = transformOrders(backendOrders);
+            console.log('[ORDER-HISTORY] Transformed to', allOrders.length, 'orders');
+            
+            if (allOrders.length > 0) {
+                console.log('[ORDER-HISTORY] Sample transformed order:', allOrders[0]);
+            }
             
             // Show success banner if new order was just created
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('new') === 'true') {
+                console.log('[ORDER-HISTORY] New order flag detected, showing success banner');
                 const banner = document.getElementById('successBanner');
-                banner.classList.add('show');
-                // Remove the ?new=true parameter
-                window.history.replaceState({}, document.title, '/order-history');
+                if (banner) {
+                    banner.classList.add('show');
+                    // Remove the ?new=true parameter
+                    window.history.replaceState({}, document.title, '/order-history');
+                    setTimeout(() => {
+                        banner.classList.remove('show');
+                    }, 5000);
+                }
             }
             
             filterAndPaginate();
         } catch (error) {
             console.error('[ORDER-HISTORY] Error loading orders:', error);
-            document.getElementById('ordersList').innerHTML = `
-                <div class="empty-state">
-                    <p style="color: #dc2626;">Gagal memuat pesanan. <a href="javascript:location.reload()">Coba lagi</a></p>
-                </div>
-            `;
+            const ordersList = document.getElementById('ordersList');
+            if (ordersList) {
+                ordersList.innerHTML = `
+                    <div class="empty-state">
+                        <p style="color: #dc2626; margin-bottom: 1rem;">Gagal memuat pesanan</p>
+                        <p style="font-size: 0.9rem; color: #999;">Error: ${error.message}</p>
+                        <a href="javascript:location.reload()" style="display: inline-block; background: #10b981; color: white; padding: 0.5rem 1.5rem; border-radius: 6px; text-decoration: none; margin-top: 1rem;">Coba Lagi</a>
+                    </div>
+                `;
+            }
         }
     }
     
@@ -333,7 +349,9 @@
                 </div>
 
                 <div class="order-items">
-                    ${order.items && order.items.length > 0 ? order.items.map(item => `
+                    ${order.items && order.items.length > 0 ? order.items.map(item => {
+                        const itemSubtotal = item.subtotal || (item.price * item.quantity);
+                        return `
                         <div class="order-item">
                             <div class="item-image">
                                 <img src="https://via.placeholder.com/80?text=${encodeURIComponent(item.name.substring(0, 10))}" alt="${item.name}">
@@ -348,10 +366,10 @@
                             </div>
                             <div class="item-total">
                                 <span class="total-label">Total</span>
-                                <span class="total-value">Rp ${(item.subtotal || 0).toLocaleString('id-ID')}</span>
+                                <span class="total-value">Rp ${itemSubtotal.toLocaleString('id-ID')}</span>
                             </div>
                         </div>
-                    `).join('') : '<p style="padding: 1rem; color: #999;">Tidak ada item</p>'}
+                    `}).join('') : '<p style="padding: 1rem; color: #999;">Tidak ada item</p>'}
                 </div>
 
                 <div class="order-footer">
